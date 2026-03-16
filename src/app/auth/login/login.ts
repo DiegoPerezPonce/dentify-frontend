@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +22,7 @@ import { Router, RouterLink } from '@angular/router';
     MatSnackBarModule,
     RouterLink
   ],
+  providers: [AuthService],
   template: `
     <div class="login-container">
       <div class="glass-card">
@@ -64,6 +66,15 @@ import { Router, RouterLink } from '@angular/router';
             </button>
           </div>
         </form>
+
+        <div class="divider">
+          <span>OR</span>
+        </div>
+
+        <button mat-stroked-button class="google-btn" (click)="loginWithGoogle()">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="google-icon">
+          Sign in with Google
+        </button>
 
         <div class="footer">
           <span>Don't have an account?</span>
@@ -143,6 +154,60 @@ import { Router, RouterLink } from '@angular/router';
       margin-top: 20px;
     }
 
+    .divider {
+      margin: 24px 0;
+      position: relative;
+      text-align: center;
+    }
+
+    .divider::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.1);
+      z-index: 1;
+    }
+
+    .divider span {
+      background: rgba(255, 255, 255, 0.5);
+      padding: 0 16px;
+      color: #666;
+      font-size: 0.8rem;
+      font-weight: 600;
+      position: relative;
+      z-index: 2;
+      border-radius: 10px;
+    }
+
+    .google-btn {
+      width: 100%;
+      height: 48px !important;
+      border-radius: 12px !important;
+      font-weight: 500 !important;
+      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      background: white !important;
+      color: #3c4043 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 12px;
+      transition: all 0.2s ease !important;
+    }
+
+    .google-btn:hover {
+      background: #f8f9fa !important;
+      box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3) !important;
+      transform: translateY(-1px);
+    }
+
+    .google-icon {
+      width: 18px;
+      height: 18px;
+    }
+
     .submit-btn {
       width: 100%;
       padding: 24px !important;
@@ -194,8 +259,10 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
+    this.checkGoogleLoginCallback();
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
@@ -229,6 +296,27 @@ export class LoginComponent {
           });
         }
       }, 1500);
+    }
+  }
+
+  loginWithGoogle() {
+    this.authService.loginWithGoogle();
+  }
+
+  private checkGoogleLoginCallback() {
+    // Check if URL contains token (e.g., from a redirect after Google login)
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (token) {
+      this.authService.saveToken(token);
+      this.snackBar.open('Google Login Successful!', 'Close', {
+        duration: 3000,
+        panelClass: ['success-snackbar']
+      });
+      // Remove token from URL to keep it clean
+      window.history.replaceState({}, document.title, window.location.pathname);
+      // this.router.navigate(['/dashboard']);
     }
   }
 }
