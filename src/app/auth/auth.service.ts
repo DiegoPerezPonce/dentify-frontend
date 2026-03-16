@@ -32,4 +32,29 @@ export class AuthService {
   isAuthenticated(): boolean {
     return this.isAuthenticatedSignal();
   }
+
+  getUserRoles(): string[] {
+    const token = this.getToken();
+    if (!token) return [];
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Assuming roles are in 'roles' or 'authorities' or 'role' claim
+      const roles = payload.roles || payload.authorities || payload.role || [];
+      return Array.isArray(roles) ? roles : [roles];
+    } catch (e) {
+      console.error('Error decoding token', e);
+      return [];
+    }
+  }
+
+  hasRole(role: string): boolean {
+    return this.getUserRoles().includes(role);
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    const userRoles = this.getUserRoles();
+    return roles.some(role => userRoles.includes(role));
+  }
 }
+
