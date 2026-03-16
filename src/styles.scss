@@ -1,7 +1,9 @@
-/* You can add global styles to this file, and also import other style files */
+@import "@angular/material/prebuilt-themes/indigo-pink.css";
 
-
-/* --- VARIABLES DE DENTIFY --- */
+html, body { 
+    height: 100%; 
+    margin: 0;
+}
 :root {
     /* Colores Corporativos (Basados en limpieza e higiene dental) */
     --dentify-cian: #00DBDE;
