@@ -1,30 +1,31 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private http = inject(HttpClient); // Inyectamos HttpClient para hacer peticiones
   private readonly TOKEN_KEY = 'auth_token';
+  private readonly API_URL = 'http://localhost:8000/api/login_check'; // Tu URL de Symfony
 
-  constructor() {}
-
-  // Guarda el token que recibes de Symfony
-  setToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+  // ESTA ES LA FUNCIÓN QUE TE FALTA:
+  login(credentials: any): Observable<any> {
+    return this.http.post<any>(this.API_URL, credentials).pipe(
+      tap(response => {
+        if (response.token) {
+          localStorage.setItem(this.TOKEN_KEY, response.token);
+        }
+      })
+    );
   }
 
-  // Recupera el token para el Interceptor
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  // Borra el token al cerrar sesión
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
-  }
-
-  // Comprueba si el usuario está logueado
-  isLoggedIn(): boolean {
-    return !!this.getToken();
   }
 }
