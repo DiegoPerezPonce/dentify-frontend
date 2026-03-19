@@ -4,7 +4,7 @@
   <div class="login-panel-left">
     <div class="panel-content">
       <img src="img/dentify_logo.png" alt="Dentify Logo" class="panel-logo">
-      <h2 class="panel-tagline">Clínica Digital del Futuro</h2>
+      <h2 class="panel-tagline">Clínica Digital</h2>
       <p class="panel-description">Gestiona tu clínica odontológica de forma inteligente, segura y eficiente.</p>
       <div class="panel-decorations">
         <div class="deco-circle deco-1"></div>
@@ -39,7 +39,7 @@
           </label>
           <div class="input-wrapper">
             <input type="text" id="identifier" formControlName="identifier"
-              placeholder="ejemplo@dentify.com o usuario123" autocomplete="username"
+              placeholder="ejemplo@correo.com o usuario123" autocomplete="username"
               [class.input-error]="showError('identifier')" [class.input-valid]="isValid('identifier')">
             <span class="input-icon" *ngIf="isValid('identifier')">✓</span>
           </div>
@@ -65,7 +65,7 @@
               placeholder="Introduce tu contraseña" autocomplete="current-password"
               [class.input-error]="showError('password')" [class.input-valid]="isValid('password')">
             <button type="button" class="toggle-password" (click)="togglePassword()" tabindex="-1">
-              {{ showPassword ? '🙈' : '👁️' }}
+              {{ showPassword ? 'ocultar' : 'mostrar' }}
             </button>
           </div>
           <div class="error-message" *ngIf="showError('password')">

@@ -31,16 +31,23 @@
 }
 
 .panel-logo {
-  width: 220px;
+  width: 400px;
   max-width: 100%;
-  filter: brightness(0) invert(1) drop-shadow(0 4px 20px rgba(0,0,0,0.15));
+  filter: brightness(0) invert(1) drop-shadow(0 4px 20px rgba(0, 0, 0, 0.15));
   margin-bottom: 2rem;
   animation: floatLogo 4s ease-in-out infinite;
 }
 
 @keyframes floatLogo {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .panel-tagline {
@@ -48,7 +55,7 @@
   font-size: 1.6rem;
   font-weight: 700;
   margin: 0 0 1rem;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .panel-description {
@@ -57,7 +64,7 @@
   opacity: 0.9;
   line-height: 1.6;
   max-width: 320px;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Círculos decorativos de fondo */
@@ -71,7 +78,7 @@
 .deco-circle {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .deco-1 {
@@ -93,7 +100,7 @@
   height: 120px;
   top: 50%;
   right: 10%;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* ===== PANEL DERECHO CON FORMULARIO ===== */
@@ -316,7 +323,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(255,255,255,0);
+    background: rgba(255, 255, 255, 0);
     transition: background 0.2s;
   }
 
@@ -325,7 +332,7 @@
     box-shadow: 0 8px 25px rgba(0, 219, 222, 0.45);
 
     &::after {
-      background: rgba(255,255,255,0.08);
+      background: rgba(255, 255, 255, 0.08);
     }
   }
 
@@ -348,7 +355,7 @@
   display: inline-block;
   width: 20px;
   height: 20px;
-  border: 3px solid rgba(255,255,255,0.4);
+  border: 3px solid rgba(255, 255, 255, 0.4);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.75s linear infinite;
@@ -356,7 +363,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===== PIE DEL FORMULARIO ===== */
