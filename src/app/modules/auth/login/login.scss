@@ -1,65 +1,398 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo:wght@400;600;700;800&family=Noto+Sans:wght@400;500&family=Istok+Web:wght@400;700&display=swap');
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
 .login-container {
-  height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  background: #f0f4f8;
+}
+
+/* ===== PANEL IZQUIERDO DECORATIVO ===== */
+.login-panel-left {
+  flex: 1;
+  background: linear-gradient(145deg, #00c6d7 0%, #00DBDE 40%, #48c6ef 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--dentify-gradient); // Usamos el degradado global
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.panel-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+}
+
+.panel-logo {
+  width: 220px;
+  max-width: 100%;
+  filter: brightness(0) invert(1) drop-shadow(0 4px 20px rgba(0,0,0,0.15));
+  margin-bottom: 2rem;
+  animation: floatLogo 4s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.panel-tagline {
+  font-family: 'Exo', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.panel-description {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 1rem;
+  opacity: 0.9;
+  line-height: 1.6;
+  max-width: 320px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Círculos decorativos de fondo */
+.panel-decorations {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.deco-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+
+.deco-1 {
+  width: 300px;
+  height: 300px;
+  bottom: -80px;
+  right: -80px;
+}
+
+.deco-2 {
+  width: 200px;
+  height: 200px;
+  top: -60px;
+  left: -60px;
+}
+
+.deco-3 {
+  width: 120px;
+  height: 120px;
+  top: 50%;
+  right: 10%;
+  background: rgba(255,255,255,0.05);
+}
+
+/* ===== PANEL DERECHO CON FORMULARIO ===== */
+.login-panel-right {
+  width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #f0f4f8;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 1.5rem;
+  }
 }
 
 .login-card {
   background: white;
-  padding: 2.5rem;
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  padding: 2.5rem 2.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 219, 222, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
+}
+
+/* Logo en móvil */
+.mobile-logo {
+  display: none;
   text-align: center;
-}
-
-.dentify-title {
-  color: var(--dentify-cian);
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.form-group {
-  text-align: left;
   margin-bottom: 1.5rem;
 
-  label {
-    display: block;
-    font-family: var(--font-subtitles);
-    margin-bottom: 0.5rem;
-    color: var(--dentify-dark);
+  img {
+    width: 160px;
+    // Aplicamos el color cian al logo (si es blanco/negro, dejamos sin filtro)
+    // filter: ...;
   }
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+}
+
+/* ===== CABECERA DEL FORMULARIO ===== */
+.login-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    font-family: 'Exo', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #2c3e50;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.5px;
+  }
+}
+
+.login-subtitle {
+  font-family: 'Noto Sans', sans-serif;
+  color: #7f8c8d;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* ===== GRUPOS DE FORMULARIO ===== */
+.form-group {
+  margin-bottom: 1.4rem;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Istok Web', sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+
+  .label-icon {
+    font-size: 1rem;
+    filter: grayscale(1);
+    opacity: 0.6;
+  }
+
+  .required-mark {
+    color: #e74c3c;
+    font-size: 1rem;
+    line-height: 1;
+    margin-left: auto; // Empuja el asterisco al final
+  }
+}
+
+/* ===== WRAPPER DEL INPUT ===== */
+.input-wrapper {
+  position: relative;
 
   input {
     width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: var(--font-body);
+    padding: 0.85rem 1rem;
+    border: 2px solid #dde3ea;
+    border-radius: 10px;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 0.95rem;
+    color: #2c3e50;
+    background: #fafbfc;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: #aab5c0;
+      font-size: 0.9rem;
+    }
+
     &:focus {
       outline: none;
-      border-color: var(--dentify-cian);
+      border-color: #00DBDE;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(0, 219, 222, 0.12);
     }
+  }
+
+  .input-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #27ae60;
+    font-size: 1rem;
+    pointer-events: none;
   }
 }
 
+/* ===== ESTADOS DE VALIDACIÓN ===== */
+.input-error {
+  border-color: #e74c3c !important;
+  background: #fff8f7 !important;
+  box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.08) !important;
+}
+
+.input-valid {
+  border-color: #27ae60 !important;
+  background: #f7fff9 !important;
+}
+
+/* ===== MENSAJES DE ERROR ===== */
+.error-message {
+  margin-top: 0.4rem;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 0.8rem;
+  color: #e74c3c;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  &::before {
+    content: '⚠';
+    font-size: 0.85rem;
+  }
+}
+
+.has-error label {
+  color: #e74c3c;
+}
+
+/* ===== ERROR DEL SERVIDOR ===== */
+.server-error {
+  background: #fdf0ef;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 0.875rem;
+  color: #c0392b;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ===== BOTÓN MOSTRAR/OCULTAR CONTRASEÑA ===== */
+.toggle-password {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.2rem 0.3rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  line-height: 1;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+/* ===== BOTÓN PRINCIPAL ===== */
 .btn-login {
   width: 100%;
   padding: 1rem;
   border: none;
-  border-radius: 8px;
-  background: var(--dentify-gradient);
+  border-radius: 10px;
+  background: linear-gradient(135deg, #00c6d7 0%, #48c6ef 100%);
   color: white;
-  font-family: var(--font-titles);
-  font-size: 1.1rem;
+  font-family: 'Exo', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: opacity 0.3s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.5rem;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.2s;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 219, 222, 0.45);
+
+    &::after {
+      background: rgba(255,255,255,0.08);
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
     cursor: not-allowed;
+  }
+
+  &.loading {
+    pointer-events: none;
+  }
+}
+
+/* ===== SPINNER DE CARGA ===== */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== PIE DEL FORMULARIO ===== */
+.login-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+
+  .forgot-link {
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 0.875rem;
+    color: #00DBDE;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #009fa8;
+      text-decoration: underline;
+    }
+  }
+
+  .contact-info {
+    margin-top: 0.75rem;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+
+    .link {
+      color: #00DBDE;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #009fa8;
+      }
+    }
   }
 }
