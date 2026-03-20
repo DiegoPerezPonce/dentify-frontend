@@ -67,12 +67,12 @@ export class LoginComponent {
 
     this.authService.login(credentials).subscribe({
       next: (response: any) => {
-        console.log('Login exitoso', response);
+        //console.log('Login exitoso', response);
         this.isLoading = false;
         this.router.navigate(['/dashboard']);
       },
       error: (err: any) => {
-        console.error('Error en el login', err);
+        //console.error('Error en el login', err);
         this.isLoading = false;
         this.serverError = 'Credenciales incorrectas. Inténtalo de nuevo.';
       }
