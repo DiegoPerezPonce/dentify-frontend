@@ -67,7 +67,7 @@
 
         <button mat-flat-button color="primary" class="submit-button" type="submit"
           [disabled]="registerForm.invalid || loading()">
-          <span *ngIf="!loading()">CREANT LA SESSÓ</span>
+          <span *ngIf="!loading()">CREAR LA SESSÓ</span>
           <span *ngIf="loading()">Espera un moment...</span>
         </button>
       </form>
@@ -75,8 +75,8 @@
 
     <mat-card-footer>
       <div class="footer-content">
-        <span>Already have an account?</span>
-        <a routerLink="/login" mat-button color="accent">Back to Login</a>
+        <span>Ja tens una sessió?</span>
+        <a routerLink="/login" mat-button color="accent">Inicia sessió</a>
       </div>
     </mat-card-footer>
   </mat-card>

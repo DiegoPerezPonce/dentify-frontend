@@ -9,7 +9,7 @@ export class AuthService {
   private http = inject(HttpClient);
 
   private readonly TOKEN_KEY = 'auth_token';
-  private readonly apiUrl = 'YOUR_API_BASE_URL'; // Update with real API URL
+  public readonly apiUrl = 'YOUR_API_BASE_URL'; // Update with real API URL
 
   currentUser = signal<any>(null);
 
