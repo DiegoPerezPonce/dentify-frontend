@@ -1,3 +1,5 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
 /* --- VARIABLES DE DENTIFY --- */
 :root {
   /* Colores Corporativos (Basados en limpieza e higiene dental) */
@@ -11,6 +13,12 @@
   --dentify-dark: #2c3e50;
   --dentify-gray: #7f8c8d;
   --dentify-light: #f4f7f6;
+
+  /* Premium variables */
+  --primary-color: #3f51b5;
+  --accent-color: #ff4081;
+  --bg-gradient: linear-gradient(135deg, #00DBDE 0%, #48c6ef 100%);
+  --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
 
   /* Tipografías según Manual de Estilo */
   --font-titles: 'Exo', sans-serif;

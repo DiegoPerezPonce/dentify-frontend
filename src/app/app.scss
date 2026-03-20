@@ -1,0 +1,18 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+html, body { 
+  height: 100%; 
+}
+
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f5f7fa;
+}
+
+:root {
+  --primary-color: #3f51b5;
+  --accent-color: #ff4081;
+  --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
