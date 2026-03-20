@@ -8,7 +8,7 @@ import { Observable, tap } from 'rxjs';
 export class AuthService {
   private http = inject(HttpClient); // Inyectamos HttpClient para hacer peticiones
   private readonly TOKEN_KEY = 'auth_token';
-  private readonly API_URL = 'http://localhost:8000/api/login_check'; // Tu URL de Symfony
+  private readonly API_URL = 'http://localhost:8000/api/login'; // Tu URL de Symfony
 
   // ESTA ES LA FUNCIÓN QUE TE FALTA:
   login(credentials: any): Observable<any> {

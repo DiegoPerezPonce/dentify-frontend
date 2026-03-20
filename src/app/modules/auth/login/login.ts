@@ -27,7 +27,7 @@ export class LoginComponent {
 
   loginForm = this.fb.group({
     identifier: ['', [Validators.required, Validators.minLength(3)]],
-    password:   ['', [Validators.required, Validators.minLength(6)]]
+    password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
   /** Alterna la visibilidad de la contraseña */
@@ -63,7 +63,7 @@ export class LoginComponent {
     const { identifier, password } = this.loginForm.getRawValue();
 
     // Enviamos 'identifier' como 'email' para compatibilidad con el backend existente
-    const credentials = { email: identifier!, password: password! };
+    const credentials = { login: identifier!, password: password! };
 
     this.authService.login(credentials).subscribe({
       next: (response: any) => {
