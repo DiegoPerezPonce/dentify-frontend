@@ -351,6 +351,65 @@
   }
 }
 
+/* ===== DIVISOR O ===== */
+.login-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: #7f8c8d;
+  font-size: 0.85rem;
+  font-family: 'Noto Sans', sans-serif;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #dde3ea;
+  }
+
+  span {
+    padding: 0 1rem;
+    white-space: nowrap;
+  }
+}
+
+/* ===== BOTÓN DE GOOGLE ===== */
+.btn-google {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #dde3ea;
+  border-radius: 10px;
+  background: white;
+  color: #2c3e50;
+  font-family: 'Istok Web', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #adb5bd;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
 /* ===== SPINNER DE CARGA ===== */
 .spinner {
   display: inline-block;
