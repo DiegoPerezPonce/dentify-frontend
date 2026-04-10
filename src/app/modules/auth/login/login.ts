@@ -2,7 +2,8 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth';
-import { Router, RouterModule } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+
 
 @Component({
   selector: 'app-login',
@@ -15,6 +16,19 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  /** ngOnInit para capturar el token de Google si viene en la URL */
+  ngOnInit(): void {
+    // Si el backend nos redirige de vuelta con un token en la URL (?token=xyz)
+    this.route.queryParams.subscribe(params => {
+      const token = params['token'];
+      if (token) {
+        this.authService.saveToken(token);
+        this.router.navigate(['/dashboard']);
+      }
+    });
+  }
 
   /** Controla si la contraseña es visible */
   showPassword = false;
@@ -77,5 +91,13 @@ export class LoginComponent {
         this.serverError = 'Credenciales incorrectas. Inténtalo de nuevo.';
       }
     });
+  }
+
+  /**
+   * Redirige al backend para iniciar el flujo de autenticación con Google.
+   */
+  onGoogleLogin(): void {
+    // Redirigimos al servidor para que el servidor haga su trabajo de OAuth2
+    window.location.href = 'http://localhost:8000/api/login/google';
   }
 }
