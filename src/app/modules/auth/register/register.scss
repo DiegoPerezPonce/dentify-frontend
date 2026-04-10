@@ -1,0 +1,16 @@
+@import "../login/login.scss";
+
+/* Estilos específicos para el registro */
+.success-message {
+  background: #e9f7ef;
+  border: 1px solid #c3e6cb;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 0.875rem;
+  color: #155724;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

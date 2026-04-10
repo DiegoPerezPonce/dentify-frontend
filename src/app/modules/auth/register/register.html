@@ -1,0 +1,149 @@
+<div class="login-container">
+
+  <!-- Panel izquierdo decorativo -->
+  <div class="login-panel-left">
+    <div class="panel-content">
+      <img src="img/dentify_logo.png" alt="Dentify Logo" class="panel-logo">
+      <h2 class="panel-tagline">Únete a Dentify</h2>
+      <p class="panel-description">Crea tu cuenta y empieza a gestionar tu clínica de forma inteligente.</p>
+      <div class="panel-decorations">
+        <div class="deco-circle deco-1"></div>
+        <div class="deco-circle deco-2"></div>
+        <div class="deco-circle deco-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel derecho con el formulario -->
+  <div class="login-panel-right">
+    <div class="login-card">
+
+      <!-- Logo visible solo en móvil -->
+      <div class="mobile-logo">
+        <img src="img/dentify_logo.png" alt="Dentify Logo">
+      </div>
+
+      <div class="login-header">
+        <h1>Crear Cuenta</h1>
+        <p class="login-subtitle">Regístrate para acceder al sistema</p>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- Campo: Nombre de usuario -->
+        <div class="form-group" [class.has-error]="showError('username')">
+          <label for="username">
+            <span class="label-icon">👤</span>
+            Nombre de usuario
+            <span class="required-mark">*</span>
+          </label>
+          <div class="input-wrapper">
+            <input type="text" id="username" formControlName="username"
+              placeholder="Ej: juan_perez" autocomplete="username"
+              [class.input-error]="showError('username')" [class.input-valid]="isValid('username')">
+            <span class="input-icon" *ngIf="isValid('username')">✓</span>
+          </div>
+          <div class="error-message" *ngIf="showError('username')">
+            <ng-container *ngIf="registerForm.get('username')?.errors?.['required']">
+              Este campo es obligatorio.
+            </ng-container>
+            <ng-container *ngIf="registerForm.get('username')?.errors?.['minlength']">
+              Debe tener al menos 3 caracteres.
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Campo: Email -->
+        <div class="form-group" [class.has-error]="showError('email')">
+          <label for="email">
+            <span class="label-icon">✉</span>
+            Correo electrónico
+            <span class="required-mark">*</span>
+          </label>
+          <div class="input-wrapper">
+            <input type="email" id="email" formControlName="email"
+              placeholder="ejemplo@correo.com" autocomplete="email"
+              [class.input-error]="showError('email')" [class.input-valid]="isValid('email')">
+            <span class="input-icon" *ngIf="isValid('email')">✓</span>
+          </div>
+          <div class="error-message" *ngIf="showError('email')">
+            <ng-container *ngIf="registerForm.get('email')?.errors?.['required']">
+              El correo es obligatorio.
+            </ng-container>
+            <ng-container *ngIf="registerForm.get('email')?.errors?.['email']">
+              Formato de correo no válido.
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Campo: Contraseña -->
+        <div class="form-group" [class.has-error]="showError('password')">
+          <label for="password">
+            <span class="label-icon">🔒</span>
+            Contraseña
+            <span class="required-mark">*</span>
+          </label>
+          <div class="input-wrapper">
+            <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"
+              placeholder="Mínimo 6 caracteres" autocomplete="new-password"
+              [class.input-error]="showError('password')" [class.input-valid]="isValid('password')">
+            <button type="button" class="toggle-password" (click)="togglePassword()" tabindex="-1">
+              {{ showPassword ? 'ocultar' : 'mostrar' }}
+            </button>
+          </div>
+          <div class="error-message" *ngIf="showError('password')">
+            <ng-container *ngIf="registerForm.get('password')?.errors?.['required']">
+              La contraseña es obligatoria.
+            </ng-container>
+            <ng-container *ngIf="registerForm.get('password')?.errors?.['minlength']">
+              Debe tener al menos 6 caracteres.
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Campo: Confirmar Contraseña -->
+        <div class="form-group" [class.has-error]="showError('confirmPassword')">
+          <label for="confirmPassword">
+            <span class="label-icon">🔒</span>
+            Confirmar Contraseña
+            <span class="required-mark">*</span>
+          </label>
+          <div class="input-wrapper">
+            <input [type]="showPassword ? 'text' : 'password'" id="confirmPassword" formControlName="confirmPassword"
+              placeholder="Repite tu contraseña" autocomplete="new-password"
+              [class.input-error]="showError('confirmPassword')" [class.input-valid]="isValid('confirmPassword')">
+          </div>
+          <div class="error-message" *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched">
+            Las contraseñas no coinciden.
+          </div>
+          <div class="error-message" *ngIf="showError('confirmPassword') && !registerForm.hasError('mismatch')">
+              Este campo es obligatorio.
+          </div>
+        </div>
+
+        <!-- Mensaje de éxito -->
+        <div class="success-message" *ngIf="successMessage">
+          <span>✅</span> {{ successMessage }}
+        </div>
+
+        <!-- Error general del servidor -->
+        <div class="server-error" *ngIf="serverError">
+          <span>⚠️</span> {{ serverError }}
+        </div>
+
+        <!-- Botón de submit -->
+        <button type="submit" class="btn-login" [class.loading]="isLoading" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Registrar Cuenta</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+
+      </form>
+
+      <div class="login-footer">
+        <p class="contact-info">¿Ya tienes cuenta? <a routerLink="/auth/login" class="link">Inicia sesión aquí</a></p>
+      </div>
+
+    </div>
+  </div>
+
+</div>

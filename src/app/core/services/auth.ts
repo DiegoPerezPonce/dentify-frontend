@@ -21,6 +21,11 @@ export class AuthService {
     );
   }
 
+  register(userData: any): Observable<any> {
+    const registerUrl = 'http://localhost:8000/api/register';
+    return this.http.post<any>(registerUrl, userData);
+  }
+
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }

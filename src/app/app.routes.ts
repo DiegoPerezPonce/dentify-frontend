@@ -3,6 +3,7 @@ import { LoginComponent } from './modules/auth/login/login';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'register', loadComponent: () => import('./modules/auth/register/register').then(m => m.RegisterComponent) },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   // Si da error en './app.component', prueba con './app' 
   // o simplemente apunta a una ruta vacía por ahora:
