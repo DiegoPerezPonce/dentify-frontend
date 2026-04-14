@@ -1,0 +1,99 @@
+Issues Frontend
+
+(No hay Issue numero 3, pasamos del 1 al 2.)
+
+- Implement JWT Interceptor #1
+- Description: Configure an interceptor to attach the JWT token to the headers of all HTTP requests.
+- Branch: feature/1-implement-jwt-interceptor
+
+- Login and Registration Interface #2
+- Description: Create the access form and the integration with the login endpoint.
+- Branch: feature/2-login-and-registration-interface
+
+- Route Guards by Roles (RBAC) #4
+- Description: Restrict access using exactly two Symfony-style roles: ROLE_ADMIN and ROLE_USER. Examples: routes/modules for user CRUD, role assignment (ADMIN vs USER only), boxes, treatment protocols, and stock configuration are ROLE_ADMIN only; patient care flows (dashboard, patients, appointments, odontogram, radiographs, clinical history, schedules as consumed by the app) require an authenticated user with ROLE_USER (admins typically hold ROLE_ADMIN and may also have ROLE_USER for day-to-day screens—define in JWT/backend). Login/register remain public. Implement route guards and optional menu visibility from JWT claims.
+- Branch: feature/4-route-guards-by-roles-rbac
+
+- Dashboard and Patient List #5
+- Description: Table with filters and pagination to view patients.
+- Branch: feature/5-dashboard-and-patient-list
+
+- Patient Registration and Editing Form #6
+- Description: Using Reactive Forms to manage the patient's personal data.
+- Branch: feature/6-patient-registration-and-editing-form
+
+- Medical History View #7
+- Description: Chronological visualization of the patient's history.
+- Branch: feature/7-medical-history-view
+
+- First Visit Form #8
+- Description: Capture initial data and refer to the treatment plan.
+- Branch: feature/8-first-visit-form
+
+- Interactive Interface of the Odontogram #9
+- Description: Create a visual component (SVG or Canvas) that allows you to select teeth and assign pathologies/states to them.
+- Branch: feature/9-interactive-interface-of-the-odontogram
+
+- X-ray Gallery #10
+- Description: Image viewer with multi-load (Drag & Drop) and delete capabilities.
+- Branch: feature/10-x-ray-gallery
+
+- Appointment Calendar (FullCalendar) #11
+- Description: Integration of a calendar library to display appointments by day/week.
+- Branch: feature/11-appointment-calendar-fullcalendar
+
+- Appointment Management Method #12
+- Description: Form to create, reschedule or cancel appointments, respecting the 5-minute gaps.
+- Branch: feature/12-appointment-management-method
+
+- Availability selector by Box and Dentist #13
+- Description: Interface to filter the schedule according to the assigned Box or dentist.
+- Branch: feature/13-availability-selector-by-box-and-dentist 
+
+- Stock Management and Alerts #14
+- Description: Panel to view current inventory and form to register receipt of material.
+- Branch: feature/14-stock-management-and-alerts
+
+- CRUD for User and Role Management #15
+- Description: Develop the interface so that ROLE_ADMIN can list, create, edit, and delete system users. Role assignment is limited to ROLE_ADMIN or ROLE_USER only (no other security roles).
+- Branch: feature/15-crud-for-user-and-role-management
+
+- CRUD for Dentist Management (Clinical Staff) #16
+- Description: Create a dedicated panel for managing dental staff professional profiles (business data). Dentists are linked to user accounts that still use only ROLE_USER or ROLE_ADMIN for security; there is no separate DENTIST/STAFF security role.
+- Branch: feature/16-crud-for-dentist-management-clinical-staff
+
+- CRUD for Cabinet (Box) Management #17
+- Description: Implement the interface to manage the physical spaces (Boxes) where the interventions are carried out. 
+- Branch: feature/17-crud-for-cabinet-box-management
+
+- Treatment Protocol Configurator #18
+- Description: Interface for administrators to define standard steps for treatments.
+- Branch: feature/18-treatment-protocol-configurator
+
+- Widget de Chatbot con IA #19
+- Description: Floating chat interface for quick queries.
+- Branch: feature/19-widget-de-chatbot-con-ia
+
+- Soporte Multi-idioma (ngx-translate) #20
+- Description: Implement the internationalization of the platform (ES/EN/etc.)
+- Branch: feature/20-soporte-multi-idioma-ngx-translate
+
+- Notification Center #21
+- Description: Display of alerts for upcoming appointments or low stock.
+- Branch: feature/21-notification-center
+
+- Dentist Schedule Management (Availability) #22
+- Description: Grid or list-style interface for defining weekly appointment schedules per dentist. Schedule overlap validation.
+- Branch: feature/22-dentist-schedule-management-availability
+
+- Material Receiving Form (Stock Entries) #23
+- Description: Form for selecting existing material.
+- Branch: feature/23-material-receiving-form-stock-entries
+
+- Implementation of Visual Identity and Global Layout #24
+- Description: Configure the global theme in Angular (Sass/CSS variables). Create the base layout.
+- Branch: feature/24-implementation-of-visual-identity-and-global-layout
+
+- User Home Dashboard (Quick Widgets) #25
+- Description: Create "Quick Action Cards" for authenticated users. Primary audience: ROLE_USER (e.g. quick links and recent appointment widget via Appointment API). ROLE_ADMIN may see the same home or an admin-oriented variant—align with product choice and route guards.
+- Branch: feature/25-user-home-dashboard-quick-widgets
