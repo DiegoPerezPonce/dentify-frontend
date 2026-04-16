@@ -28,6 +28,11 @@
         <p class="login-subtitle">Accede a tu cuenta de Dentify</p>
       </div>
 
+      <div class="session-active" *ngIf="authService.isLoggedIn()">
+        <p>Ya tienes una sesión iniciada en este navegador.</p>
+        <a routerLink="/dashboard" class="session-active-link">Ir al panel</a>
+      </div>
+
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
 
         <!-- Campo: Correo o Nombre de usuario -->

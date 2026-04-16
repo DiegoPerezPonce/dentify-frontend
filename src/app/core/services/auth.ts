@@ -25,6 +25,12 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
+  /** Hay token persistido (no valida expiración del JWT; eso lo hace el backend). */
+  isLoggedIn(): boolean {
+    const t = this.getToken();
+    return !!t && t.trim().length > 0;
+  }
+
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
   }

@@ -1,5 +1,7 @@
 Issues Backend
 
+(No hay issue numero#2, pasamos del #1 al #3)
+
 - User Role Management auth #1
 - Description: Implement RBAC with exactly two application roles: ROLE_ADMIN and ROLE_USER (Symfony naming). Persist and validate roles on the User entity; issue JWTs whose payload includes a coherent roles claim (e.g. array of ROLE_* strings) for the frontend. Protect routes with Symfony Security: access_control, #[IsGranted('ROLE_ADMIN')] / #[IsGranted('ROLE_USER')] on controllers or services, and voters where rules are finer-grained. Dentist, staff, and box assignment are business/domain data (entities), not additional security roles—authorization remains ADMIN vs USER only.
 - Branch: feature/1-user-role-management-auth

@@ -166,6 +166,31 @@
   font-size: 0.95rem;
 }
 
+.session-active {
+  margin: -0.5rem 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #e8f9fb;
+  border: 1px solid #b8ecf0;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 0.875rem;
+  color: #2c3e50;
+
+  p {
+    margin: 0 0 0.5rem;
+  }
+}
+
+.session-active-link {
+  font-weight: 600;
+  color: #00a8b8;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 /* ===== GRUPOS DE FORMULARIO ===== */
 .form-group {
   margin-bottom: 1.4rem;
