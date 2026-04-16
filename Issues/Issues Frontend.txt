@@ -1,17 +1,17 @@
 Issues Frontend
 
-(No hay Issue numero 3, pasamos del 1 al 2.)
+(No hay Issue numero 3, pasamos del #2 al #4.)
 
 - Implement JWT Interceptor #1
 - Description: Configure an interceptor to attach the JWT token to the headers of all HTTP requests.
 - Branch: feature/1-implement-jwt-interceptor
 
-- Login and Registration Interface #2
-- Description: Create the access form and the integration with the login endpoint.
-- Branch: feature/2-login-and-registration-interface
+- Login Interface #2
+- Description: Create the public access form (login) and integrate it with the login endpoint (JWT stored client-side). There is no self-service registration: new accounts are created only by ROLE_ADMIN from the admin area (see issue #15 / backend user CRUD). Optional copy on the login screen should reflect this (e.g. contact admin if you need an account).
+- Branch: feature/2-login-interface
 
 - Route Guards by Roles (RBAC) #4
-- Description: Restrict access using exactly two Symfony-style roles: ROLE_ADMIN and ROLE_USER. Examples: routes/modules for user CRUD, role assignment (ADMIN vs USER only), boxes, treatment protocols, and stock configuration are ROLE_ADMIN only; patient care flows (dashboard, patients, appointments, odontogram, radiographs, clinical history, schedules as consumed by the app) require an authenticated user with ROLE_USER (admins typically hold ROLE_ADMIN and may also have ROLE_USER for day-to-day screens—define in JWT/backend). Login/register remain public. Implement route guards and optional menu visibility from JWT claims.
+- Description: Restrict access using exactly two Symfony-style roles: ROLE_ADMIN and ROLE_USER. Examples: routes/modules for user CRUD, role assignment (ADMIN vs USER only), boxes, treatment protocols, and stock configuration are ROLE_ADMIN only; patient care flows (dashboard, patients, appointments, odontogram, radiographs, clinical history, schedules as consumed by the app) require an authenticated user with ROLE_USER (admins typically hold ROLE_ADMIN and may also have ROLE_USER for day-to-day screens—define in JWT/backend). Only the login route stays public (no JWT). There is no public application signup: new user accounts are created exclusively by ROLE_ADMIN via issue #15 (and backend admin APIs). Implement route guards and optional menu visibility from JWT claims.
 - Branch: feature/4-route-guards-by-roles-rbac
 
 - Dashboard and Patient List #5
@@ -19,7 +19,7 @@ Issues Frontend
 - Branch: feature/5-dashboard-and-patient-list
 
 - Patient Registration and Editing Form #6
-- Description: Using Reactive Forms to manage the patient's personal data.
+- Description: Using Reactive Forms to manage the patient's personal data (clinical patient record / demographics— not creation of application login accounts; those are admin-only, see #15).
 - Branch: feature/6-patient-registration-and-editing-form
 
 - Medical History View #7
@@ -51,11 +51,11 @@ Issues Frontend
 - Branch: feature/13-availability-selector-by-box-and-dentist 
 
 - Stock Management and Alerts #14
-- Description: Panel to view current inventory and form to register receipt of material.
+- Description: Panel to view current inventory and form to log receipt of material (stock intake— not user registration).
 - Branch: feature/14-stock-management-and-alerts
 
 - CRUD for User and Role Management #15
-- Description: Develop the interface so that ROLE_ADMIN can list, create, edit, and delete system users. Role assignment is limited to ROLE_ADMIN or ROLE_USER only (no other security roles).
+- Description: Develop the interface so that ROLE_ADMIN can list, create, edit, and delete system users. This is the only in-app way to provision new application accounts (no public self-registration). Role assignment is limited to ROLE_ADMIN or ROLE_USER only (no other security roles).
 - Branch: feature/15-crud-for-user-and-role-management
 
 - CRUD for Dentist Management (Clinical Staff) #16
