@@ -1,0 +1,103 @@
+Issues Frontend
+
+(No hay Issue numero 3, pasamos del #2 al #4.)
+
+- Implement JWT Interceptor #1
+- Description: Configure an interceptor to attach the JWT token to the headers of all HTTP requests.
+- Branch: feature/1-implement-jwt-interceptor
+
+- Login Interface #2
+- Description: Create the public access form (login) and integrate it with the login endpoint (JWT stored client-side). There is no self-service registration: new accounts are created only by ROLE_ADMIN from the admin area (see issue #15 / backend user CRUD). Optional copy on the login screen should reflect this (e.g. contact admin if you need an account).
+- Branch: feature/2-login-interface
+
+- Route Guards by Roles (RBAC) #4
+- Description: Exactly two security roles: ROLE_ADMIN and ROLE_USER (Symfony-style). Product mapping: ROLE_USER = alumno (estudiante / personal clínico en la simulación); ROLE_ADMIN = supervisor-administrador (misma persona en JWT, etiqueta UX “admin” o “supervisor”). Use case rule: ROLE_ADMIN inherits all ROLE_USER clinical capabilities—same routes and screens for pacientes, agenda, radiografías, etc., plus exclusive administration (user CRUD #15, role assignment ADMIN vs USER only, dentists #16, boxes #17, protocols #18, stock configuration #14, …). There is NO “switch to student mode” or second app entry: a single admin shell with sections General (clinical, shared with students) + Administración (admin-only); optionally collapse the Administración block in the UI for focus, but that is cosmetic only, not a security boundary. Route policy: clinical/patient-care routes allow ROLE_USER OR ROLE_ADMIN; administration-only routes require ROLE_ADMIN. Only /login is public (no JWT). No public signup (#15). Implement authGuard + roleGuard and shell menu from JWT claims. Include placement for avisos / notas pedagógicas published by ROLE_ADMIN and shown to ROLE_USER (students must see them), e.g. banners on dashboard or patient flows—content may be static at first or backed by API (see backend notices issue).
+- Branch: feature/4-route-guards-by-roles-rbac
+
+- Dashboard and Patient List #5
+- Description: Table with filters and pagination to view patients.
+- Branch: feature/5-dashboard-and-patient-list
+
+- Patient Registration and Editing Form #6
+- Description: Using Reactive Forms to manage the patient's personal data (clinical patient record / demographics— not creation of application login accounts; those are admin-only, see #15).
+- Branch: feature/6-patient-registration-and-editing-form
+
+- Medical History View #7
+- Description: Chronological visualization of the patient's history.
+- Branch: feature/7-medical-history-view
+
+- First Visit Form #8
+- Description: Capture initial data and refer to the treatment plan.
+- Branch: feature/8-first-visit-form
+
+- Interactive Interface of the Odontogram #9
+- Description: Create a visual component (SVG or Canvas) that allows you to select teeth and assign pathologies/states to them.
+- Branch: feature/9-interactive-interface-of-the-odontogram
+
+- X-ray Gallery #10
+- Description: Image viewer with multi-load (Drag & Drop) and delete capabilities.
+- Branch: feature/10-x-ray-gallery
+
+- Appointment Calendar (FullCalendar) #11
+- Description: Integration of a calendar library to display appointments by day/week.
+- Branch: feature/11-appointment-calendar-fullcalendar
+
+- Appointment Management Method #12
+- Description: Form to create, reschedule or cancel appointments, respecting the 5-minute gaps.
+- Branch: feature/12-appointment-management-method
+
+- Availability selector by Box and Dentist #13
+- Description: Interface to filter the schedule according to the assigned Box or dentist.
+- Branch: feature/13-availability-selector-by-box-and-dentist 
+
+- Stock Management and Alerts #14
+- Description: Panel to view current inventory and form to log receipt of material (stock intake— not user registration).
+- Branch: feature/14-stock-management-and-alerts
+
+- CRUD for User and Role Management #15
+- Description: Develop the interface so that ROLE_ADMIN can list, create, edit, and delete system users. This is the only in-app way to provision new application accounts (no public self-registration). Role assignment is limited to ROLE_ADMIN or ROLE_USER only (no other security roles).
+- Branch: feature/15-crud-for-user-and-role-management
+
+- CRUD for Dentist Management (Clinical Staff) #16
+- Description: Create a dedicated panel for managing dental staff professional profiles (business data). Dentists are linked to user accounts that still use only ROLE_USER or ROLE_ADMIN for security; there is no separate DENTIST/STAFF security role.
+- Branch: feature/16-crud-for-dentist-management-clinical-staff
+
+- CRUD for Cabinet (Box) Management #17
+- Description: Implement the interface to manage the physical spaces (Boxes) where the interventions are carried out. 
+- Branch: feature/17-crud-for-cabinet-box-management
+
+- Treatment Protocol Configurator #18
+- Description: Interface for administrators to define standard steps for treatments.
+- Branch: feature/18-treatment-protocol-configurator
+
+- Widget de Chatbot con IA #19
+- Description: Floating chat interface for quick queries.
+- Branch: feature/19-widget-de-chatbot-con-ia
+
+- Soporte Multi-idioma (ngx-translate) #20
+- Description: Implement the internationalization of the platform (ES/EN/etc.)
+- Branch: feature/20-soporte-multi-idioma-ngx-translate
+
+- Notification Center #21
+- Description: Display of alerts for upcoming appointments or low stock. May later integrate or link admin-authored notices (#4 / backend #36) if those are surfaced as in-app notifications.
+- Branch: feature/21-notification-center
+
+- Dentist Schedule Management (Availability) #22
+- Description: Grid or list-style interface for defining weekly appointment schedules per dentist. Schedule overlap validation.
+- Branch: feature/22-dentist-schedule-management-availability
+
+- Material Receiving Form (Stock Entries) #23
+- Description: Form for selecting existing material.
+- Branch: feature/23-material-receiving-form-stock-entries
+
+- Implementation of Visual Identity and Global Layout #24
+- Description: Configure the global theme in Angular (Sass/CSS variables). Create the base layout.
+- Branch: feature/24-implementation-of-visual-identity-and-global-layout
+
+- User Home Dashboard (Quick Widgets) #25
+- Description: Create "Quick Action Cards" and widgets (e.g. próxima cita). ROLE_USER (alumno): home orientado a práctica clínica (wireframe Inicio Alumno). ROLE_ADMIN: mismo tipo de accesos clínicos en la misma navegación, más widgets de resumen de clínica (boxes, stock, actividad) en el mismo shell—una sola vista admin, sin modo alterno; lo extra es aditivo en la misma entrada a la app.
+- Branch: feature/25-user-home-dashboard-quick-widgets
+
+- Billing and Payments (Facturación) #33
+- Description: Módulo de pagos / facturación accesible para ROLE_USER y ROLE_ADMIN (ambos roles entran al área; el backend acota con voters qué acciones son solo lectura, alta, edición o anulación). Alinear menú y guards con OR de roles hasta reglas más finas. Wireframes “Pagos” para alumno y admin coherentes con esta issue.
+- Branch: feature/26-billing-and-payments

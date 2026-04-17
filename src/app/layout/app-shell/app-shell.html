@@ -1,0 +1,55 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <span class="brand-text">DENTIFY</span>
+    </div>
+
+    <nav class="nav-block">
+      <p class="nav-label">General</p>
+      <a routerLink="/app/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+      <a routerLink="/app/pacientes" routerLinkActive="active">Pacientes</a>
+      <a routerLink="/app/agenda" routerLinkActive="active">Agenda</a>
+      <a routerLink="/app/radiografias" routerLinkActive="active">Radiografías</a>
+      <a routerLink="/app/asistente" routerLinkActive="active">Asistente <span class="badge">IA</span></a>
+      <a routerLink="/app/pagos" routerLinkActive="active">Pagos</a>
+    </nav>
+
+    @if (auth.hasRole(ROLE_ADMIN)) {
+      <nav class="nav-block admin-block" [class.collapsed]="adminNavCollapsed()">
+        <div class="nav-label-row">
+          <p class="nav-label">Administración</p>
+          <button type="button" class="collapse-btn" (click)="toggleAdminNav()" [attr.aria-expanded]="!adminNavCollapsed()">
+            {{ adminNavCollapsed() ? 'Mostrar' : 'Ocultar' }}
+          </button>
+        </div>
+        @if (!adminNavCollapsed()) {
+          <a routerLink="/app/admin/odontologos" routerLinkActive="active">Odontólogos</a>
+          <a routerLink="/app/admin/boxes" routerLinkActive="active">Boxes</a>
+          <a routerLink="/app/admin/stock" routerLinkActive="active">Stock</a>
+          <a routerLink="/app/admin/protocolos" routerLinkActive="active">Protocolos</a>
+          <a routerLink="/app/admin/usuarios" routerLinkActive="active">Usuarios</a>
+        }
+      </nav>
+    }
+
+    <div class="sidebar-footer">
+      <div class="user-line">
+        <span class="user-role">{{ auth.hasRole(ROLE_ADMIN) ? 'Administrador' : 'Alumno' }}</span>
+      </div>
+      <button type="button" class="logout" (click)="logout()">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    @if (showPedagogicalNotice()) {
+      <div class="notice-banner" role="status">
+        <strong>Aviso del centro.</strong>
+        Actualiza el historial clínico tras cada intervención. Los pacientes en tratamiento activo requieren revisión periódica según protocolo del docente.
+      </div>
+    }
+    <div class="outlet-wrap">
+      <router-outlet />
+    </div>
+  </main>
+</div>

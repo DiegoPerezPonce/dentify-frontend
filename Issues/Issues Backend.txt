@@ -1,0 +1,143 @@
+Issues Backend
+
+(No hay issue numero#2, pasamos del #1 al #3)
+
+- User Role Management auth #1
+- Description: Implement RBAC with exactly two application roles: ROLE_ADMIN and ROLE_USER (Symfony naming). Persist and validate roles on the User entity; issue JWTs whose payload includes a coherent roles claim (e.g. array of ROLE_* strings) for the frontend. Protect routes with Symfony Security: access_control, #[IsGranted('ROLE_ADMIN')] / #[IsGranted('ROLE_USER')] on controllers or services, and voters where rules are finer-grained. Dentist, staff, and box assignment are business/domain data (entities), not additional security roles—authorization remains ADMIN vs USER only.
+- Branch: feature/1-user-role-management-auth
+
+- Create User Entity #3
+- Description: Define relationships if applicable (appointments, dentist profile, etc.).
+- Branch: feature/3-create-user-entity
+
+- CRUD for Users #4
+- Description: Implement ROLE_ADMIN-only endpoints. Add validation, password hashing, and assign only ROLE_ADMIN or ROLE_USER per user (no other security roles).
+- Branch: feature/4-crud-for-users
+
+- Implement JWT Authentication #5
+- Description: Implement standard authentication with JWT. Tokens must carry roles consistent with issue #1 (ROLE_ADMIN, ROLE_USER only) so clients can drive guards and UI.
+- Branch: feature/5-implement-jwt-authentication
+
+- Create Patient Entity #6
+- Description: Include pagination and search by name/DNI
+- Branch: feature/6-create-patient-entity
+
+- CRUD for Patients #7
+- Description: Include pagination and search by name/DNI
+- Branch: feature/7-crud-for-patients
+
+- Create Clinical History Entity #8
+- Description: 
+- Branch: feature/8-create-clinical-history-entity
+
+- Link Clinical History to Patient #9
+- Description: 
+- Branch: feature/9-link-clinical-history-to-patient
+
+- Create PrimeraVisita Entity & Endpoint #10
+- Description: 
+- Branch: feature/10-create-primeravisita-entity-endpoint
+
+- Create Odontogram Entity #11
+- Description: 
+- Branch: feature/11-create-odontogram-entity
+
+- Link Odontogram to Patient #12
+- Description:
+- Branch: feature/12-link-odontogram-to-patient
+
+- Create Patologia Entity #13
+- Description:
+- Branch: feature/13-create-patologia-entity
+
+- Store Tooth Treatment Status #14
+- Description:
+- Branch: feature/14-store-tooth-treatment-status
+
+- Upload Multiple Radiographs #15
+- Description:
+- Branch: feature/15-upload-multiple-radiographs
+
+- List Patient Radiographs #16
+- Description:
+- Branch: feature/16-list-patient-radiographs
+
+- Delete / Replace Radiographs #17
+- Description:
+- Branch: feature/17-delete-replace-radiographs
+
+- Create Dentist Entity #18
+- Description: Professional profile entity linked to User (ROLE_USER/ROLE_ADMIN only for auth; dentist is not a separate security role).
+- Branch: feature/18-create-dentist-entity
+
+- CRUD for Dentists #19
+- Description: Endpoints to manage dentist profiles as business data; enforce access with ROLE_ADMIN and/or ROLE_USER per product rules—without introducing DENTIST/STAFF roles.
+- Branch: feature/19-crud-for-dentists
+
+- Create Box Entity #20
+- Description: 
+- Branch: feature/20-create-box-entity
+
+- CRUD for Boxes #21
+- Description: 
+- Branch: feature/21-crud-for-boxes
+
+- Assign Boxes to Dentists #22
+- Description: 
+- Branch: feature/22-assign-boxes-to-dentists
+
+- Create Appointment Entity #23
+- Description: 
+- Branch: feature/23-create-appointment-entity
+
+- CRUD for Appointments #24
+- Description: 
+- Branch: feature/24-crud-for-appointments
+
+- Validate Availability #25
+- Description: 
+- Branch: feature/25-validate-availability
+
+- 5-Minute Gaps Between Appointments #26
+- Description: 
+- Branch: feature/26-5-minute-gaps-between-appointments
+
+- Cancel or Reschedule Appointments #27
+- Description: 
+- Branch: feature/27-cancel-or-reschedule-appointments
+
+- Create Stock Entity #28
+- Description: 
+- Branch: feature/28-create-stock-entity
+
+- Manage Stock #29
+- Description: 
+- Branch: feature/29-manage-stock
+
+- Create RecepcionMaterial Entity #30
+- Description: 
+- Branch: feature/30-create-recepcionmaterial-entity
+
+- Create Treatment Protocols #31
+- Description: 
+- Branch: feature/31-create-treatment-protocols
+
+- Multilingual Support #32
+- Description: 
+- Branch: feature/32-multilingual-support
+
+- Chatbot Backend #33
+- Description: 
+- Branch: feature/33-chatbot-backend
+
+- Email Notifications Service #34
+- Description: 
+- Branch: feature/34-email-notifications-service
+
+- Billing and Payments API #35
+- Description: API de facturación / pagos alineada con FE issue #26. Por decisión de producto, ROLE_USER y ROLE_ADMIN pueden acceder al módulo; definir con voters o reglas qué operaciones son solo lectura, cuáles de alta/edición, y si alguna acción queda restringida a ROLE_ADMIN. Mantener coherencia con el modelo de solo dos roles de seguridad.
+- Branch: feature/35-billing-and-payments-api
+
+- Pedagogical Notices (Admin to Students) #36
+- Description: Recursos para que ROLE_ADMIN publique avisos o notas breves (pedagogía / centro) visibles para ROLE_USER en dashboards o flujos clínicos; lectura para alumnos obligatoria donde aplique; edición/alta para administradores. Opcional en una primera iteración como texto estático en FE (#4); evolución a entidad + endpoints protegidos.
+- Branch: feature/36-pedagogical-notices-api
