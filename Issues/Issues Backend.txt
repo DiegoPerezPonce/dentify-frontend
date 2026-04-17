@@ -133,3 +133,11 @@ Issues Backend
 - Email Notifications Service #34
 - Description: 
 - Branch: feature/34-email-notifications-service
+
+- Billing and Payments API #35
+- Description: API de facturación / pagos alineada con FE issue #26. Por decisión de producto, ROLE_USER y ROLE_ADMIN pueden acceder al módulo; definir con voters o reglas qué operaciones son solo lectura, cuáles de alta/edición, y si alguna acción queda restringida a ROLE_ADMIN. Mantener coherencia con el modelo de solo dos roles de seguridad.
+- Branch: feature/35-billing-and-payments-api
+
+- Pedagogical Notices (Admin to Students) #36
+- Description: Recursos para que ROLE_ADMIN publique avisos o notas breves (pedagogía / centro) visibles para ROLE_USER en dashboards o flujos clínicos; lectura para alumnos obligatoria donde aplique; edición/alta para administradores. Opcional en una primera iteración como texto estático en FE (#4); evolución a entidad + endpoints protegidos.
+- Branch: feature/36-pedagogical-notices-api

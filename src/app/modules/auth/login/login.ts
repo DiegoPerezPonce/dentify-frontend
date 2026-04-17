@@ -69,7 +69,7 @@ export class LoginComponent {
       next: (response: any) => {
         //console.log('Login exitoso', response);
         this.isLoading = false;
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/app/dashboard']);
       },
       error: (err: any) => {
         //console.error('Error en el login', err);

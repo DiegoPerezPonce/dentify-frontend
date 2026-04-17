@@ -11,7 +11,7 @@ Issues Frontend
 - Branch: feature/2-login-interface
 
 - Route Guards by Roles (RBAC) #4
-- Description: Restrict access using exactly two Symfony-style roles: ROLE_ADMIN and ROLE_USER. Examples: routes/modules for user CRUD, role assignment (ADMIN vs USER only), boxes, treatment protocols, and stock configuration are ROLE_ADMIN only; patient care flows (dashboard, patients, appointments, odontogram, radiographs, clinical history, schedules as consumed by the app) require an authenticated user with ROLE_USER (admins typically hold ROLE_ADMIN and may also have ROLE_USER for day-to-day screens—define in JWT/backend). Only the login route stays public (no JWT). There is no public application signup: new user accounts are created exclusively by ROLE_ADMIN via issue #15 (and backend admin APIs). Implement route guards and optional menu visibility from JWT claims.
+- Description: Exactly two security roles: ROLE_ADMIN and ROLE_USER (Symfony-style). Product mapping: ROLE_USER = alumno (estudiante / personal clínico en la simulación); ROLE_ADMIN = supervisor-administrador (misma persona en JWT, etiqueta UX “admin” o “supervisor”). Use case rule: ROLE_ADMIN inherits all ROLE_USER clinical capabilities—same routes and screens for pacientes, agenda, radiografías, etc., plus exclusive administration (user CRUD #15, role assignment ADMIN vs USER only, dentists #16, boxes #17, protocols #18, stock configuration #14, …). There is NO “switch to student mode” or second app entry: a single admin shell with sections General (clinical, shared with students) + Administración (admin-only); optionally collapse the Administración block in the UI for focus, but that is cosmetic only, not a security boundary. Route policy: clinical/patient-care routes allow ROLE_USER OR ROLE_ADMIN; administration-only routes require ROLE_ADMIN. Only /login is public (no JWT). No public signup (#15). Implement authGuard + roleGuard and shell menu from JWT claims. Include placement for avisos / notas pedagógicas published by ROLE_ADMIN and shown to ROLE_USER (students must see them), e.g. banners on dashboard or patient flows—content may be static at first or backed by API (see backend notices issue).
 - Branch: feature/4-route-guards-by-roles-rbac
 
 - Dashboard and Patient List #5
@@ -79,7 +79,7 @@ Issues Frontend
 - Branch: feature/20-soporte-multi-idioma-ngx-translate
 
 - Notification Center #21
-- Description: Display of alerts for upcoming appointments or low stock.
+- Description: Display of alerts for upcoming appointments or low stock. May later integrate or link admin-authored notices (#4 / backend #36) if those are surfaced as in-app notifications.
 - Branch: feature/21-notification-center
 
 - Dentist Schedule Management (Availability) #22
@@ -95,5 +95,9 @@ Issues Frontend
 - Branch: feature/24-implementation-of-visual-identity-and-global-layout
 
 - User Home Dashboard (Quick Widgets) #25
-- Description: Create "Quick Action Cards" for authenticated users. Primary audience: ROLE_USER (e.g. quick links and recent appointment widget via Appointment API). ROLE_ADMIN may see the same home or an admin-oriented variant—align with product choice and route guards.
+- Description: Create "Quick Action Cards" and widgets (e.g. próxima cita). ROLE_USER (alumno): home orientado a práctica clínica (wireframe Inicio Alumno). ROLE_ADMIN: mismo tipo de accesos clínicos en la misma navegación, más widgets de resumen de clínica (boxes, stock, actividad) en el mismo shell—una sola vista admin, sin modo alterno; lo extra es aditivo en la misma entrada a la app.
 - Branch: feature/25-user-home-dashboard-quick-widgets
+
+- Billing and Payments (Facturación) #33
+- Description: Módulo de pagos / facturación accesible para ROLE_USER y ROLE_ADMIN (ambos roles entran al área; el backend acota con voters qué acciones son solo lectura, alta, edición o anulación). Alinear menú y guards con OR de roles hasta reglas más finas. Wireframes “Pagos” para alumno y admin coherentes con esta issue.
+- Branch: feature/26-billing-and-payments

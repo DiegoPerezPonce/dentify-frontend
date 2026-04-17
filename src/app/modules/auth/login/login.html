@@ -30,7 +30,7 @@
 
       <div class="session-active" *ngIf="authService.isLoggedIn()">
         <p>Ya tienes una sesión iniciada en este navegador.</p>
-        <a routerLink="/dashboard" class="session-active-link">Ir al panel</a>
+        <a routerLink="/app/dashboard" class="session-active-link">Ir al panel</a>
       </div>
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
