@@ -34,13 +34,9 @@ export const routes: Routes = [
       {
         path: 'pacientes',
         canActivate: [roleGuard],
-        data: {
-          ...clinicalOrAdmin,
-          pageTitle: 'Gestión de pacientes',
-          hint: 'Issue #5: tabla con filtros y paginación.'
-        },
+        data: { ...clinicalOrAdmin, pageTitle: 'Gestión de pacientes' },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/patients/patient-list/patient-list').then((m) => m.PatientListComponent)
       },
       {
         path: 'agenda',

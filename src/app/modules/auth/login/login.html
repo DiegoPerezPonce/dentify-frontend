@@ -33,6 +33,12 @@
         <a routerLink="/app/dashboard" class="session-active-link">Ir al panel</a>
       </div>
 
+      @if (sessionExpiredNotice(); as notice) {
+        <div class="session-expired-notice" role="alert">
+          <p>{{ notice }}</p>
+        </div>
+      }
+
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
 
         <!-- Campo: Correo o Nombre de usuario -->
