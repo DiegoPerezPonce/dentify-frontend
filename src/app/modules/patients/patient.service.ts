@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { API_BASE_URL } from '../../core/config/api-base';
 import { PatientListQuery, PatientListResult, PatientRow } from './models/patient-list.models';
+import { Patient, PatientCreateDTO, PatientUpdateDTO } from './models/patient.models';
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +38,34 @@ export class PatientService {
         return parsed;
       })
     );
+  }
+
+  /**
+   * GET paciente por ID.
+   */
+  getById(id: number): Observable<Patient> {
+    return this.http.get<Patient>(`${this.base}/${id}`);
+  }
+
+  /**
+   * POST crear nuevo paciente.
+   */
+  create(dto: PatientCreateDTO): Observable<Patient> {
+    return this.http.post<Patient>(this.base, dto);
+  }
+
+  /**
+   * PUT actualizar paciente existente.
+   */
+  update(id: number, dto: PatientUpdateDTO): Observable<Patient> {
+    return this.http.put<Patient>(`${this.base}/${id}`, dto);
+  }
+
+  /**
+   * DELETE eliminar paciente.
+   */
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${id}`);
   }
 }
 
