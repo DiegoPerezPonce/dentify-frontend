@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -11,10 +11,11 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   protected authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   /** Controla si la contraseña es visible */
   showPassword = false;
@@ -24,6 +25,9 @@ export class LoginComponent {
 
   /** Mensaje de error proveniente del servidor */
   serverError = '';
+
+  /** Aviso cuando el guard redirige por JWT caducado. */
+  readonly sessionExpiredNotice = signal<string | null>(null);
 
   loginForm = this.fb.group({
     identifier: ['', [Validators.required, Validators.minLength(3)]],
@@ -49,6 +53,13 @@ export class LoginComponent {
   isValid(field: string): boolean {
     const control = this.loginForm.get(field);
     return !!(control && control.valid && control.touched);
+  }
+
+  ngOnInit(): void {
+    const motivo = this.route.snapshot.queryParamMap.get('motivo');
+    if (motivo === 'sesion-expirada') {
+      this.sessionExpiredNotice.set('Tu sesión ha caducado. Vuelve a iniciar sesión.');
+    }
   }
 
   onSubmit(): void {

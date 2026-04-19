@@ -1,0 +1,80 @@
+<div class="patient-page">
+  <header class="page-head">
+    <div>
+      <h1>Gestión de pacientes</h1>
+      <p class="sub">Listado con búsqueda y paginación (issue #5 · Peticiones #2).</p>
+    </div>
+    <button type="button" class="btn-secondary" disabled title="Issue #6 — registro de paciente">
+      + Registrar paciente
+    </button>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <label class="sr-only" for="patient-search">Buscar</label>
+      <input
+        id="patient-search"
+        type="search"
+        placeholder="Nombre, apellidos, DNI, NSS, teléfono, email o historial clínico…"
+        [formControl]="search"
+        autocomplete="off"
+      />
+    </div>
+    <div class="page-size">
+      <label for="page-size">Por página</label>
+      <select id="page-size" [value]="pageSize()" (change)="setPageSize(+$any($event.target).value)">
+        @for (n of pageSizeOptions; track n) {
+          <option [value]="n" [selected]="pageSize() === n">{{ n }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="muted">Cargando…</p>
+  } @else {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>DNI</th>
+            <th>Contacto</th>
+            <th class="col-actions">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of items(); track trackById($index, p)) {
+            <tr>
+              <td class="cell-strong">{{ displayName(p) }}</td>
+              <td>{{ dniLine(p) }}</td>
+              <td class="cell-muted">{{ contactLine(p) }}</td>
+              <td>
+                <button type="button" class="linkish" disabled title="Issue #6 — ficha del paciente">Ver</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="empty">No hay pacientes para mostrar.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (total() > 0) {
+    <footer class="pager">
+      <span class="muted">{{ rangeLabel() }}</span>
+      <div class="pager-btns">
+        <button type="button" (click)="setPage(page() - 1)" [disabled]="page() <= 1">Anterior</button>
+        <span class="page-indicator">Página {{ page() }} / {{ totalPages() }}</span>
+        <button type="button" (click)="setPage(page() + 1)" [disabled]="page() >= totalPages()">Siguiente</button>
+      </div>
+    </footer>
+    }
+  }
+</div>

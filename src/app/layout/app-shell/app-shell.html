@@ -37,6 +37,15 @@
       <div class="user-line">
         <span class="user-role">{{ auth.hasRole(ROLE_ADMIN) ? 'Administrador' : 'Alumno' }}</span>
       </div>
+      @if (sessionRemainingLine(); as line) {
+        <p
+          class="session-remaining"
+          [class.session-remaining-urgent]="sessionRemainingUrgent()"
+          role="status"
+        >
+          Sesión: {{ line }}.
+        </p>
+      }
       <button type="button" class="logout" (click)="logout()">Cerrar sesión</button>
     </div>
   </aside>

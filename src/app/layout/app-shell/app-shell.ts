@@ -1,7 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
-import { ROLE_ADMIN } from '../../core/utils/jwt-roles';
+import {
+  formatSessionRemainingLabel,
+  getSessionRemainingMs,
+  ROLE_ADMIN
+} from '../../core/utils/jwt-roles';
 
 @Component({
   selector: 'app-shell',
@@ -10,11 +14,26 @@ import { ROLE_ADMIN } from '../../core/utils/jwt-roles';
   templateUrl: './app-shell.html',
   styleUrl: './app-shell.scss'
 })
-export class AppShellComponent {
+export class AppShellComponent implements OnInit {
   protected auth = inject(AuthService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+
+  /** Dispara recomputación del tiempo de sesión cada 30 s. */
+  private readonly sessionTick = signal(0);
 
   readonly ROLE_ADMIN = ROLE_ADMIN;
+
+  readonly sessionRemainingLine = computed(() => {
+    this.sessionTick();
+    return formatSessionRemainingLabel(this.auth.getToken());
+  });
+
+  readonly sessionRemainingUrgent = computed(() => {
+    this.sessionTick();
+    const ms = getSessionRemainingMs(this.auth.getToken());
+    return ms != null && ms <= 5 * 60 * 1000;
+  });
 
   /** Solo UI: oculta el bloque Administración sin cambiar permisos. */
   readonly adminNavCollapsed = signal(false);
@@ -25,6 +44,11 @@ export class AppShellComponent {
 
   /** Aviso pedagógico visible para alumnos (y admins); texto estático hasta API #36. */
   readonly showPedagogicalNotice = signal(true);
+
+  ngOnInit(): void {
+    const id = window.setInterval(() => this.sessionTick.update((n) => n + 1), 30_000);
+    this.destroyRef.onDestroy(() => clearInterval(id));
+  }
 
   logout(): void {
     this.auth.logout();

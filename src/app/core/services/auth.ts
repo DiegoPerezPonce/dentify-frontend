@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { API_BASE_URL } from '../config/api-base';
 import { parseRolesFromJwt } from '../utils/jwt-roles';
 
 @Injectable({
@@ -9,7 +10,7 @@ import { parseRolesFromJwt } from '../utils/jwt-roles';
 export class AuthService {
   private http = inject(HttpClient);
   private readonly TOKEN_KEY = 'auth_token';
-  private readonly API_URL = 'http://localhost:8000/api/login';
+  private readonly API_URL = `${API_BASE_URL}/login`;
 
   login(credentials: unknown): Observable<{ token?: string }> {
     return this.http.post<{ token?: string }>(this.API_URL, credentials).pipe(
