@@ -39,6 +39,13 @@ export const routes: Routes = [
           import('./modules/patients/patient-list/patient-list').then((m) => m.PatientListComponent)
       },
       {
+        path: 'pacientes/:id',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Paciente' },
+        loadComponent: () =>
+          import('./modules/patients/patient-form/patient-form').then((m) => m.PatientFormComponent)
+      },
+      {
         path: 'agenda',
         canActivate: [roleGuard],
         data: {

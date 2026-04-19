@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PatientService } from '../patient.service';
 import { PatientListQuery, PatientRow } from '../models/patient-list.models';
@@ -14,6 +15,7 @@ import { PatientListQuery, PatientRow } from '../models/patient-list.models';
 })
 export class PatientListComponent implements OnInit {
   private patientService = inject(PatientService);
+  private router = inject(Router);
 
   readonly search = new FormControl('', { nonNullable: true });
   readonly page = signal(1);
@@ -24,6 +26,10 @@ export class PatientListComponent implements OnInit {
   readonly total = signal(0);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
+  
+  readonly showDeleteModal = signal(false);
+  readonly patientToDelete = signal<PatientRow | null>(null);
+  readonly deleting = signal(false);
 
   readonly totalPages = computed(() => {
     const t = this.total();
@@ -103,6 +109,64 @@ export class PatientListComponent implements OnInit {
   trackById(_i: number, p: PatientRow): string {
     return String(p.id ?? p['@id'] ?? _i);
   }
+
+  goToNewPatient(): void {
+    this.router.navigate(['/app/pacientes', 'nuevo']);
+  }
+
+  goToEditPatient(p: PatientRow): void {
+    const id = p.id ?? (p['@id'] ? extractIdFromIri(p['@id']) : null);
+    if (id) {
+      this.router.navigate(['/app/pacientes', id]);
+    }
+  }
+
+  confirmDelete(p: PatientRow): void {
+    this.patientToDelete.set(p);
+    this.showDeleteModal.set(true);
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal.set(false);
+    this.patientToDelete.set(null);
+    this.deleting.set(false);
+  }
+
+  deletePatient(): void {
+    const patient = this.patientToDelete();
+    if (!patient) return;
+
+    const id = patient.id ?? (patient['@id'] ? extractIdFromIri(patient['@id']) : null);
+    if (!id) {
+      this.error.set('No se pudo identificar el paciente a eliminar.');
+      this.cancelDelete();
+      return;
+    }
+
+    this.deleting.set(true);
+    this.error.set(null);
+
+    this.patientService.delete(Number(id)).subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.cancelDelete();
+        // Recargar la lista
+        this.load();
+      },
+      error: (err) => {
+        this.deleting.set(false);
+        this.cancelDelete();
+        this.error.set('Error al eliminar el paciente. Es posible que tenga datos relacionados.');
+        console.error('Error deleting patient:', err);
+      }
+    });
+  }
+}
+
+/** Extrae ID numérico de IRI de API Platform (ej: /api/patients/5 → 5). */
+function extractIdFromIri(iri: string): number | null {
+  const match = iri.match(/\/(\d+)$/);
+  return match ? Number(match[1]) : null;
 }
 
 function listLoadErrorMessage(err: unknown): string {
