@@ -60,7 +60,7 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "open": "/login"
+            "open": true
           },
           "configurations": {
             "production": {
