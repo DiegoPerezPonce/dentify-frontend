@@ -1,0 +1,19 @@
+Backlog detallado (issues, ramas, descripciones): ver Issues/Issues Frontend.txt e Issues/Issues Backend.txt. Los puntos 1–5 de abajo están referenciados desde esas issues como “Peticiones #n”.
+
+1. Que un usuario se pueda logear.
+
+2. Gestion de paciente.
+
+3. En el perfil de un paciente, Avisos de warnig por alergias o infecciones.
+(que sea facilmente identificable que ese paciente tenga un problema.)
+
+4. Mostrar que el paciente a aceptado los terminos. 
+(Mostrar 2 checkbox que haya marcado, para terminos generales y anestesia.)
+
+5. Citas, la cita depende del doctor, tratamiento y tiempo:
+
+Si es un tratamiento largo no puede ir a utima hora.
+5 minutos despues de cada cita.
+Un paciente infeccioso tiene que ir al final del dia, que sea la ultima cita. 
+En la cita y muestre una alerta o en otro color indicando que es un paciente infeccioso
+En la agenda completa que se vea de otro color diferente para poder identificarlo 

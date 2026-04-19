@@ -1,5 +1,7 @@
 Issues Frontend
 
+- Product cross-reference: extra acceptance criteria (login, patient UX, consent checkboxes, appointment rules) live in Issues/Peticiones.txt (items 1–5). Issues below should satisfy the relevant Peticiones points; where it matters, the issue text cites the Peticiones item number(s).
+
 (No hay Issue numero 3, pasamos del #2 al #4.)
 
 - Implement JWT Interceptor #1

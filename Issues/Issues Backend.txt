@@ -1,5 +1,7 @@
 Issues Backend
 
+- Product cross-reference: domain rules and UX-driven API behaviour described in Issues/Peticiones.txt (items 1–5). Backend issues below should enforce or expose data needed for those criteria; Peticiones item numbers are cited where relevant.
+
 (No hay issue numero#2, pasamos del #1 al #3)
 
 - User Role Management auth #1
@@ -15,27 +17,27 @@ Issues Backend
 - Branch: feature/4-crud-for-users
 
 - Implement JWT Authentication #5
-- Description: Implement standard authentication with JWT. Tokens must carry roles consistent with issue #1 (ROLE_ADMIN, ROLE_USER only) so clients can drive guards and UI.
+- Description: Implement standard authentication with JWT. Tokens must carry roles consistent with issue #1 (ROLE_ADMIN, ROLE_USER only) so clients can drive guards and UI. Peticiones #1 (user can log in).
 - Branch: feature/5-implement-jwt-authentication
 
 - Create Patient Entity #6
-- Description: Include pagination and search by name/DNI
+- Description: Include pagination and search by name/DNI. Peticiones #2–#4: model fields/flags needed for allergy or infection warnings, consent for general terms and anesthesia (checkboxes persisted), and any data required to schedule infectious patients last (see appointment issues).
 - Branch: feature/6-create-patient-entity
 
 - CRUD for Patients #7
-- Description: Include pagination and search by name/DNI
+- Description: Include pagination and search by name/DNI. Peticiones #2–#4: API responses must allow the frontend to show consent state and risk indicators (allergies/infections) clearly.
 - Branch: feature/7-crud-for-patients
 
 - Create Clinical History Entity #8
-- Description: 
+- Description: Peticiones #3: structure data so clinical history supports allergy/infection context for APIs and UI.
 - Branch: feature/8-create-clinical-history-entity
 
 - Link Clinical History to Patient #9
-- Description: 
+- Description: Peticiones #3: linkage must preserve patient-level risk signals for history endpoints.
 - Branch: feature/9-link-clinical-history-to-patient
 
 - Create PrimeraVisita Entity & Endpoint #10
-- Description: 
+- Description: Peticiones #4: persist acceptance of general terms and anesthesia where the product requires it on first visit.
 - Branch: feature/10-create-primeravisita-entity-endpoint
 
 - Create Odontogram Entity #11
@@ -87,23 +89,23 @@ Issues Backend
 - Branch: feature/22-assign-boxes-to-dentists
 
 - Create Appointment Entity #23
-- Description: 
+- Description: Peticiones #5: store doctor, treatment, duration, infectious-patient flag (or equivalent) for scheduling rules.
 - Branch: feature/23-create-appointment-entity
 
 - CRUD for Appointments #24
-- Description: 
+- Description: Peticiones #5: CRUD must respect business rules enforced in validation (#25–#26) and infectious-patient ordering.
 - Branch: feature/24-crud-for-appointments
 
 - Validate Availability #25
-- Description: 
+- Description: Peticiones #5: reject invalid slots (e.g. long treatment at forbidden end-of-day windows; infectious patient not last of day when rule applies).
 - Branch: feature/25-validate-availability
 
 - 5-Minute Gaps Between Appointments #26
-- Description: 
+- Description: Peticiones #5: enforce at least 5 minutes between consecutive appointments (coordinate with #25/#24).
 - Branch: feature/26-5-minute-gaps-between-appointments
 
 - Cancel or Reschedule Appointments #27
-- Description: 
+- Description: Peticiones #5: reschedule flows must re-run validation (gaps, infectious ordering, treatment duration).
 - Branch: feature/27-cancel-or-reschedule-appointments
 
 - Create Stock Entity #28
