@@ -1,0 +1,101 @@
+<div class="medical-history-container">
+  <!-- Header con info del paciente -->
+  <div class="page-header">
+    <button type="button" class="btn-back" (click)="goBack()">
+      ← Volver a pacientes
+    </button>
+    
+    @if (patient()) {
+      <div class="patient-info-card">
+        <div class="patient-details">
+          <h1>{{ patient()!.nombre }} {{ patient()!.apellidos }}</h1>
+          <div class="meta">
+            <span class="badge">DNI: {{ patient()!.dni }}</span>
+            @if (patient()!.nss) {
+              <span class="badge">NSS: {{ patient()!.nss }}</span>
+            }
+          </div>
+        </div>
+        <button type="button" class="btn-secondary" (click)="goToPatientEdit()">
+          Editar paciente
+        </button>
+      </div>
+    }
+
+    <div class="section-header">
+      <h2>📋 Historial Clínico</h2>
+      <p class="subtitle">Registro cronológico de consultas, tratamientos y observaciones médicas</p>
+    </div>
+  </div>
+
+  <!-- Loading & Error states -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando historial...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <span class="icon">⚠️</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <!-- Timeline del historial -->
+  @if (!loading() && !error()) {
+    @if (history().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📄</div>
+        <h3>Sin historial clínico</h3>
+        <p>Este paciente aún no tiene entradas en su historial médico.</p>
+      </div>
+    } @else {
+      <div class="timeline">
+        @for (entry of history(); track entry.id) {
+          <div class="timeline-item">
+            <!-- Indicador de tipo -->
+            <div class="timeline-marker" [style.background-color]="getTypeColor(entry.tipo)">
+              <span class="timeline-dot"></span>
+            </div>
+
+            <!-- Contenido -->
+            <div class="timeline-content">
+              <div class="entry-header">
+                <div class="entry-meta">
+                  <span class="entry-type" [style.background-color]="getTypeColor(entry.tipo)">
+                    {{ getTypeLabel(entry.tipo) }}
+                  </span>
+                  <span class="entry-date">
+                    {{ formatDate(entry.fecha) }} · {{ formatTime(entry.fecha) }}
+                  </span>
+                  <span class="entry-relative">{{ getRelativeTime(entry.fecha) }}</span>
+                </div>
+              </div>
+
+              <div class="entry-body">
+                <h3 class="entry-description">{{ entry.descripcion }}</h3>
+                
+                @if (entry.observaciones) {
+                  <div class="entry-observations">
+                    <strong>Observaciones:</strong>
+                    <p>{{ entry.observaciones }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Resumen al final -->
+      <div class="history-summary">
+        <p>
+          <strong>{{ history().length }}</strong> 
+          {{ history().length === 1 ? 'entrada' : 'entradas' }} en el historial
+        </p>
+      </div>
+    }
+  }
+</div>

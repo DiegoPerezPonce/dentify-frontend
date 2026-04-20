@@ -156,7 +156,7 @@
 }
 
 .col-actions {
-  width: 10rem;
+  width: 14rem;
   text-align: right;
 }
 
@@ -175,6 +175,18 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+
+  &.history-btn {
+    background: #faf5ff;
+    color: #805ad5;
+
+    &:hover {
+      background: #805ad5;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(128, 90, 213, 0.3);
+    }
+  }
 
   &.edit-btn {
     background: #e8f4f8;
