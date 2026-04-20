@@ -140,6 +140,12 @@ export class PatientFormComponent implements OnInit {
     this.router.navigate(['/app/pacientes']);
   }
 
+  goToHistory(): void {
+    if (this.patientId()) {
+      this.router.navigate(['/app/pacientes', this.patientId(), 'historial']);
+    }
+  }
+
   hasError(field: string): boolean {
     const control = this.patientForm.get(field);
     return !!(control && control.invalid && control.touched);

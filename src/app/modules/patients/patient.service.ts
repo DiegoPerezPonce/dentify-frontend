@@ -4,6 +4,7 @@ import { map, Observable } from 'rxjs';
 import { API_BASE_URL } from '../../core/config/api-base';
 import { PatientListQuery, PatientListResult, PatientRow } from './models/patient-list.models';
 import { Patient, PatientCreateDTO, PatientUpdateDTO } from './models/patient.models';
+import { ClinicalHistory } from './models/clinical-history.models';
 
 @Injectable({
   providedIn: 'root'
@@ -66,6 +67,13 @@ export class PatientService {
    */
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${id}`);
+  }
+
+  /**
+   * GET historial clínico del paciente.
+   */
+  getHistory(patientId: number): Observable<ClinicalHistory[]> {
+    return this.http.get<ClinicalHistory[]>(`${this.base}/${patientId}/history`);
   }
 }
 
