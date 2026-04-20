@@ -53,6 +53,13 @@ export const routes: Routes = [
           import('./modules/patients/medical-history/medical-history').then((m) => m.MedicalHistoryComponent)
       },
       {
+        path: 'pacientes/:id/primera-visita',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Primera visita' },
+        loadComponent: () =>
+          import('./modules/patients/first-visit-form/first-visit-form').then((m) => m.FirstVisitFormComponent)
+      },
+      {
         path: 'agenda',
         canActivate: [roleGuard],
         data: {

@@ -156,7 +156,7 @@
 }
 
 .col-actions {
-  width: 14rem;
+  width: 18rem;
   text-align: right;
 }
 
@@ -164,6 +164,7 @@
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 .action-btn {
@@ -175,6 +176,18 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+
+  &.visit-btn {
+    background: #ebf8ff;
+    color: #3182ce;
+
+    &:hover {
+      background: #3182ce;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(49, 130, 206, 0.3);
+    }
+  }
 
   &.history-btn {
     background: #faf5ff;

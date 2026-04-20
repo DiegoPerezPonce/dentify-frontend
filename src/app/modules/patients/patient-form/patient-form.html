@@ -5,9 +5,14 @@
       <p class="subtitle">{{ isEditMode() ? 'Actualiza la información del paciente' : 'Completa los datos del nuevo paciente' }}</p>
     </div>
     @if (isEditMode()) {
-      <button type="button" class="btn-history" (click)="goToHistory()">
-        📋 Ver historial clínico
-      </button>
+      <div class="header-actions">
+        <button type="button" class="btn-action btn-history" (click)="goToHistory()">
+          📋 Historial
+        </button>
+        <button type="button" class="btn-action btn-first-visit" (click)="goToFirstVisit()">
+          🏥 Primera visita
+        </button>
+      </div>
     }
   </div>
 

@@ -16,9 +16,14 @@
             }
           </div>
         </div>
-        <button type="button" class="btn-secondary" (click)="goToPatientEdit()">
-          Editar paciente
-        </button>
+        <div class="action-buttons">
+          <button type="button" class="btn-action btn-first-visit" (click)="goToFirstVisit()">
+            🏥 Primera visita
+          </button>
+          <button type="button" class="btn-action btn-edit" (click)="goToPatientEdit()">
+            Editar paciente
+          </button>
+        </div>
       </div>
     }
 
