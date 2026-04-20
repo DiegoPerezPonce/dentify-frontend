@@ -119,4 +119,11 @@ export class MedicalHistoryComponent implements OnInit {
       this.router.navigate(['/app/pacientes', id]);
     }
   }
+
+  goToFirstVisit(): void {
+    const id = this.patient()?.id;
+    if (id) {
+      this.router.navigate(['/app/pacientes', id, 'primera-visita']);
+    }
+  }
 }

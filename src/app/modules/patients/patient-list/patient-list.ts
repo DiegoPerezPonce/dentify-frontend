@@ -128,6 +128,13 @@ export class PatientListComponent implements OnInit {
     }
   }
 
+  goToFirstVisit(p: PatientRow): void {
+    const id = p.id ?? (p['@id'] ? extractIdFromIri(p['@id']) : null);
+    if (id) {
+      this.router.navigate(['/app/pacientes', id, 'primera-visita']);
+    }
+  }
+
   confirmDelete(p: PatientRow): void {
     this.patientToDelete.set(p);
     this.showDeleteModal.set(true);
