@@ -49,6 +49,19 @@
   }
 }
 
+.btn-odonto {
+  border-color: #81e6d9;
+  background: #e6fffa;
+  color: #319795;
+
+  &:hover {
+    background: #319795;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(49, 151, 149, 0.3);
+  }
+}
+
 .btn-history {
   border-color: #d6bcfa;
   background: #faf5ff;

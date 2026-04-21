@@ -60,6 +60,13 @@ export const routes: Routes = [
           import('./modules/patients/first-visit-form/first-visit-form').then((m) => m.FirstVisitFormComponent)
       },
       {
+        path: 'pacientes/:id/odontograma',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Odontograma' },
+        loadComponent: () =>
+          import('./modules/patients/odontograma-interactive/odontograma-interactive').then((m) => m.OdontogramaInteractiveComponent)
+      },
+      {
         path: 'agenda',
         canActivate: [roleGuard],
         data: {

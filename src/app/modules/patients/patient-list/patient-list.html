@@ -54,6 +54,9 @@
               <td>{{ dniLine(p) }}</td>
               <td class="cell-muted">{{ contactLine(p) }}</td>
               <td class="actions-cell">
+                <button type="button" class="action-btn odonto-btn" (click)="goToOdontograma(p)" title="Ver odontograma">
+                  Odontograma
+                </button>
                 <button type="button" class="action-btn visit-btn" (click)="goToFirstVisit(p)" title="Registrar primera visita">
                   Primera visita
                 </button>

@@ -152,6 +152,12 @@ export class PatientFormComponent implements OnInit {
     }
   }
 
+  goToOdontograma(): void {
+    if (this.patientId()) {
+      this.router.navigate(['/app/pacientes', this.patientId(), 'odontograma']);
+    }
+  }
+
   hasError(field: string): boolean {
     const control = this.patientForm.get(field);
     return !!(control && control.invalid && control.touched);

@@ -1,0 +1,307 @@
+<div class="odontograma-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button type="button" class="btn-back" (click)="goBack()">
+      ← Volver a pacientes
+    </button>
+    
+    @if (patient()) {
+      <div class="patient-info-card">
+        <div class="patient-details">
+          <h1>🦷 Odontograma Interactivo</h1>
+          <p class="patient-name">{{ patient()!.nombre }} {{ patient()!.apellidos }}</p>
+          <span class="badge">DNI: {{ patient()!.dni }}</span>
+        </div>
+        <button type="button" class="btn-secondary" (click)="goToPatientEdit()">
+          Editar paciente
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Loading & Error -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando odontograma...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <span class="icon">⚠️</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <!-- Main content -->
+  @if (!loading()) {
+    <div class="odontograma-workspace">
+      
+      <!-- Odontograma visual -->
+      <div class="odontograma-visual">
+        <h2 class="section-title">🦷 Dentadura (Sistema FDI)</h2>
+        
+        <!-- Leyenda de colores -->
+        <div class="color-legend">
+          <div class="legend-item">
+            <span class="legend-color" style="background: #e53e3e;"></span>
+            <span>Rojo: Patología/Tratamiento necesario</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: #3182ce;"></span>
+            <span>Azul: Tratamiento realizado</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: #38a169;"></span>
+            <span>Verde: Prevención</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: #2d3748;"></span>
+            <span>Negro: Estado base</span>
+          </div>
+        </div>
+
+        <!-- Dentadura superior -->
+        <div class="jaw upper-jaw">
+          <div class="quadrant-label">Superior</div>
+          <div class="teeth-row">
+            <!-- Cuadrante 1: Superior derecho (18-11) -->
+            <div class="quadrant q1">
+              <span class="quadrant-number">1</span>
+              @for (tooth of FDI_TEETH.quadrant1.slice().reverse(); track tooth) {
+                <button
+                  type="button"
+                  class="tooth"
+                  [class.selected]="isToothSelected(tooth)"
+                  [style.background-color]="getToothColor(tooth.toString())"
+                  (click)="selectTooth(tooth)"
+                  [title]="'Diente ' + tooth"
+                >
+                  <span class="tooth-number">{{ tooth }}</span>
+                </button>
+              }
+            </div>
+            
+            <!-- Cuadrante 2: Superior izquierdo (21-28) -->
+            <div class="quadrant q2">
+              <span class="quadrant-number">2</span>
+              @for (tooth of FDI_TEETH.quadrant2; track tooth) {
+                <button
+                  type="button"
+                  class="tooth"
+                  [class.selected]="isToothSelected(tooth)"
+                  [style.background-color]="getToothColor(tooth.toString())"
+                  (click)="selectTooth(tooth)"
+                  [title]="'Diente ' + tooth"
+                >
+                  <span class="tooth-number">{{ tooth }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Dentadura inferior -->
+        <div class="jaw lower-jaw">
+          <div class="teeth-row">
+            <!-- Cuadrante 4: Inferior derecho (48-41) -->
+            <div class="quadrant q4">
+              <span class="quadrant-number">4</span>
+              @for (tooth of FDI_TEETH.quadrant4.slice().reverse(); track tooth) {
+                <button
+                  type="button"
+                  class="tooth"
+                  [class.selected]="isToothSelected(tooth)"
+                  [style.background-color]="getToothColor(tooth.toString())"
+                  (click)="selectTooth(tooth)"
+                  [title]="'Diente ' + tooth"
+                >
+                  <span class="tooth-number">{{ tooth }}</span>
+                </button>
+              }
+            </div>
+            
+            <!-- Cuadrante 3: Inferior izquierdo (31-38) -->
+            <div class="quadrant q3">
+              <span class="quadrant-number">3</span>
+              @for (tooth of FDI_TEETH.quadrant3; track tooth) {
+                <button
+                  type="button"
+                  class="tooth"
+                  [class.selected]="isToothSelected(tooth)"
+                  [style.background-color]="getToothColor(tooth.toString())"
+                  (click)="selectTooth(tooth)"
+                  [title]="'Diente ' + tooth"
+                >
+                  <span class="tooth-number">{{ tooth }}</span>
+                </button>
+              }
+            </div>
+          </div>
+          <div class="quadrant-label">Inferior</div>
+        </div>
+      </div>
+
+      <!-- Panel de control -->
+      <div class="control-panel">
+        <h2 class="section-title">⚙️ Panel de control</h2>
+        
+        <!-- Diente seleccionado -->
+        @if (selectedTooth()) {
+          <div class="selection-info">
+            <h3>Diente seleccionado</h3>
+            <div class="tooth-badge">{{ selectedTooth()!.toothId }}</div>
+            
+            <!-- Selección de cara -->
+            <div class="face-selector">
+              <label>Selecciona la cara del diente:</label>
+              <div class="face-buttons">
+                @for (face of faces; track face) {
+                  <button
+                    type="button"
+                    class="face-btn"
+                    [class.selected]="isFaceSelected(face)"
+                    [style.background-color]="getFaceColor(selectedTooth()!.toothId, face)"
+                    (click)="selectFace(face)"
+                    [title]="FACE_LABELS[face]"
+                  >
+                    {{ face }}
+                    <small>{{ FACE_LABELS[face] }}</small>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Estado actual de la cara seleccionada -->
+            @if (selectedTooth()!.face) {
+              <div class="current-status">
+                @if (getToothStatus(selectedTooth()!.toothId, selectedTooth()!.face!)) {
+                  <div class="status-display">
+                    <strong>Estado actual:</strong>
+                    <span class="status-badge" [style.background-color]="getFaceColor(selectedTooth()!.toothId, selectedTooth()!.face!)">
+                      {{ getToothStateLabel(getToothStatus(selectedTooth()!.toothId, selectedTooth()!.face!)!.estado) }}
+                    </span>
+                  </div>
+                } @else {
+                  <p class="no-status">Sin estado registrado</p>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Selector de estado/patología -->
+          @if (selectedTooth()!.face) {
+            <div class="state-selector">
+              <label>Asignar estado/patología:</label>
+
+              <!-- Patologías (rojas) -->
+              <div class="state-group">
+                <h4>🔴 Patologías</h4>
+                <div class="state-options">
+                  @for (item of stateGroups().patologias; track item[0]) {
+                    <label class="state-option">
+                      <input
+                        type="radio"
+                        name="state"
+                        [value]="item[0]"
+                        [(ngModel)]="selectedState"
+                      />
+                      <span class="state-label" [style.border-color]="item[1].color">
+                        <span class="color-dot" [style.background-color]="item[1].color"></span>
+                        {{ item[1].label }}
+                      </span>
+                    </label>
+                  }
+                </div>
+              </div>
+
+              <!-- Tratamientos (azul) -->
+              <div class="state-group">
+                <h4>🔵 Tratamientos realizados</h4>
+                <div class="state-options">
+                  @for (item of stateGroups().tratamientos; track item[0]) {
+                    <label class="state-option">
+                      <input
+                        type="radio"
+                        name="state"
+                        [value]="item[0]"
+                        [(ngModel)]="selectedState"
+                      />
+                      <span class="state-label" [style.border-color]="item[1].color">
+                        <span class="color-dot" [style.background-color]="item[1].color"></span>
+                        {{ item[1].label }}
+                      </span>
+                    </label>
+                  }
+                </div>
+              </div>
+
+              <!-- Estados base (negro) -->
+              <div class="state-group">
+                <h4>⚫ Estado base</h4>
+                <div class="state-options">
+                  @for (item of stateGroups().estados; track item[0]) {
+                    <label class="state-option">
+                      <input
+                        type="radio"
+                        name="state"
+                        [value]="item[0]"
+                        [(ngModel)]="selectedState"
+                      />
+                      <span class="state-label" [style.border-color]="item[1].color">
+                        <span class="color-dot" [style.background-color]="item[1].color"></span>
+                        {{ item[1].label }}
+                      </span>
+                    </label>
+                  }
+                </div>
+              </div>
+
+              <!-- Prevención (verde) -->
+              <div class="state-group">
+                <h4>🟢 Prevención</h4>
+                <div class="state-options">
+                  @for (item of stateGroups().prevencion; track item[0]) {
+                    <label class="state-option">
+                      <input
+                        type="radio"
+                        name="state"
+                        [value]="item[0]"
+                        [(ngModel)]="selectedState"
+                      />
+                      <span class="state-label" [style.border-color]="item[1].color">
+                        <span class="color-dot" [style.background-color]="item[1].color"></span>
+                        {{ item[1].label }}
+                      </span>
+                    </label>
+                  }
+                </div>
+              </div>
+
+              <!-- Botón aplicar -->
+              <button
+                type="button"
+                class="btn-apply"
+                (click)="applyState()"
+                [disabled]="saving()"
+              >
+                {{ saving() ? 'Guardando...' : 'Aplicar estado' }}
+              </button>
+            </div>
+          } @else {
+            <div class="instruction">
+              <p>👆 Selecciona una cara del diente para asignar un estado</p>
+            </div>
+          }
+        } @else {
+          <div class="empty-selection">
+            <div class="empty-icon">🦷</div>
+            <h3>Selecciona un diente</h3>
+            <p>Haz clic en cualquier diente del odontograma para comenzar</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
