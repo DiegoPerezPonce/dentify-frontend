@@ -156,7 +156,7 @@
 }
 
 .col-actions {
-  width: 18rem;
+  width: 22rem;
   text-align: right;
 }
 
@@ -176,6 +176,18 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+
+  &.odonto-btn {
+    background: #e6fffa;
+    color: #319795;
+
+    &:hover {
+      background: #319795;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(49, 151, 149, 0.3);
+    }
+  }
 
   &.visit-btn {
     background: #ebf8ff;

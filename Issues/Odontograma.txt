@@ -1,0 +1,83 @@
+Un odontograma es un esquema gráfico estandarizado que representa todos los dientes y permite registrar estado, patologías y tratamientos de forma visual.
+
+Organización básica
+Cuadrantes (sistema internacional FDI)
+1 → Superior derecho
+2 → Superior izquierdo
+3 → Inferior izquierdo
+4 → Inferior derecho
+
+Ejemplo:
+
+11 = incisivo central superior derecho
+36 = primer molar inferior izquierdo
+🦷 Caras dentales
+
+Cada diente se divide en 5 superficies:
+
+Vestibular (V) → externa
+Lingual/Palatina (L/P) → interna
+Oclusal (O) → masticación (posteriores)
+Incisal (I) → borde (anteriores)
+Mesial (M) → hacia la línea media
+Distal (D) → lado opuesto
+
+Colores del odontograma (CLAVE IMPORTANTE)
+
+🔴 Rojo → Patologías / tratamiento necesario
+
+Indica lo que hay que hacer:
+
+Caries activas
+Fracturas
+Restauraciones defectuosas
+Piezas a extraer
+Enfermedad actual
+
+Interpretación: problema presente
+
+🔵 Azul → Tratamientos ya realizados
+
+Indica lo que ya está hecho:
+
+Obturaciones (empastes)
+Endodoncias
+Coronas
+Prótesis colocadas
+
+Interpretación: historial clínico
+
+⚫ Negro → Condición existente sin intervención
+Dientes sanos
+Anatomía normal
+Ausencias no tratadas
+
+Interpretación: estado base
+
+🟢 Verde (menos universal, pero usado)
+Tratamientos preventivos
+Sellantes
+Profilaxis
+
+Interpretación: prevención
+
+Símbolos comunes
+❌ Cruz → diente ausente / extracción indicada
+⬛ Zona sombreada → caries o restauración
+◯ Círculo → corona
+Línea → endodoncia
+
+Cómo leer un odontograma
+Identificas el diente (número)
+Observas la superficie afectada
+Ves el color:
+🔴 problema actual
+🔵 tratamiento hecho
+Interpretas el símbolo
+🧾 Idea clave final
+
+El odontograma es básicamente un lenguaje visual clínico que permite:
+
+Diagnosticar
+Registrar tratamientos
+Comunicar información entre odontólogos
