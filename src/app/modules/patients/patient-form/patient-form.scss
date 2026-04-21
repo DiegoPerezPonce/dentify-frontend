@@ -49,6 +49,19 @@
   }
 }
 
+.btn-radio {
+  border-color: #fbb6ce;
+  background: #ffe6f0;
+  color: #d53f8c;
+
+  &:hover {
+    background: #d53f8c;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(213, 63, 140, 0.3);
+  }
+}
+
 .btn-odonto {
   border-color: #81e6d9;
   background: #e6fffa;

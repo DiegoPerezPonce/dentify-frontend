@@ -158,6 +158,12 @@ export class PatientFormComponent implements OnInit {
     }
   }
 
+  goToRadiografias(): void {
+    if (this.patientId()) {
+      this.router.navigate(['/app/pacientes', this.patientId(), 'radiografias']);
+    }
+  }
+
   hasError(field: string): boolean {
     const control = this.patientForm.get(field);
     return !!(control && control.invalid && control.touched);
