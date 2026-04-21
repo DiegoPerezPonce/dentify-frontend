@@ -67,6 +67,13 @@ export const routes: Routes = [
           import('./modules/patients/odontograma-interactive/odontograma-interactive').then((m) => m.OdontogramaInteractiveComponent)
       },
       {
+        path: 'pacientes/:id/radiografias',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Radiografías' },
+        loadComponent: () =>
+          import('./modules/patients/xray-gallery/xray-gallery').then((m) => m.XrayGalleryComponent)
+      },
+      {
         path: 'agenda',
         canActivate: [roleGuard],
         data: {

@@ -133,4 +133,11 @@ export class MedicalHistoryComponent implements OnInit {
       this.router.navigate(['/app/pacientes', id, 'odontograma']);
     }
   }
+
+  goToRadiografias(): void {
+    const id = this.patient()?.id;
+    if (id) {
+      this.router.navigate(['/app/pacientes', id, 'radiografias']);
+    }
+  }
 }

@@ -1,0 +1,209 @@
+<div class="xray-gallery-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button type="button" class="btn-back" (click)="goBack()">
+      ← Volver a pacientes
+    </button>
+    
+    @if (patient()) {
+      <div class="patient-info-card">
+        <div class="patient-details">
+          <h1>📸 Galería de Radiografías</h1>
+          <p class="patient-name">{{ patient()!.nombre }} {{ patient()!.apellidos }}</p>
+          <span class="badge">DNI: {{ patient()!.dni }}</span>
+        </div>
+        <button type="button" class="btn-secondary" (click)="goToPatientEdit()">
+          Editar paciente
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Loading & Error -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando radiografías...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <span class="icon">⚠️</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <!-- Main content -->
+  @if (!loading()) {
+    <!-- Upload zone -->
+    <div 
+      class="upload-zone"
+      [class.drag-over]="dragOver()"
+      [class.uploading]="uploading()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+    >
+      @if (uploading()) {
+        <div class="upload-progress">
+          <div class="spinner"></div>
+          <p>Subiendo archivos...</p>
+        </div>
+      } @else {
+        <div class="upload-content">
+          <div class="upload-icon">📤</div>
+          <h3>Arrastra y suelta archivos aquí</h3>
+          <p class="upload-description">o haz clic para seleccionar</p>
+          <p class="upload-hint">Formatos permitidos: JPEG, PNG, PDF • Máximo 10MB por archivo</p>
+          <input
+            type="file"
+            multiple
+            accept=".jpg,.jpeg,.png,.pdf"
+            (change)="onFileSelect($event)"
+            class="file-input"
+            id="file-input"
+          />
+          <label for="file-input" class="btn-upload">
+            Seleccionar archivos
+          </label>
+        </div>
+      }
+    </div>
+
+    <!-- Gallery grid -->
+    @if (radiografias().length > 0) {
+      <div class="gallery-section">
+        <h2 class="section-title">
+          Radiografías guardadas ({{ radiografias().length }})
+        </h2>
+        
+        <div class="gallery-grid">
+          @for (radiografia of radiografias(); track radiografia.id; let i = $index) {
+            <div class="gallery-item">
+              <div class="item-preview" (click)="openLightbox(i)">
+                @if (isImageFile(radiografia.tipo_mime)) {
+                  <img 
+                    [src]="getFileUrl(radiografia)" 
+                    [alt]="radiografia.nombre_archivo"
+                    class="preview-image"
+                  />
+                } @else if (isPdfFile(radiografia.tipo_mime)) {
+                  <div class="pdf-preview">
+                    <span class="pdf-icon">📄</span>
+                    <span class="pdf-label">PDF</span>
+                  </div>
+                }
+                <div class="item-overlay">
+                  <span class="overlay-icon">🔍</span>
+                  <span class="overlay-text">Ver</span>
+                </div>
+              </div>
+              
+              <div class="item-info">
+                <p class="item-name" [title]="radiografia.nombre_archivo">
+                  {{ radiografia.nombre_archivo }}
+                </p>
+                <p class="item-date">
+                  {{ formatDate(radiografia.fecha_subida) }}
+                </p>
+              </div>
+              
+              <button 
+                type="button" 
+                class="btn-delete-item"
+                (click)="confirmDelete(radiografia)"
+                title="Eliminar"
+              >
+                🗑️
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <div class="empty-icon">📷</div>
+        <h3>No hay radiografías</h3>
+        <p>Arrastra archivos o haz clic en "Seleccionar archivos" para comenzar</p>
+      </div>
+    }
+  }
+
+  <!-- Lightbox modal -->
+  @if (lightboxOpen()) {
+    <div class="lightbox-overlay" (click)="closeLightbox()">
+      <button type="button" class="lightbox-close" (click)="closeLightbox()">
+        ✕
+      </button>
+      
+      @if (radiografias()[lightboxIndex()]) {
+        <div class="lightbox-content" (click)="$event.stopPropagation()">
+          @if (isImageFile(radiografias()[lightboxIndex()].tipo_mime)) {
+            <img 
+              [src]="getFileUrl(radiografias()[lightboxIndex()])" 
+              [alt]="radiografias()[lightboxIndex()].nombre_archivo"
+              class="lightbox-image"
+            />
+          } @else if (isPdfFile(radiografias()[lightboxIndex()].tipo_mime)) {
+            <div class="lightbox-pdf">
+              <div class="pdf-icon-large">📄</div>
+              <p class="pdf-name">{{ radiografias()[lightboxIndex()].nombre_archivo }}</p>
+              <a 
+                [href]="getFileUrl(radiografias()[lightboxIndex()])" 
+                target="_blank"
+                class="btn-view-pdf"
+              >
+                Abrir PDF en nueva pestaña
+              </a>
+            </div>
+          }
+          
+          <div class="lightbox-info">
+            <h3>{{ radiografias()[lightboxIndex()].nombre_archivo }}</h3>
+            <p>Subida: {{ formatDateTime(radiografias()[lightboxIndex()].fecha_subida) }}</p>
+          </div>
+        </div>
+        
+        @if (radiografias().length > 1) {
+          <button type="button" class="lightbox-nav lightbox-prev" (click)="prevImage(); $event.stopPropagation()">
+            ‹
+          </button>
+          <button type="button" class="lightbox-nav lightbox-next" (click)="nextImage(); $event.stopPropagation()">
+            ›
+          </button>
+        }
+      }
+    </div>
+  }
+
+  <!-- Delete confirmation modal -->
+  @if (showDeleteModal()) {
+    <div class="modal-overlay" (click)="cancelDelete()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>⚠️ Confirmar eliminación</h2>
+        </div>
+        <div class="modal-body">
+          <p>¿Estás seguro de que deseas eliminar esta radiografía?</p>
+          @if (radiografiaToDelete()) {
+            <div class="file-info">
+              <strong>{{ radiografiaToDelete()!.nombre_archivo }}</strong>
+            </div>
+          }
+          <p class="warning-text">
+            Esta acción no se puede deshacer. El archivo se eliminará permanentemente.
+          </p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="cancelDelete()" [disabled]="deleting()">
+            Cancelar
+          </button>
+          <button type="button" class="btn-delete" (click)="deleteRadiografia()" [disabled]="deleting()">
+            {{ deleting() ? 'Eliminando...' : 'Eliminar radiografía' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -156,7 +156,7 @@
 }
 
 .col-actions {
-  width: 22rem;
+  width: 26rem;
   text-align: right;
 }
 
@@ -176,6 +176,18 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+
+  &.radio-btn {
+    background: #ffe6f0;
+    color: #d53f8c;
+
+    &:hover {
+      background: #d53f8c;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(213, 63, 140, 0.3);
+    }
+  }
 
   &.odonto-btn {
     background: #e6fffa;
