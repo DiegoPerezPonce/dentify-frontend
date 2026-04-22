@@ -35,7 +35,6 @@ Issues Frontend
 - Interactive Interface of the Odontogram #9
 - Description: Create a visual component (SVG or Canvas) that allows you to select teeth and assign pathologies/states to them.
 - Branch: feature/9-interactive-interface-of-the-odontogram
-
 - X-ray Gallery #10
 - Description: Image viewer with multi-load (Drag & Drop) and delete capabilities.
 - Branch: feature/10-x-ray-gallery
