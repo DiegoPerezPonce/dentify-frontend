@@ -1,0 +1,42 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <h2 class="dentify-title">Calendario de Citas</h2>
+    <p class="dentify-subtitle">Gestione las citas de sus pacientes de forma sencilla</p>
+  </div>
+  
+  <div class="calendar-card">
+    <full-calendar *ngIf="calendarVisible()" [options]="calendarOptions()"></full-calendar>
+  </div>
+
+  <!-- Modal de creación de cita -->
+  <div class="modal-backdrop" *ngIf="isModalOpen()" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Nueva Cita</h3>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Paciente</label>
+          <input type="text" [(ngModel)]="appointmentForm.title" placeholder="Nombre completo" autofocus>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha</label>
+            <input type="date" [(ngModel)]="appointmentForm.date">
+          </div>
+          <div class="form-group">
+            <label>Hora</label>
+            <input type="time" [(ngModel)]="appointmentForm.time">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn-primary" (click)="saveAppointment()" [disabled]="!appointmentForm.title">
+          Agendar Cita
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

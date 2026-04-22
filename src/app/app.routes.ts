@@ -82,7 +82,9 @@ export const routes: Routes = [
           hint: 'Issues #11–#13: calendario, gestión de citas y filtros por box/odontólogo.'
         },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/appointments/appointment-calendar/appointment-calendar').then(
+            (m) => m.AppointmentCalendarComponent
+          )
       },
       {
         path: 'radiografias',
