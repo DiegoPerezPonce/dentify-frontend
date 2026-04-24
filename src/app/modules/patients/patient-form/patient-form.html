@@ -1,0 +1,200 @@
+<div class="patient-form-container">
+  <div class="form-header">
+    <div>
+      <h1>{{ isEditMode() ? 'Editar paciente' : 'Nuevo paciente' }}</h1>
+      <p class="subtitle">{{ isEditMode() ? 'Actualiza la información del paciente' : 'Completa los datos del nuevo paciente' }}</p>
+    </div>
+    @if (isEditMode()) {
+      <div class="header-actions">
+        <button type="button" class="btn-action btn-radio" (click)="goToRadiografias()">
+          📸 Radiografías
+        </button>
+        <button type="button" class="btn-action btn-odonto" (click)="goToOdontograma()">
+          🦷 Odontograma
+        </button>
+        <button type="button" class="btn-action btn-history" (click)="goToHistory()">
+          📋 Historial
+        </button>
+        <button type="button" class="btn-action btn-first-visit" (click)="goToFirstVisit()">
+          🏥 Primera visita
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <span class="icon">⚠️</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p>{{ isEditMode() ? 'Cargando paciente...' : 'Guardando...' }}</p>
+    </div>
+  }
+
+  <form [formGroup]="patientForm" (ngSubmit)="onSubmit()" class="patient-form">
+    
+    <!-- Sección: Datos personales -->
+    <div class="form-section">
+      <h2 class="section-title">Datos personales</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nombre" class="required">Nombre</label>
+          <input
+            type="text"
+            id="nombre"
+            formControlName="nombre"
+            [class.error]="hasError('nombre')"
+            placeholder="Ej: Juan"
+          />
+          @if (hasError('nombre')) {
+            <span class="error-message">{{ getErrorMessage('nombre') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="apellidos" class="required">Apellidos</label>
+          <input
+            type="text"
+            id="apellidos"
+            formControlName="apellidos"
+            [class.error]="hasError('apellidos')"
+            placeholder="Ej: García López"
+          />
+          @if (hasError('apellidos')) {
+            <span class="error-message">{{ getErrorMessage('apellidos') }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dni" class="required">DNI/NIE</label>
+          <input
+            type="text"
+            id="dni"
+            formControlName="dni"
+            [class.error]="hasError('dni')"
+            placeholder="12345678A"
+            maxlength="9"
+          />
+          @if (hasError('dni')) {
+            <span class="error-message">{{ getErrorMessage('dni') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="nss">NSS (Número Seguridad Social)</label>
+          <input
+            type="text"
+            id="nss"
+            formControlName="nss"
+            placeholder="Opcional"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Contacto -->
+    <div class="form-section">
+      <h2 class="section-title">Contacto</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="telefono">Teléfono</label>
+          <input
+            type="tel"
+            id="telefono"
+            formControlName="telefono"
+            [class.error]="hasError('telefono')"
+            placeholder="612345678"
+            maxlength="9"
+          />
+          @if (hasError('telefono')) {
+            <span class="error-message">{{ getErrorMessage('telefono') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            [class.error]="hasError('email')"
+            placeholder="ejemplo@email.com"
+          />
+          @if (hasError('email')) {
+            <span class="error-message">{{ getErrorMessage('email') }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Información clínica -->
+    <div class="form-section">
+      <h2 class="section-title">Información clínica</h2>
+      
+      <div class="form-group">
+        <label for="enfermedades">Enfermedades / Patologías</label>
+        <textarea
+          id="enfermedades"
+          formControlName="enfermedades"
+          rows="3"
+          placeholder="Enfermedades conocidas, condiciones médicas relevantes..."
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="alergias">Alergias</label>
+        <textarea
+          id="alergias"
+          formControlName="alergias"
+          rows="3"
+          placeholder="Alergias a medicamentos, materiales, alimentos..."
+        ></textarea>
+        <p class="field-hint">⚠️ Información crítica para tratamientos seguros</p>
+      </div>
+
+      <div class="form-group">
+        <label for="historial_clinico">Historial clínico</label>
+        <textarea
+          id="historial_clinico"
+          formControlName="historial_clinico"
+          rows="4"
+          placeholder="Tratamientos previos, cirugías, observaciones relevantes..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Sección: Facturación -->
+    <div class="form-section">
+      <h2 class="section-title">Datos de facturación</h2>
+      
+      <div class="form-group">
+        <label for="datos_facturacion">Información de facturación</label>
+        <textarea
+          id="datos_facturacion"
+          formControlName="datos_facturacion"
+          rows="3"
+          placeholder="Dirección, datos fiscales, observaciones de pago..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="loading()">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading() || patientForm.invalid">
+        {{ isEditMode() ? 'Guardar cambios' : 'Crear paciente' }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -127,6 +127,19 @@
   font-family: 'Noto Sans', system-ui, sans-serif;
 }
 
+.session-remaining {
+  margin: 0 0 0.65rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #7f8c8d;
+  font-family: 'Noto Sans', system-ui, sans-serif;
+}
+
+.session-remaining-urgent {
+  color: #c0392b;
+  font-weight: 600;
+}
+
 .logout {
   width: 100%;
   padding: 0.5rem;

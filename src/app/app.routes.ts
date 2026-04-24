@@ -34,13 +34,44 @@ export const routes: Routes = [
       {
         path: 'pacientes',
         canActivate: [roleGuard],
-        data: {
-          ...clinicalOrAdmin,
-          pageTitle: 'Gestión de pacientes',
-          hint: 'Issue #5: tabla con filtros y paginación.'
-        },
+        data: { ...clinicalOrAdmin, pageTitle: 'Gestión de pacientes' },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/patients/patient-list/patient-list').then((m) => m.PatientListComponent)
+      },
+      {
+        path: 'pacientes/:id',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Paciente' },
+        loadComponent: () =>
+          import('./modules/patients/patient-form/patient-form').then((m) => m.PatientFormComponent)
+      },
+      {
+        path: 'pacientes/:id/historial',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Historial clínico' },
+        loadComponent: () =>
+          import('./modules/patients/medical-history/medical-history').then((m) => m.MedicalHistoryComponent)
+      },
+      {
+        path: 'pacientes/:id/primera-visita',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Primera visita' },
+        loadComponent: () =>
+          import('./modules/patients/first-visit-form/first-visit-form').then((m) => m.FirstVisitFormComponent)
+      },
+      {
+        path: 'pacientes/:id/odontograma',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Odontograma' },
+        loadComponent: () =>
+          import('./modules/patients/odontograma-interactive/odontograma-interactive').then((m) => m.OdontogramaInteractiveComponent)
+      },
+      {
+        path: 'pacientes/:id/radiografias',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Radiografías' },
+        loadComponent: () =>
+          import('./modules/patients/xray-gallery/xray-gallery').then((m) => m.XrayGalleryComponent)
       },
       {
         path: 'agenda',
@@ -48,10 +79,12 @@ export const routes: Routes = [
         data: {
           ...clinicalOrAdmin,
           pageTitle: 'Agenda y citas',
-          hint: 'Issues #11–#13: calendario, gestión de citas y filtros por box/odontólogo.'
+          hint: 'Issue #11: calendario FullCalendar implementado. Issues #12–#13 pendientes: gestión completa de citas y filtros.'
         },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/appointments/appointment-calendar/appointment-calendar').then(
+            (m) => m.AppointmentCalendarComponent
+          )
       },
       {
         path: 'radiografias',

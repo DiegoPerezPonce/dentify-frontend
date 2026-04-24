@@ -1,0 +1,131 @@
+<div class="first-visit-container">
+  <!-- Header con info del paciente -->
+  <div class="page-header">
+    <button type="button" class="btn-back" (click)="goBack()">
+      ← Volver
+    </button>
+    
+    @if (patient()) {
+      <div class="patient-info-card">
+        <div class="patient-icon">🏥</div>
+        <div class="patient-details">
+          <h1>Primera Visita</h1>
+          <p class="patient-name">{{ patient()!.nombre }} {{ patient()!.apellidos }}</p>
+          <span class="badge">DNI: {{ patient()!.dni }}</span>
+        </div>
+      </div>
+    }
+
+    <div class="section-header">
+      <h2>📋 Registro de Primera Visita</h2>
+      <p class="subtitle">Captura datos iniciales y evalúa el estado del paciente</p>
+    </div>
+  </div>
+
+  <!-- Loading & Error states -->
+  @if (loading() && !patient()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando información...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <span class="icon">⚠️</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <!-- Formulario -->
+  @if (!loading() || patient()) {
+    <form [formGroup]="visitForm" (ngSubmit)="onSubmit()" class="visit-form">
+      
+      <!-- Motivo de consulta -->
+      <div class="form-section">
+        <h3 class="section-title">💬 Motivo de la consulta</h3>
+        
+        <div class="form-group">
+          <label for="motivo_consulta" class="required">
+            ¿Por qué acude el paciente?
+          </label>
+          <textarea
+            id="motivo_consulta"
+            formControlName="motivo_consulta"
+            rows="4"
+            [class.error]="hasError('motivo_consulta')"
+            placeholder="Describe el motivo principal de la visita, síntomas, molestias o preocupaciones del paciente..."
+          ></textarea>
+          @if (hasError('motivo_consulta')) {
+            <span class="error-message">{{ getErrorMessage('motivo_consulta') }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Nivel de dolor -->
+      <div class="form-section">
+        <h3 class="section-title">😣 Nivel de dolor</h3>
+        <p class="section-description">Selecciona el nivel de dolor del paciente (0 = sin dolor, 10 = insoportable)</p>
+        
+        <div class="pain-scale">
+          @for (level of painLevels; track level.value) {
+            <button
+              type="button"
+              class="pain-level-btn"
+              [class.selected]="selectedPainLevel() === level.value"
+              [style.--level-color]="level.color"
+              (click)="selectPainLevel(level.value)"
+              [attr.aria-label]="'Nivel ' + level.value + ': ' + level.label"
+            >
+              <span class="pain-icon">{{ level.icon }}</span>
+              <span class="pain-value">{{ level.value }}</span>
+              <span class="pain-label">{{ level.label }}</span>
+            </button>
+          }
+        </div>
+
+        <div class="pain-summary">
+          <div class="pain-summary-card" [style.background-color]="getPainLevelData(selectedPainLevel()).color">
+            <span class="pain-summary-icon">{{ getPainLevelData(selectedPainLevel()).icon }}</span>
+            <div class="pain-summary-text">
+              <strong>Nivel {{ selectedPainLevel() }}</strong>
+              <span>{{ getPainLevelData(selectedPainLevel()).label }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Observaciones -->
+      <div class="form-section">
+        <h3 class="section-title">📝 Observaciones adicionales</h3>
+        
+        <div class="form-group">
+          <label for="observaciones">Notas y comentarios (opcional)</label>
+          <textarea
+            id="observaciones"
+            formControlName="observaciones"
+            rows="5"
+            placeholder="Observaciones relevantes sobre el estado del paciente, antecedentes mencionados, factores especiales a considerar..."
+          ></textarea>
+          <p class="field-hint">
+            Incluye información que pueda ser útil para el tratamiento: hábitos, medicación actual, alergias no registradas, etc.
+          </p>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="goBack()" [disabled]="loading()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading() || visitForm.invalid">
+          @if (loading()) {
+            Guardando...
+          } @else {
+            Guardar primera visita
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

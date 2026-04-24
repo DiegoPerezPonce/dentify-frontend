@@ -2,23 +2,81 @@
 export const ROLE_USER = 'ROLE_USER';
 export const ROLE_ADMIN = 'ROLE_ADMIN';
 
-/**
- * Lee el array `roles` del payload JWT (sin verificar firma; solo UI / guards de conveniencia).
- */
-export function parseRolesFromJwt(token: string | null): string[] {
-  if (!token?.trim()) return [];
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
   const parts = token.split('.');
-  if (parts.length < 2) return [];
+  if (parts.length < 2) return null;
   try {
     let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
     const pad = base64.length % 4;
     if (pad) base64 += '='.repeat(4 - pad);
     const json = atob(base64);
-    const payload = JSON.parse(json) as Record<string, unknown>;
-    const raw = payload['roles'] ?? payload['role'];
-    const list = Array.isArray(raw) ? raw : raw != null ? [raw] : [];
-    return [...new Set(list.map((r) => String(r)))];
+    return JSON.parse(json) as Record<string, unknown>;
   } catch {
-    return [];
+    return null;
   }
+}
+
+/**
+ * Lee el array `roles` del payload JWT (sin verificar firma; solo UI / guards de conveniencia).
+ */
+export function parseRolesFromJwt(token: string | null): string[] {
+  if (!token?.trim()) return [];
+  const payload = decodeJwtPayload(token);
+  if (!payload) return [];
+  const raw = payload['roles'] ?? payload['role'];
+  const list = Array.isArray(raw) ? raw : raw != null ? [raw] : [];
+  return [...new Set(list.map((r) => String(r)))];
+}
+
+/**
+ * True si el JWT tiene `exp` y ya pasó (margen `skewSec` para relojes descuadrados).
+ * Si el token no se puede leer, se considera caducado o inválido para la UI.
+ * Sin claim `exp`, devuelve false y deja que el API valide la firma.
+ */
+export function isJwtExpired(token: string | null, skewSec = 30): boolean {
+  if (!token?.trim()) return true;
+  const payload = decodeJwtPayload(token);
+  if (!payload) return true;
+  const exp = payload['exp'];
+  if (typeof exp !== 'number') return false;
+  return Date.now() >= (exp - skewSec) * 1000;
+}
+
+/** Instantánea de caducidad del JWT (`exp` en ms), o null si no hay claim / token ilegible. */
+export function getJwtExpMs(token: string | null): number | null {
+  if (!token?.trim()) return null;
+  const payload = decodeJwtPayload(token);
+  if (!payload) return null;
+  const exp = payload['exp'];
+  if (typeof exp !== 'number') return null;
+  return exp * 1000;
+}
+
+/** Milisegundos hasta `exp`, o null si no aplica. Puede ser negativo si ya caducó. */
+export function getSessionRemainingMs(token: string | null): number | null {
+  const expMs = getJwtExpMs(token);
+  if (expMs === null) return null;
+  return expMs - Date.now();
+}
+
+/**
+ * Texto corto para UI (p. ej. barra lateral). Null si el token no trae `exp`.
+ */
+export function formatSessionRemainingLabel(token: string | null): string | null {
+  const rem = getSessionRemainingMs(token);
+  if (rem === null) return null;
+  if (rem <= 0) {
+    return 'caducada; vuelve a iniciar sesión';
+  }
+  const totalSeconds = Math.floor(rem / 1000);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  if (h > 0) {
+    return `${h} h ${m} min`;
+  }
+  if (m > 0) {
+    return `${m} min ${s} s`;
+  }
+  return `${s} s`;
 }

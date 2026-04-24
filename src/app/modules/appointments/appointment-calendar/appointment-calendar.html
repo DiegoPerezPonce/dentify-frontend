@@ -1,0 +1,76 @@
+<div class="appointment-calendar-container">
+  <div class="calendar-header">
+    <h1 class="page-title">Agenda y Citas</h1>
+    <p class="page-subtitle">
+      Gestiona las citas de los pacientes. Haz clic en un espacio libre para crear una nueva
+      cita, o en una cita existente para ver detalles.
+    </p>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg
+        class="icon"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Cargando calendario...</p>
+    </div>
+  }
+
+  <div class="calendar-wrapper">
+    <full-calendar [options]="calendarOptions"></full-calendar>
+  </div>
+
+  <div class="calendar-footer">
+    <div class="legend">
+      <h3>Leyenda:</h3>
+      <div class="legend-items">
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #3788d8"></span>
+          <span>Programada</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #28a745"></span>
+          <span>Confirmada</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #6c757d"></span>
+          <span>Completada</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #dc3545"></span>
+          <span>Cancelada</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #ffc107"></span>
+          <span>No asistió</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-text">
+      <p><strong>Tip:</strong> Arrastra las citas para reprogramarlas.</p>
+      <p>
+        <strong>Nota:</strong> Este calendario muestra las citas del mes actual y el próximo. Los
+        issues #12 y #13 añadirán funcionalidad completa de gestión y filtros.
+      </p>
+    </div>
+  </div>
+</div>
