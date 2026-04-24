@@ -140,9 +140,8 @@ export const routes: Routes = [
       {
         path: 'admin/stock',
         canActivate: [roleGuard],
-        data: { ...adminOnly, pageTitle: 'Gestión de stock', hint: 'Issue #14.' },
-        loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+        data: { ...adminOnly, pageTitle: 'Gestión de stock', hint: 'Issue #14: Inventario y recepciones.' },
+        loadComponent: () => import('./modules/stock/stock-list/stock-list').then((m) => m.StockListComponent)
       },
       {
         path: 'admin/protocolos',
