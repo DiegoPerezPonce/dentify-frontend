@@ -13,25 +13,40 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import esLocale from '@fullcalendar/core/locales/es';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AppointmentService } from '../appointment.service';
+import { DentistService } from '../dentist.service';
+import { BoxService } from '../box.service';
 import { Appointment, AppointmentStatus } from '../models/appointment.models';
+import { Dentist } from '../models/dentist.models';
+import { Box } from '../models/box.models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppointmentFormModalComponent } from '../appointment-form-modal/appointment-form-modal';
 
 @Component({
   selector: 'app-appointment-calendar',
   standalone: true,
-  imports: [FullCalendarModule, AppointmentFormModalComponent],
+  imports: [CommonModule, FormsModule, FullCalendarModule, AppointmentFormModalComponent],
   templateUrl: './appointment-calendar.html',
   styleUrl: './appointment-calendar.scss'
 })
 export class AppointmentCalendarComponent implements OnInit {
   private appointmentService = inject(AppointmentService);
+  private dentistService = inject(DentistService);
+  private boxService = inject(BoxService);
   private router = inject(Router);
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly appointments = signal<Appointment[]>([]);
+
+  // Filter state
+  readonly dentists = signal<Dentist[]>([]);
+  readonly boxes = signal<Box[]>([]);
+  readonly selectedDentistId = signal<number | null>(null);
+  readonly selectedBoxId = signal<number | null>(null);
+  readonly loadingFilters = signal(true);
 
   // Modal state
   readonly showModal = signal(false);
@@ -73,7 +88,26 @@ export class AppointmentCalendarComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    this.loadFilters();
     this.loadAppointments();
+  }
+
+  loadFilters(): void {
+    this.loadingFilters.set(true);
+
+    Promise.all([
+      this.dentistService.list().toPromise(),
+      this.boxService.list().toPromise()
+    ])
+      .then(([dentists, boxes]) => {
+        this.dentists.set(dentists?.items || []);
+        this.boxes.set(boxes?.items || []);
+        this.loadingFilters.set(false);
+      })
+      .catch((err) => {
+        console.error('Error loading filters:', err);
+        this.loadingFilters.set(false);
+      });
   }
 
   loadAppointments(): void {
@@ -84,23 +118,34 @@ export class AppointmentCalendarComponent implements OnInit {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
 
-    this.appointmentService
-      .list({
-        startDate: startOfMonth.toISOString().split('T')[0],
-        endDate: endOfMonth.toISOString().split('T')[0]
-      })
-      .subscribe({
-        next: (res) => {
-          this.appointments.set(res.items);
-          this.updateCalendarEvents(res.items);
-          this.loading.set(false);
-        },
-        error: (err: unknown) => {
-          this.appointments.set([]);
-          this.loading.set(false);
-          this.error.set(this.getErrorMessage(err));
-        }
-      });
+    const query: any = {
+      startDate: startOfMonth.toISOString().split('T')[0],
+      endDate: endOfMonth.toISOString().split('T')[0]
+    };
+
+    // Apply filters
+    const dentistId = this.selectedDentistId();
+    const boxId = this.selectedBoxId();
+    
+    if (dentistId) {
+      query.dentistId = dentistId;
+    }
+    if (boxId) {
+      query.boxId = boxId;
+    }
+
+    this.appointmentService.list(query).subscribe({
+      next: (res) => {
+        this.appointments.set(res.items);
+        this.updateCalendarEvents(res.items);
+        this.loading.set(false);
+      },
+      error: (err: unknown) => {
+        this.appointments.set([]);
+        this.loading.set(false);
+        this.error.set(this.getErrorMessage(err));
+      }
+    });
   }
 
   private updateCalendarEvents(appointments: Appointment[]): void {
@@ -238,6 +283,30 @@ export class AppointmentCalendarComponent implements OnInit {
         alert('Error al cancelar la cita. Intenta nuevamente.');
       }
     });
+  }
+
+  onDentistFilterChange(dentistId: string): void {
+    this.selectedDentistId.set(dentistId ? Number(dentistId) : null);
+    this.loadAppointments();
+  }
+
+  onBoxFilterChange(boxId: string): void {
+    this.selectedBoxId.set(boxId ? Number(boxId) : null);
+    this.loadAppointments();
+  }
+
+  clearFilters(): void {
+    this.selectedDentistId.set(null);
+    this.selectedBoxId.set(null);
+    this.loadAppointments();
+  }
+
+  hasActiveFilters(): boolean {
+    return this.selectedDentistId() !== null || this.selectedBoxId() !== null;
+  }
+
+  getDentistName(dentist: Dentist): string {
+    return `${dentist.nombre} ${dentist.apellidos}`.trim();
   }
 
   private getErrorMessage(err: unknown): string {
