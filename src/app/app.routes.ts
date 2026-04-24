@@ -79,10 +79,12 @@ export const routes: Routes = [
         data: {
           ...clinicalOrAdmin,
           pageTitle: 'Agenda y citas',
-          hint: 'Issues #11–#13: calendario, gestión de citas y filtros por box/odontólogo.'
+          hint: 'Issue #11: calendario FullCalendar implementado. Issues #12–#13 pendientes: gestión completa de citas y filtros.'
         },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/appointments/appointment-calendar/appointment-calendar').then(
+            (m) => m.AppointmentCalendarComponent
+          )
       },
       {
         path: 'radiografias',
