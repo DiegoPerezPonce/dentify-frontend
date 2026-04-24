@@ -66,11 +66,20 @@
     </div>
 
     <div class="help-text">
-      <p><strong>Tip:</strong> Arrastra las citas para reprogramarlas.</p>
+      <p><strong>Tip:</strong> Haz clic en un espacio libre para crear una cita.</p>
       <p>
-        <strong>Nota:</strong> Este calendario muestra las citas del mes actual y el próximo. Los
-        issues #12 y #13 añadirán funcionalidad completa de gestión y filtros.
+        <strong>Nota:</strong> Haz clic en una cita existente para editarla o cancelarla.
+        El issue #13 añadirá filtros por box/odontólogo.
       </p>
     </div>
   </div>
 </div>
+
+<app-appointment-form-modal
+  [isOpen]="showModal()"
+  [appointment]="selectedAppointment()"
+  [preselectedStart]="preselectedStart()"
+  [preselectedEnd]="preselectedEnd()"
+  (close)="onModalClose()"
+  (saved)="onAppointmentSaved($event)"
+></app-appointment-form-modal>
