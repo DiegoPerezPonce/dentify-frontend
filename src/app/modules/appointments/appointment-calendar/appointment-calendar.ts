@@ -16,11 +16,12 @@ import esLocale from '@fullcalendar/core/locales/es';
 import { AppointmentService } from '../appointment.service';
 import { Appointment, AppointmentStatus } from '../models/appointment.models';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AppointmentFormModalComponent } from '../appointment-form-modal/appointment-form-modal';
 
 @Component({
   selector: 'app-appointment-calendar',
   standalone: true,
-  imports: [FullCalendarModule],
+  imports: [FullCalendarModule, AppointmentFormModalComponent],
   templateUrl: './appointment-calendar.html',
   styleUrl: './appointment-calendar.scss'
 })
@@ -31,6 +32,12 @@ export class AppointmentCalendarComponent implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly appointments = signal<Appointment[]>([]);
+
+  // Modal state
+  readonly showModal = signal(false);
+  readonly selectedAppointment = signal<Appointment | null>(null);
+  readonly preselectedStart = signal<string | null>(null);
+  readonly preselectedEnd = signal<string | null>(null);
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin],
@@ -147,34 +154,19 @@ export class AppointmentCalendarComponent implements OnInit {
     const calendarApi = selectInfo.view.calendar;
     calendarApi.unselect();
 
-    console.log('Nueva cita seleccionada:', {
-      start: selectInfo.startStr,
-      end: selectInfo.endStr
-    });
-
-    // TODO: Abrir modal o formulario para crear nueva cita
-    // Por ahora solo mostramos un mensaje
-    alert(`Crear cita desde ${selectInfo.startStr} hasta ${selectInfo.endStr}`);
+    this.preselectedStart.set(selectInfo.startStr);
+    this.preselectedEnd.set(selectInfo.endStr);
+    this.selectedAppointment.set(null);
+    this.showModal.set(true);
   }
 
   handleEventClick(clickInfo: EventClickArg): void {
     const appointment = clickInfo.event.extendedProps['appointment'] as Appointment;
-    console.log('Cita clickeada:', appointment);
-
-    // TODO: Abrir modal o navegar a detalle de cita
-    // Por ahora mostramos detalles básicos
-    const message = `
-Cita #${appointment.id}
-Paciente: ${appointment.patientName || 'N/A'}
-Odontólogo: ${appointment.dentistName || 'N/A'}
-Tratamiento: ${appointment.treatment || 'N/A'}
-Estado: ${appointment.status}
-    `;
     
-    if (confirm(`${message}\n\n¿Desea gestionar esta cita?`)) {
-      // Aquí podríamos navegar a un componente de detalle
-      // this.router.navigate(['/app/agenda', appointment.id]);
-    }
+    this.selectedAppointment.set(appointment);
+    this.preselectedStart.set(null);
+    this.preselectedEnd.set(null);
+    this.showModal.set(true);
   }
 
   handleEvents(events: EventApi[]): void {
@@ -183,45 +175,69 @@ Estado: ${appointment.status}
   }
 
   handleEventDrop(info: any): void {
+    // Por ahora revertimos el cambio, la edición se hará desde el modal
+    info.revert();
     const appointment = info.event.extendedProps['appointment'] as Appointment;
-    const newStart = info.event.start;
+    this.selectedAppointment.set(appointment);
+    this.preselectedStart.set(null);
+    this.preselectedEnd.set(null);
+    this.showModal.set(true);
+  }
 
-    if (!newStart) {
-      info.revert();
+  handleEventResize(info: any): void {
+    // Por ahora revertimos el cambio, la edición se hará desde el modal
+    info.revert();
+    const appointment = info.event.extendedProps['appointment'] as Appointment;
+    this.selectedAppointment.set(appointment);
+    this.preselectedStart.set(null);
+    this.preselectedEnd.set(null);
+    this.showModal.set(true);
+  }
+
+  onModalClose(): void {
+    this.showModal.set(false);
+    this.selectedAppointment.set(null);
+    this.preselectedStart.set(null);
+    this.preselectedEnd.set(null);
+  }
+
+  onAppointmentSaved(appointment: Appointment): void {
+    console.log('Cita guardada:', appointment);
+    this.loadAppointments();
+  }
+
+  onDeleteAppointment(appointment: Appointment): void {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
       return;
     }
 
-    console.log('Reprogramando cita:', appointment.id, 'a', newStart.toISOString());
-
-    // TODO: Llamar al backend para reprogramar
-    this.appointmentService.reschedule(appointment.id, newStart.toISOString()).subscribe({
+    this.appointmentService.delete(appointment.id).subscribe({
       next: () => {
-        console.log('Cita reprogramada exitosamente');
+        this.showModal.set(false);
         this.loadAppointments();
       },
       error: (err) => {
-        console.error('Error al reprogramar cita:', err);
-        info.revert();
-        alert('Error al reprogramar la cita. Intente nuevamente.');
+        console.error('Error al eliminar cita:', err);
+        alert('Error al eliminar la cita. Intenta nuevamente.');
       }
     });
   }
 
-  handleEventResize(info: any): void {
-    const appointment = info.event.extendedProps['appointment'] as Appointment;
-    const newEnd = info.event.end;
-
-    if (!newEnd) {
-      info.revert();
+  onCancelAppointment(appointment: Appointment): void {
+    if (!confirm('¿Estás seguro de que deseas cancelar esta cita?')) {
       return;
     }
 
-    console.log('Redimensionando cita:', appointment.id, 'nueva duración hasta', newEnd.toISOString());
-
-    // TODO: Implementar actualización de duración
-    // Por ahora solo revertimos
-    info.revert();
-    alert('La modificación de duración aún no está implementada.');
+    this.appointmentService.cancel(appointment.id).subscribe({
+      next: () => {
+        this.showModal.set(false);
+        this.loadAppointments();
+      },
+      error: (err) => {
+        console.error('Error al cancelar cita:', err);
+        alert('Error al cancelar la cita. Intenta nuevamente.');
+      }
+    });
   }
 
   private getErrorMessage(err: unknown): string {
