@@ -154,8 +154,7 @@ export const routes: Routes = [
         path: 'admin/usuarios',
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Usuarios y roles', hint: 'Issue #15: CRUD usuarios (solo admin).' },
-        loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+        loadComponent: () => import('./modules/users/user-list/user-list').then((m) => m.UserListComponent)
       },
       {
         path: 'forbidden',
