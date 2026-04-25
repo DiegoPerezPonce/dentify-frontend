@@ -148,7 +148,7 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Protocolos de tratamiento', hint: 'Issue #18.' },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/protocolos/protocolo-list/protocolo-list').then((m) => m.ProtocoloListComponent)
       },
       {
         path: 'admin/usuarios',
