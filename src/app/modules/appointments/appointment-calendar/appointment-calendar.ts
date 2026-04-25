@@ -17,10 +17,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AppointmentService } from '../appointment.service';
 import { DentistService } from '../dentist.service';
-import { BoxService } from '../box.service';
+import { BoxService } from '../../boxes/box.service';
 import { Appointment, AppointmentStatus } from '../models/appointment.models';
 import { Dentist } from '../models/dentist.models';
-import { Box } from '../models/box.models';
+import { Box } from '../../boxes/models/box.models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppointmentFormModalComponent } from '../appointment-form-modal/appointment-form-modal';
 

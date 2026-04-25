@@ -11,11 +11,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CommonModule } from '@angular/common';
 import { AppointmentService } from '../appointment.service';
 import { DentistService } from '../dentist.service';
-import { BoxService } from '../box.service';
+import { BoxService } from '../../boxes/box.service';
 import { PatientService } from '../../patients/patient.service';
 import { Appointment, AppointmentCreateDTO, AppointmentStatus } from '../models/appointment.models';
 import { Dentist } from '../models/dentist.models';
-import { Box } from '../models/box.models';
+import { Box } from '../../boxes/models/box.models';
 import { PatientRow } from '../../patients/models/patient-list.models';
 import { HttpErrorResponse } from '@angular/common/http';
 

@@ -135,7 +135,7 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Gestión de boxes', hint: 'Issue #17.' },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/boxes/box-list/box-list').then((m) => m.BoxListComponent)
       },
       {
         path: 'admin/stock',
