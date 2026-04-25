@@ -128,7 +128,7 @@ export const routes: Routes = [
           hint: 'Issue #16: CRUD personal clínico (solo ROLE_ADMIN).'
         },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/dentists/dentist-list/dentist-list').then((m) => m.DentistListComponent)
       },
       {
         path: 'admin/boxes',

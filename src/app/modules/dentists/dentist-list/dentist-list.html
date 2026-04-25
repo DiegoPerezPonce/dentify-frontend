@@ -1,0 +1,126 @@
+<div class="dentist-list-container">
+  <div class="header">
+    <h1>Gestión de Odontólogos</h1>
+    <button type="button" class="btn-primary" (click)="openCreateModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <line x1="19" y1="8" x2="19" y2="14"/>
+        <line x1="22" y1="11" x2="16" y2="11"/>
+      </svg>
+      Crear Odontólogo
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Cargando odontólogos...</p>
+    </div>
+  } @else {
+    @if (dentists().length === 0) {
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <h3>No hay odontólogos registrados</h3>
+        <p>Crea el primer perfil de odontólogo.</p>
+      </div>
+    } @else {
+      <div class="table-container">
+        <table class="dentists-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre Completo</th>
+              <th>Especialidad</th>
+              <th>Email</th>
+              <th>Boxes Asignados</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (dentist of dentists(); track dentist.id) {
+              <tr>
+                <td>{{ dentist.id }}</td>
+                <td>
+                  <div class="dentist-name">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>{{ getFullName(dentist) }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="specialty-badge">{{ dentist.especialidad }}</span>
+                </td>
+                <td>{{ dentist.email }}</td>
+                <td>
+                  @if (dentist.boxes && dentist.boxes.length > 0) {
+                    <div class="boxes-list">
+                      @for (box of dentist.boxes; track box) {
+                        <span class="box-badge">{{ box }}</span>
+                      }
+                    </div>
+                  } @else {
+                    <span class="no-boxes">Sin boxes asignados</span>
+                  }
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button
+                      type="button"
+                      class="btn-icon btn-edit"
+                      (click)="openEditModal(dentist)"
+                      title="Editar odontólogo"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-icon btn-delete"
+                      (click)="deleteDentist(dentist)"
+                      title="Eliminar odontólogo"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <line x1="10" y1="11" x2="10" y2="17"/>
+                        <line x1="14" y1="11" x2="14" y2="17"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>
+
+<app-dentist-form-modal
+  [isOpen]="showModal()"
+  [dentist]="selectedDentist()"
+  (close)="closeModal()"
+  (saved)="onDentistSaved()"
+></app-dentist-form-modal>
