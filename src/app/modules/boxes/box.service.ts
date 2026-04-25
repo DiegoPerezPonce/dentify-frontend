@@ -1,8 +1,8 @@
-import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { API_BASE_URL } from '../../core/config/api-base';
-import { Box, BoxListResult } from './models/box.models';
+import { Box, BoxCreatePayload, BoxListResult, BoxUpdatePayload } from './models/box.models';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +22,18 @@ export class BoxService {
 
   getById(id: number): Observable<Box> {
     return this.http.get<Box>(`${this.base}/${id}`);
+  }
+
+  create(payload: BoxCreatePayload): Observable<Box> {
+    return this.http.post<Box>(this.base, payload);
+  }
+
+  update(id: number, payload: BoxUpdatePayload): Observable<Box> {
+    return this.http.put<Box>(`${this.base}/${id}`, payload);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${id}`);
   }
 }
 
