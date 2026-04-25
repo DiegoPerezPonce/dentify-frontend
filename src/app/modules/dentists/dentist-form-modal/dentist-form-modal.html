@@ -1,0 +1,114 @@
+@if (isOpen) {
+  <div class="modal-overlay" (click)="onClose()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ modalTitle }}</h2>
+        <button type="button" class="close-btn" (click)="onClose()" [disabled]="saving()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          @if (error()) {
+            <div class="alert alert-error">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>{{ error() }}</span>
+            </div>
+          }
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="nombre">Nombre *</label>
+              <input
+                type="text"
+                id="nombre"
+                formControlName="nombre"
+                placeholder="Juan"
+                [class.error]="form.get('nombre')?.touched && form.get('nombre')?.invalid"
+              />
+              @if (getFieldError('nombre'); as error) {
+                <span class="error-message">{{ error }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="apellidos">Apellidos *</label>
+              <input
+                type="text"
+                id="apellidos"
+                formControlName="apellidos"
+                placeholder="Pérez García"
+                [class.error]="form.get('apellidos')?.touched && form.get('apellidos')?.invalid"
+              />
+              @if (getFieldError('apellidos'); as error) {
+                <span class="error-message">{{ error }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="especialidad">Especialidad *</label>
+              <select
+                id="especialidad"
+                formControlName="especialidad"
+                [class.error]="form.get('especialidad')?.touched && form.get('especialidad')?.invalid"
+              >
+                <option value="">Selecciona una especialidad</option>
+                @for (specialty of specialties; track specialty) {
+                  <option [value]="specialty">{{ specialty }}</option>
+                }
+              </select>
+              @if (getFieldError('especialidad'); as error) {
+                <span class="error-message">{{ error }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                placeholder="juan.perez@clinica.com"
+                [class.error]="form.get('email')?.touched && form.get('email')?.invalid"
+              />
+              @if (getFieldError('email'); as error) {
+                <span class="error-message">{{ error }}</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="onClose()"
+            [disabled]="saving()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="saving() || form.invalid"
+          >
+            @if (saving()) {
+              <div class="btn-spinner"></div>
+              <span>Guardando...</span>
+            } @else {
+              <span>{{ isEditMode ? 'Actualizar' : 'Crear' }} Odontólogo</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
