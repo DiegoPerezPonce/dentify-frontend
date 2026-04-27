@@ -1,0 +1,251 @@
+.protocolo-list-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  .header-text {
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 0.9375rem;
+      color: #6b7280;
+      line-height: 1.5;
+      max-width: 36rem;
+    }
+  }
+
+  .btn-primary {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #7c3aed;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #6d28d9;
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: #6b7280;
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #7c3aed;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+
+  svg {
+    color: #d1d5db;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    color: #6b7280;
+    margin: 0;
+  }
+}
+
+.table-container {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.protocolos-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background-color: #f5f3ff;
+    border-bottom: 1px solid #e9d5ff;
+
+    th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #f3f4f6;
+      transition: background-color 0.15s;
+
+      &:hover {
+        background-color: #faf5ff;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: 1rem;
+      font-size: 0.875rem;
+      color: #374151;
+    }
+  }
+}
+
+.cell-strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.cell-notes {
+  max-width: 18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &.btn-edit {
+      background-color: #ede9fe;
+      color: #5b21b6;
+
+      &:hover {
+        background-color: #ddd6fe;
+      }
+    }
+
+    &.btn-delete {
+      background-color: #fee2e2;
+      color: #991b1b;
+
+      &:hover {
+        background-color: #fecaca;
+      }
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .protocolo-list-container {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+
+    .btn-primary {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .protocolos-table {
+    min-width: 800px;
+  }
+}

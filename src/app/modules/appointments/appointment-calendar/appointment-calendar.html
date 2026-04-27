@@ -1,0 +1,148 @@
+<div class="appointment-calendar-container">
+  <div class="calendar-header">
+    <h1 class="page-title">Agenda y Citas</h1>
+    <p class="page-subtitle">
+      Gestiona las citas de los pacientes. Haz clic en un espacio libre para crear una nueva
+      cita, o en una cita existente para ver detalles.
+    </p>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg
+        class="icon"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <div class="filters-container">
+    <div class="filters-header">
+      <h3>Filtros</h3>
+      @if (hasActiveFilters()) {
+        <button type="button" class="clear-filters-btn" (click)="clearFilters()">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+          Limpiar filtros
+        </button>
+      }
+    </div>
+
+    @if (loadingFilters()) {
+      <div class="filters-loading">
+        <div class="spinner-small"></div>
+        <span>Cargando filtros...</span>
+      </div>
+    } @else {
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="dentist-filter">Odontólogo</label>
+          <select
+            id="dentist-filter"
+            class="filter-select"
+            [value]="selectedDentistId() || ''"
+            (change)="onDentistFilterChange($any($event.target).value)"
+          >
+            <option value="">Todos los odontólogos</option>
+            @for (dentist of dentists(); track dentist.id) {
+              <option [value]="dentist.id">{{ getDentistName(dentist) }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="box-filter">Box</label>
+          <select
+            id="box-filter"
+            class="filter-select"
+            [value]="selectedBoxId() || ''"
+            (change)="onBoxFilterChange($any($event.target).value)"
+          >
+            <option value="">Todos los boxes</option>
+            @for (box of boxes(); track box.id) {
+              <option [value]="box.id">{{ box.nombre }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Cargando calendario...</p>
+    </div>
+  }
+
+  <div class="calendar-wrapper">
+    <full-calendar [options]="calendarOptions"></full-calendar>
+  </div>
+
+  <div class="calendar-footer">
+    <div class="legend">
+      <h3>Leyenda:</h3>
+      <div class="legend-items">
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #3788d8"></span>
+          <span>Programada</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #28a745"></span>
+          <span>Confirmada</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #6c757d"></span>
+          <span>Completada</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #dc3545"></span>
+          <span>Cancelada</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #ffc107"></span>
+          <span>No asistió</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-text">
+      <p><strong>Tip:</strong> Haz clic en un espacio libre para crear una cita.</p>
+      <p>
+        <strong>Nota:</strong> Haz clic en una cita existente para editarla o cancelarla.
+        El issue #13 añadirá filtros por box/odontólogo.
+      </p>
+    </div>
+  </div>
+</div>
+
+<app-appointment-form-modal
+  [isOpen]="showModal()"
+  [appointment]="selectedAppointment()"
+  [preselectedStart]="preselectedStart()"
+  [preselectedEnd]="preselectedEnd()"
+  (close)="onModalClose()"
+  (saved)="onAppointmentSaved($event)"
+></app-appointment-form-modal>

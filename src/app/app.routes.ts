@@ -60,15 +60,31 @@ export const routes: Routes = [
           import('./modules/patients/first-visit-form/first-visit-form').then((m) => m.FirstVisitFormComponent)
       },
       {
+        path: 'pacientes/:id/odontograma',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Odontograma' },
+        loadComponent: () =>
+          import('./modules/patients/odontograma-interactive/odontograma-interactive').then((m) => m.OdontogramaInteractiveComponent)
+      },
+      {
+        path: 'pacientes/:id/radiografias',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Radiografías' },
+        loadComponent: () =>
+          import('./modules/patients/xray-gallery/xray-gallery').then((m) => m.XrayGalleryComponent)
+      },
+      {
         path: 'agenda',
         canActivate: [roleGuard],
         data: {
           ...clinicalOrAdmin,
           pageTitle: 'Agenda y citas',
-          hint: 'Issues #11–#13: calendario, gestión de citas y filtros por box/odontólogo.'
+          hint: 'Issue #11: calendario FullCalendar implementado. Issues #12–#13 pendientes: gestión completa de citas y filtros.'
         },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/appointments/appointment-calendar/appointment-calendar').then(
+            (m) => m.AppointmentCalendarComponent
+          )
       },
       {
         path: 'radiografias',
@@ -112,35 +128,33 @@ export const routes: Routes = [
           hint: 'Issue #16: CRUD personal clínico (solo ROLE_ADMIN).'
         },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/dentists/dentist-list/dentist-list').then((m) => m.DentistListComponent)
       },
       {
         path: 'admin/boxes',
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Gestión de boxes', hint: 'Issue #17.' },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/boxes/box-list/box-list').then((m) => m.BoxListComponent)
       },
       {
         path: 'admin/stock',
         canActivate: [roleGuard],
-        data: { ...adminOnly, pageTitle: 'Gestión de stock', hint: 'Issue #14.' },
-        loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+        data: { ...adminOnly, pageTitle: 'Gestión de stock', hint: 'Issue #14: Inventario y recepciones.' },
+        loadComponent: () => import('./modules/stock/stock-list/stock-list').then((m) => m.StockListComponent)
       },
       {
         path: 'admin/protocolos',
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Protocolos de tratamiento', hint: 'Issue #18.' },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/protocolos/protocolo-list/protocolo-list').then((m) => m.ProtocoloListComponent)
       },
       {
         path: 'admin/usuarios',
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Usuarios y roles', hint: 'Issue #15: CRUD usuarios (solo admin).' },
-        loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+        loadComponent: () => import('./modules/users/user-list/user-list').then((m) => m.UserListComponent)
       },
       {
         path: 'forbidden',

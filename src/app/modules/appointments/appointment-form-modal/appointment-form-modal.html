@@ -1,0 +1,179 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ modalTitle }}</h2>
+      <button type="button" class="close-button" (click)="onClose()" [disabled]="saving()">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    @if (error()) {
+      <div class="alert alert-error">
+        <svg
+          class="icon"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
+        </svg>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    @if (loadingResources()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando recursos...</p>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="patientId">Paciente *</label>
+            <select id="patientId" formControlName="patientId" class="form-control">
+              <option [value]="null">Seleccionar paciente</option>
+              @for (patient of patients(); track patient.id) {
+                <option [value]="patient.id">{{ getPatientName(patient) }}</option>
+              }
+            </select>
+            @if (form.get('patientId')?.invalid && form.get('patientId')?.touched) {
+              <span class="error-message">Selecciona un paciente</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="dentistId">Odontólogo *</label>
+            <select id="dentistId" formControlName="dentistId" class="form-control">
+              <option [value]="null">Seleccionar odontólogo</option>
+              @for (dentist of dentists(); track dentist.id) {
+                <option [value]="dentist.id">{{ getDentistName(dentist) }}</option>
+              }
+            </select>
+            @if (form.get('dentistId')?.invalid && form.get('dentistId')?.touched) {
+              <span class="error-message">Selecciona un odontólogo</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="boxId">Box *</label>
+            <select id="boxId" formControlName="boxId" class="form-control">
+              <option [value]="null">Seleccionar box</option>
+              @for (box of boxes(); track box.id) {
+                <option [value]="box.id">{{ box.nombre }}</option>
+              }
+            </select>
+            @if (form.get('boxId')?.invalid && form.get('boxId')?.touched) {
+              <span class="error-message">Selecciona un box</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="startDateTime">Fecha y hora de inicio *</label>
+            <input
+              type="datetime-local"
+              id="startDateTime"
+              formControlName="startDateTime"
+              class="form-control"
+            />
+            @if (form.get('startDateTime')?.invalid && form.get('startDateTime')?.touched) {
+              <span class="error-message">Ingresa fecha y hora de inicio</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="duration">Duración (minutos) *</label>
+            <input
+              type="number"
+              id="duration"
+              formControlName="duration"
+              class="form-control"
+              min="15"
+              step="15"
+            />
+            @if (form.get('duration')?.invalid && form.get('duration')?.touched) {
+              <span class="error-message">Ingresa duración válida (mínimo 15 min)</span>
+            }
+          </div>
+
+          @if (isEditMode) {
+            <div class="form-group">
+              <label for="status">Estado</label>
+              <select id="status" formControlName="status" class="form-control">
+                @for (status of statusOptions; track status.value) {
+                  <option [value]="status.value">{{ status.label }}</option>
+                }
+              </select>
+            </div>
+          }
+
+          <div class="form-group full-width">
+            <label for="treatment">Tratamiento</label>
+            <input
+              type="text"
+              id="treatment"
+              formControlName="treatment"
+              class="form-control"
+              placeholder="Ej: Limpieza dental, Endodoncia, etc."
+            />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="notes">Notas</label>
+            <textarea
+              id="notes"
+              formControlName="notes"
+              class="form-control"
+              rows="3"
+              placeholder="Notas adicionales sobre la cita"
+            ></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="isInfectiousPatient" />
+              <span>Paciente infeccioso (debe ser la última cita del día)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="onClose()"
+            [disabled]="saving()"
+          >
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving() || form.invalid">
+            @if (saving()) {
+              <span class="spinner-small"></span>
+              <span>Guardando...</span>
+            } @else {
+              <span>{{ isEditMode ? 'Actualizar' : 'Crear' }} Cita</span>
+            }
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</div>

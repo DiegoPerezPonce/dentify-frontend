@@ -1,0 +1,124 @@
+@if (isOpen) {
+  <div class="modal-overlay" (click)="onClose()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ modalTitle }}</h2>
+        <button type="button" class="close-btn" (click)="onClose()" [disabled]="saving()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          @if (error()) {
+            <div class="alert alert-error">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>{{ error() }}</span>
+            </div>
+          }
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                placeholder="usuario@ejemplo.com"
+                [class.error]="form.get('email')?.touched && form.get('email')?.invalid"
+              />
+              @if (getFieldError('email'); as error) {
+                <span class="error-message">{{ error }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="nombre_usuario">Nombre de Usuario *</label>
+              <input
+                type="text"
+                id="nombre_usuario"
+                formControlName="nombre_usuario"
+                placeholder="juan.perez"
+                [class.error]="form.get('nombre_usuario')?.touched && form.get('nombre_usuario')?.invalid"
+              />
+              @if (getFieldError('nombre_usuario'); as error) {
+                <span class="error-message">{{ error }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="password">
+                Contraseña
+                @if (isEditMode) {
+                  <span class="optional-text">(dejar en blanco para no cambiar)</span>
+                } @else {
+                  *
+                }
+              </label>
+              <input
+                type="password"
+                id="password"
+                formControlName="password"
+                [placeholder]="isEditMode ? 'Nueva contraseña (opcional)' : 'Contraseña'"
+                [class.error]="form.get('password')?.touched && form.get('password')?.invalid"
+              />
+              @if (getFieldError('password'); as error) {
+                <span class="error-message">{{ error }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="role">Rol *</label>
+              <select
+                id="role"
+                formControlName="role"
+                [class.error]="form.get('role')?.touched && form.get('role')?.invalid"
+              >
+                @for (role of availableRoles; track role.value) {
+                  <option [value]="role.value">{{ role.label }}</option>
+                }
+              </select>
+              @if (getFieldError('role'); as error) {
+                <span class="error-message">{{ error }}</span>
+              }
+              <p class="help-text">
+                <strong>Usuario (Alumno):</strong> Acceso a funciones clínicas.<br>
+                <strong>Administrador:</strong> Acceso total (clínica + gestión).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="onClose()"
+            [disabled]="saving()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="saving() || form.invalid"
+          >
+            @if (saving()) {
+              <div class="btn-spinner"></div>
+              <span>Guardando...</span>
+            } @else {
+              <span>{{ isEditMode ? 'Actualizar' : 'Crear' }} Usuario</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

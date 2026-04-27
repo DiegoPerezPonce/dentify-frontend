@@ -1,0 +1,101 @@
+<div class="protocolo-list-container">
+  <div class="header">
+    <div class="header-text">
+      <h1>Protocolos de tratamiento</h1>
+      <p class="subtitle">
+        Define pasos estándar: tratamiento, material de stock necesario, cantidad y notas para el equipo.
+      </p>
+    </div>
+    <button type="button" class="btn-primary" (click)="openCreateModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="12" y1="18" x2="12" y2="12"/>
+        <line x1="9" y1="15" x2="15" y2="15"/>
+      </svg>
+      Nuevo paso
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Cargando protocolos...</p>
+    </div>
+  } @else {
+    @if (protocolos().length === 0) {
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <h3>No hay pasos de protocolo</h3>
+        <p>Crea el primero enlazando un material del inventario.</p>
+      </div>
+    } @else {
+      <div class="table-container">
+        <table class="protocolos-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tratamiento</th>
+              <th>Material</th>
+              <th>Cantidad</th>
+              <th>Notas</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of protocolos(); track p.id) {
+              <tr>
+                <td>{{ p.id }}</td>
+                <td class="cell-strong">{{ p.nombre_tratamiento }}</td>
+                <td>{{ materialLabel(p) }}</td>
+                <td>{{ p.cantidad_necesaria }}</td>
+                <td class="cell-notes">{{ p.notas_paso_a_paso || '—' }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button type="button" class="btn-icon btn-edit" (click)="openEditModal(p)" title="Editar">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                    </button>
+                    <button type="button" class="btn-icon btn-delete" (click)="deleteProtocolo(p)" title="Eliminar">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <line x1="10" y1="11" x2="10" y2="17"/>
+                        <line x1="14" y1="11" x2="14" y2="17"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>
+
+<app-protocolo-form-modal
+  [isOpen]="showModal()"
+  [protocolo]="selectedProtocolo()"
+  (close)="closeModal()"
+  (saved)="onSaved()"
+></app-protocolo-form-modal>
