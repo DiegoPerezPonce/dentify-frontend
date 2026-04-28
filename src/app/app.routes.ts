@@ -128,35 +128,33 @@ export const routes: Routes = [
           hint: 'Issue #16: CRUD personal clínico (solo ROLE_ADMIN).'
         },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/dentists/dentist-list/dentist-list').then((m) => m.DentistListComponent)
       },
       {
         path: 'admin/boxes',
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Gestión de boxes', hint: 'Issue #17.' },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/boxes/box-list/box-list').then((m) => m.BoxListComponent)
       },
       {
         path: 'admin/stock',
         canActivate: [roleGuard],
-        data: { ...adminOnly, pageTitle: 'Gestión de stock', hint: 'Issue #14.' },
-        loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+        data: { ...adminOnly, pageTitle: 'Gestión de stock', hint: 'Issue #14: Inventario y recepciones.' },
+        loadComponent: () => import('./modules/stock/stock-list/stock-list').then((m) => m.StockListComponent)
       },
       {
         path: 'admin/protocolos',
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Protocolos de tratamiento', hint: 'Issue #18.' },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/protocolos/protocolo-list/protocolo-list').then((m) => m.ProtocoloListComponent)
       },
       {
         path: 'admin/usuarios',
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Usuarios y roles', hint: 'Issue #15: CRUD usuarios (solo admin).' },
-        loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+        loadComponent: () => import('./modules/users/user-list/user-list').then((m) => m.UserListComponent)
       },
       {
         path: 'forbidden',

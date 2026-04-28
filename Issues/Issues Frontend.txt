@@ -13,7 +13,7 @@ Issues Frontend
 - Branch: feature/2-login-interface
 
 - Route Guards by Roles (RBAC) #4
-- Description: Exactly two security roles: ROLE_ADMIN and ROLE_USER (Symfony-style). Product mapping: ROLE_USER = alumno (estudiante / personal clínico en la simulación); ROLE_ADMIN = supervisor-administrador (misma persona en JWT, etiqueta UX “admin” o “supervisor”). Use case rule: ROLE_ADMIN inherits all ROLE_USER clinical capabilities—same routes and screens for pacientes, agenda, radiografías, etc., plus exclusive administration (user CRUD #15, role assignment ADMIN vs USER only, dentists #16, boxes #17, protocols #18, stock configuration #14, …). There is NO “switch to student mode” or second app entry: a single admin shell with sections General (clinical, shared with students) + Administración (admin-only); optionally collapse the Administración block in the UI for focus, but that is cosmetic only, not a security boundary. Route policy: clinical/patient-care routes allow ROLE_USER OR ROLE_ADMIN; administration-only routes require ROLE_ADMIN. Only /login is public (no JWT). No public signup (#15). Implement authGuard + roleGuard and shell menu from JWT claims. Include placement for avisos / notas pedagógicas published by ROLE_ADMIN and shown to ROLE_USER (students must see them), e.g. banners on dashboard or patient flows—content may be static at first or backed by API (see backend notices issue).
+- Description: Exactly two security roles: ROLE_ADMIN and ROLE_USER (Symfony-style). Product mapping: ROLE_USER = alumno (estudiante / personal clínico en la simulación); ROLE_ADMIN = supervisor-administrador (misma persona en JWT, etiqueta UX “admin” o “supervisor”). Use case rule: ROLE_ADMIN inherits all ROLE_USER clinical capabilities—same routes and screens for pacientes, agenda, radiografías, etc., plus exclusive administration (user CRUD #15, role assignment ADMIN vs USER only, dentists #16, boxes #17, protocols #18, stock configuration #14 + material catalog #26, …). There is NO “switch to student mode” or second app entry: a single admin shell with sections General (clinical, shared with students) + Administración (admin-only); optionally collapse the Administración block in the UI for focus, but that is cosmetic only, not a security boundary. Route policy: clinical/patient-care routes allow ROLE_USER OR ROLE_ADMIN; administration-only routes require ROLE_ADMIN. Only /login is public (no JWT). No public signup (#15). Implement authGuard + roleGuard and shell menu from JWT claims. Include placement for avisos / notas pedagógicas published by ROLE_ADMIN and shown to ROLE_USER (students must see them), e.g. banners on dashboard or patient flows—content may be static at first or backed by API (see backend notices issue).
 - Branch: feature/4-route-guards-by-roles-rbac
 
 - Dashboard and Patient List #5
@@ -52,7 +52,7 @@ Issues Frontend
 - Branch: feature/13-availability-selector-by-box-and-dentist 
 
 - Stock Management and Alerts #14
-- Description: Panel to view current inventory and form to log receipt of material (stock intake— not user registration).
+- Description: Panel to view current inventory and form to log receipt of material (stock intake— not user registration). Does **not** include CRUD of catalog material definitions; that is **#26** (admin/stock catalog).
 - Branch: feature/14-stock-management-and-alerts
 
 - CRUD for User and Role Management #15
@@ -88,7 +88,7 @@ Issues Frontend
 - Branch: feature/22-dentist-schedule-management-availability
 
 - Material Receiving Form (Stock Entries) #23
-- Description: Form for selecting existing material.
+- Description: Form for selecting **existing** catalog material only (no creation of new stock lines here). Creating/editing/deleting catalog items is **#26** to avoid mixing scopes with #14 (receipts / inventory view).
 - Branch: feature/23-material-receiving-form-stock-entries
 
 - Implementation of Visual Identity and Global Layout #24
@@ -99,6 +99,10 @@ Issues Frontend
 - Description: Create "Quick Action Cards" and widgets (e.g. próxima cita). ROLE_USER (alumno): home orientado a práctica clínica (wireframe Inicio Alumno). ROLE_ADMIN: mismo tipo de accesos clínicos en la misma navegación, más widgets de resumen de clínica (boxes, stock, actividad) en el mismo shell—una sola vista admin, sin modo alterno; lo extra es aditivo en la misma entrada a la app.
 - Branch: feature/25-user-home-dashboard-quick-widgets
 
+- CRUD catálogo de materiales (admin / stock) #51
+- Description: Issue pequeña y acotada: en la zona **Administración → Stock** (`admin/stock`), UI para **CRUD del catálogo** de materiales (alta, edición, borrado de líneas: nombre, unidad, cantidad inicial, etc.) consumiendo la API de `StockMaterial`. Complementa **#14** (panel, alertas de stock bajo y recepciones) sin duplicarla. **#23** sigue limitada a **seleccionar material ya existente**; el alta en catálogo es solo **#26**.
+- Branch: feature/26-crud-stock-material-catalog
+
 - Billing and Payments (Facturación) #33
 - Description: Módulo de pagos / facturación accesible para ROLE_USER y ROLE_ADMIN (ambos roles entran al área; el backend acota con voters qué acciones son solo lectura, alta, edición o anulación). Alinear menú y guards con OR de roles hasta reglas más finas. Wireframes “Pagos” para alumno y admin coherentes con esta issue.
-- Branch: feature/26-billing-and-payments
+- Branch: feature/27-billing-and-payments

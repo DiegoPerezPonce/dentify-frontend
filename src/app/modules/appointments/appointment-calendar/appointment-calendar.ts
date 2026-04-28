@@ -13,24 +13,46 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import esLocale from '@fullcalendar/core/locales/es';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AppointmentService } from '../appointment.service';
+import { DentistService } from '../dentist.service';
+import { BoxService } from '../../boxes/box.service';
 import { Appointment, AppointmentStatus } from '../models/appointment.models';
+import { Dentist } from '../models/dentist.models';
+import { Box } from '../../boxes/models/box.models';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AppointmentFormModalComponent } from '../appointment-form-modal/appointment-form-modal';
 
 @Component({
   selector: 'app-appointment-calendar',
   standalone: true,
-  imports: [FullCalendarModule],
+  imports: [CommonModule, FormsModule, FullCalendarModule, AppointmentFormModalComponent],
   templateUrl: './appointment-calendar.html',
   styleUrl: './appointment-calendar.scss'
 })
 export class AppointmentCalendarComponent implements OnInit {
   private appointmentService = inject(AppointmentService);
+  private dentistService = inject(DentistService);
+  private boxService = inject(BoxService);
   private router = inject(Router);
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly appointments = signal<Appointment[]>([]);
+
+  // Filter state
+  readonly dentists = signal<Dentist[]>([]);
+  readonly boxes = signal<Box[]>([]);
+  readonly selectedDentistId = signal<number | null>(null);
+  readonly selectedBoxId = signal<number | null>(null);
+  readonly loadingFilters = signal(true);
+
+  // Modal state
+  readonly showModal = signal(false);
+  readonly selectedAppointment = signal<Appointment | null>(null);
+  readonly preselectedStart = signal<string | null>(null);
+  readonly preselectedEnd = signal<string | null>(null);
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin],
@@ -66,7 +88,26 @@ export class AppointmentCalendarComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    this.loadFilters();
     this.loadAppointments();
+  }
+
+  loadFilters(): void {
+    this.loadingFilters.set(true);
+
+    Promise.all([
+      this.dentistService.list().toPromise(),
+      this.boxService.list().toPromise()
+    ])
+      .then(([dentists, boxes]) => {
+        this.dentists.set(dentists?.items || []);
+        this.boxes.set(boxes?.items || []);
+        this.loadingFilters.set(false);
+      })
+      .catch((err) => {
+        console.error('Error loading filters:', err);
+        this.loadingFilters.set(false);
+      });
   }
 
   loadAppointments(): void {
@@ -77,23 +118,34 @@ export class AppointmentCalendarComponent implements OnInit {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
 
-    this.appointmentService
-      .list({
-        startDate: startOfMonth.toISOString().split('T')[0],
-        endDate: endOfMonth.toISOString().split('T')[0]
-      })
-      .subscribe({
-        next: (res) => {
-          this.appointments.set(res.items);
-          this.updateCalendarEvents(res.items);
-          this.loading.set(false);
-        },
-        error: (err: unknown) => {
-          this.appointments.set([]);
-          this.loading.set(false);
-          this.error.set(this.getErrorMessage(err));
-        }
-      });
+    const query: any = {
+      startDate: startOfMonth.toISOString().split('T')[0],
+      endDate: endOfMonth.toISOString().split('T')[0]
+    };
+
+    // Apply filters
+    const dentistId = this.selectedDentistId();
+    const boxId = this.selectedBoxId();
+    
+    if (dentistId) {
+      query.dentistId = dentistId;
+    }
+    if (boxId) {
+      query.boxId = boxId;
+    }
+
+    this.appointmentService.list(query).subscribe({
+      next: (res) => {
+        this.appointments.set(res.items);
+        this.updateCalendarEvents(res.items);
+        this.loading.set(false);
+      },
+      error: (err: unknown) => {
+        this.appointments.set([]);
+        this.loading.set(false);
+        this.error.set(this.getErrorMessage(err));
+      }
+    });
   }
 
   private updateCalendarEvents(appointments: Appointment[]): void {
@@ -147,34 +199,19 @@ export class AppointmentCalendarComponent implements OnInit {
     const calendarApi = selectInfo.view.calendar;
     calendarApi.unselect();
 
-    console.log('Nueva cita seleccionada:', {
-      start: selectInfo.startStr,
-      end: selectInfo.endStr
-    });
-
-    // TODO: Abrir modal o formulario para crear nueva cita
-    // Por ahora solo mostramos un mensaje
-    alert(`Crear cita desde ${selectInfo.startStr} hasta ${selectInfo.endStr}`);
+    this.preselectedStart.set(selectInfo.startStr);
+    this.preselectedEnd.set(selectInfo.endStr);
+    this.selectedAppointment.set(null);
+    this.showModal.set(true);
   }
 
   handleEventClick(clickInfo: EventClickArg): void {
     const appointment = clickInfo.event.extendedProps['appointment'] as Appointment;
-    console.log('Cita clickeada:', appointment);
-
-    // TODO: Abrir modal o navegar a detalle de cita
-    // Por ahora mostramos detalles básicos
-    const message = `
-Cita #${appointment.id}
-Paciente: ${appointment.patientName || 'N/A'}
-Odontólogo: ${appointment.dentistName || 'N/A'}
-Tratamiento: ${appointment.treatment || 'N/A'}
-Estado: ${appointment.status}
-    `;
     
-    if (confirm(`${message}\n\n¿Desea gestionar esta cita?`)) {
-      // Aquí podríamos navegar a un componente de detalle
-      // this.router.navigate(['/app/agenda', appointment.id]);
-    }
+    this.selectedAppointment.set(appointment);
+    this.preselectedStart.set(null);
+    this.preselectedEnd.set(null);
+    this.showModal.set(true);
   }
 
   handleEvents(events: EventApi[]): void {
@@ -183,45 +220,93 @@ Estado: ${appointment.status}
   }
 
   handleEventDrop(info: any): void {
+    // Por ahora revertimos el cambio, la edición se hará desde el modal
+    info.revert();
     const appointment = info.event.extendedProps['appointment'] as Appointment;
-    const newStart = info.event.start;
+    this.selectedAppointment.set(appointment);
+    this.preselectedStart.set(null);
+    this.preselectedEnd.set(null);
+    this.showModal.set(true);
+  }
 
-    if (!newStart) {
-      info.revert();
+  handleEventResize(info: any): void {
+    // Por ahora revertimos el cambio, la edición se hará desde el modal
+    info.revert();
+    const appointment = info.event.extendedProps['appointment'] as Appointment;
+    this.selectedAppointment.set(appointment);
+    this.preselectedStart.set(null);
+    this.preselectedEnd.set(null);
+    this.showModal.set(true);
+  }
+
+  onModalClose(): void {
+    this.showModal.set(false);
+    this.selectedAppointment.set(null);
+    this.preselectedStart.set(null);
+    this.preselectedEnd.set(null);
+  }
+
+  onAppointmentSaved(appointment: Appointment): void {
+    console.log('Cita guardada:', appointment);
+    this.loadAppointments();
+  }
+
+  onDeleteAppointment(appointment: Appointment): void {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
       return;
     }
 
-    console.log('Reprogramando cita:', appointment.id, 'a', newStart.toISOString());
-
-    // TODO: Llamar al backend para reprogramar
-    this.appointmentService.reschedule(appointment.id, newStart.toISOString()).subscribe({
+    this.appointmentService.delete(appointment.id).subscribe({
       next: () => {
-        console.log('Cita reprogramada exitosamente');
+        this.showModal.set(false);
         this.loadAppointments();
       },
       error: (err) => {
-        console.error('Error al reprogramar cita:', err);
-        info.revert();
-        alert('Error al reprogramar la cita. Intente nuevamente.');
+        console.error('Error al eliminar cita:', err);
+        alert('Error al eliminar la cita. Intenta nuevamente.');
       }
     });
   }
 
-  handleEventResize(info: any): void {
-    const appointment = info.event.extendedProps['appointment'] as Appointment;
-    const newEnd = info.event.end;
-
-    if (!newEnd) {
-      info.revert();
+  onCancelAppointment(appointment: Appointment): void {
+    if (!confirm('¿Estás seguro de que deseas cancelar esta cita?')) {
       return;
     }
 
-    console.log('Redimensionando cita:', appointment.id, 'nueva duración hasta', newEnd.toISOString());
+    this.appointmentService.cancel(appointment.id).subscribe({
+      next: () => {
+        this.showModal.set(false);
+        this.loadAppointments();
+      },
+      error: (err) => {
+        console.error('Error al cancelar cita:', err);
+        alert('Error al cancelar la cita. Intenta nuevamente.');
+      }
+    });
+  }
 
-    // TODO: Implementar actualización de duración
-    // Por ahora solo revertimos
-    info.revert();
-    alert('La modificación de duración aún no está implementada.');
+  onDentistFilterChange(dentistId: string): void {
+    this.selectedDentistId.set(dentistId ? Number(dentistId) : null);
+    this.loadAppointments();
+  }
+
+  onBoxFilterChange(boxId: string): void {
+    this.selectedBoxId.set(boxId ? Number(boxId) : null);
+    this.loadAppointments();
+  }
+
+  clearFilters(): void {
+    this.selectedDentistId.set(null);
+    this.selectedBoxId.set(null);
+    this.loadAppointments();
+  }
+
+  hasActiveFilters(): boolean {
+    return this.selectedDentistId() !== null || this.selectedBoxId() !== null;
+  }
+
+  getDentistName(dentist: Dentist): string {
+    return `${dentist.nombre} ${dentist.apellidos}`.trim();
   }
 
   private getErrorMessage(err: unknown): string {
