@@ -1,0 +1,49 @@
+<section class="notification-center">
+  <header class="head">
+    <div>
+      <h1>Centro de notificaciones</h1>
+      <p>Alertas de citas próximas, stock bajo y avisos del centro.</p>
+    </div>
+    <button type="button" class="refresh-btn" (click)="loadNotifications()" [disabled]="loading()">
+      {{ loading() ? 'Actualizando...' : 'Actualizar' }}
+    </button>
+  </header>
+
+  <div class="kpis">
+    <article class="kpi">
+      <span class="label">Citas próximas</span>
+      <strong>{{ appointmentCount() }}</strong>
+    </article>
+    <article class="kpi">
+      <span class="label">Stock bajo</span>
+      <strong>{{ lowStockCount() }}</strong>
+    </article>
+    <article class="kpi">
+      <span class="label">Avisos pedagógicos</span>
+      <strong>{{ noticeCount() }}</strong>
+    </article>
+  </div>
+
+  @if (error()) {
+    <div class="state error">{{ error() }}</div>
+  } @else if (loading()) {
+    <div class="state">Cargando notificaciones...</div>
+  } @else if (!items().length) {
+    <div class="state">No hay notificaciones en este momento.</div>
+  } @else {
+    <ul class="items">
+      @for (item of items(); track item.id) {
+        <li class="item" [class.high]="item.level === 'high'" [class.medium]="item.level === 'medium'">
+          <div class="top">
+            <span class="badge">{{ item.kind }}</span>
+            @if (item.when) {
+              <time>{{ item.when }}</time>
+            }
+          </div>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.message }}</p>
+        </li>
+      }
+    </ul>
+  }
+</section>
