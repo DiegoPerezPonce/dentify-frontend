@@ -74,6 +74,13 @@ export const routes: Routes = [
           import('./modules/patients/xray-gallery/xray-gallery').then((m) => m.XrayGalleryComponent)
       },
       {
+        path: 'notificaciones',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Centro de notificaciones', hint: 'Issue #21: alertas de citas y stock.' },
+        loadComponent: () =>
+          import('./pages/notification-center/notification-center').then((m) => m.NotificationCenterComponent)
+      },
+      {
         path: 'agenda',
         canActivate: [roleGuard],
         data: {
@@ -155,6 +162,15 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Usuarios y roles', hint: 'Issue #15: CRUD usuarios (solo admin).' },
         loadComponent: () => import('./modules/users/user-list/user-list').then((m) => m.UserListComponent)
+      },
+      {
+        path: 'admin/avisos',
+        canActivate: [roleGuard],
+        data: { ...adminOnly, pageTitle: 'Avisos pedagógicos', hint: 'Issue #36: admin publica avisos para alumnos.' },
+        loadComponent: () =>
+          import('./modules/notifications/pedagogical-notice-admin/pedagogical-notice-admin').then(
+            (m) => m.PedagogicalNoticeAdminComponent
+          )
       },
       {
         path: 'forbidden',
