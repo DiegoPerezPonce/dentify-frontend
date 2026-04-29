@@ -158,6 +158,15 @@ export const routes: Routes = [
           import('./modules/protocolos/protocolo-list/protocolo-list').then((m) => m.ProtocoloListComponent)
       },
       {
+        path: 'admin/disponibilidad-odontologos',
+        canActivate: [roleGuard],
+        data: { ...adminOnly, pageTitle: 'Disponibilidad de odontólogos', hint: 'Issue #22: horario semanal y solapes.' },
+        loadComponent: () =>
+          import('./modules/dentist-availability/dentist-availability-management/dentist-availability-management').then(
+            (m) => m.DentistAvailabilityManagementComponent
+          )
+      },
+      {
         path: 'admin/usuarios',
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Usuarios y roles', hint: 'Issue #15: CRUD usuarios (solo admin).' },
