@@ -1,3 +1,51 @@
+@font-face {
+  font-family: 'Exo';
+  src: url('/fonts/exo/Exo-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('/fonts/exo/Exo-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Istok Web';
+  src: url('/fonts/istok-web/IstokWeb-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Istok Web';
+  src: url('/fonts/istok-web/IstokWeb-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('/fonts/noto-sans/NotoSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('/fonts/noto-sans/NotoSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* --- VARIABLES DE DENTIFY --- */
 :root {
   /* Colores Corporativos (Basados en limpieza e higiene dental) */
@@ -13,9 +61,9 @@
   --dentify-light: #f4f7f6;
 
   /* Tipografías según Manual de Estilo */
-  --font-titles: 'Exo', sans-serif;
-  --font-subtitles: 'Istok Web', sans-serif;
-  --font-body: 'Noto Sans', sans-serif;
+  --font-titles: 'Exo', 'Segoe UI', Arial, sans-serif;
+  --font-subtitles: 'Istok Web', 'Segoe UI', Arial, sans-serif;
+  --font-body: 'Noto Sans', 'Segoe UI', Arial, sans-serif;
 }
 
 /* --- ESTILOS GLOBALES BASE --- */
