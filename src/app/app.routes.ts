@@ -151,6 +151,15 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/stock/stock-list/stock-list').then((m) => m.StockListComponent)
       },
       {
+        path: 'admin/stock/recepciones',
+        canActivate: [roleGuard],
+        data: { ...adminOnly, pageTitle: 'Recepción de material', hint: 'Issue #23: entradas usando material existente.' },
+        loadComponent: () =>
+          import('./modules/stock/material-receiving-form/material-receiving-form').then(
+            (m) => m.MaterialReceivingFormComponent
+          )
+      },
+      {
         path: 'admin/protocolos',
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Protocolos de tratamiento', hint: 'Issue #18.' },

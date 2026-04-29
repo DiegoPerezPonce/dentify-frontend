@@ -1,0 +1,76 @@
+<section class="receiving-page">
+  <header>
+    <h1>Recepción de material</h1>
+    <p>Registra entradas seleccionando materiales ya existentes del catálogo.</p>
+  </header>
+
+  @if (error()) {
+    <div class="msg error">{{ error() }}</div>
+  }
+  @if (success()) {
+    <div class="msg success">{{ success() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="state">Cargando datos...</div>
+  } @else {
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+      <label>
+        Material existente *
+        <select formControlName="material_id">
+          <option value="">Selecciona material</option>
+          @for (m of materials(); track m.id) {
+            <option [value]="m.id">{{ m.nombre }} (stock actual: {{ m.cantidad_actual }} {{ m.unidad }})</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Cantidad recibida *
+        <input type="number" min="0.01" step="0.01" formControlName="cantidad_recibida" placeholder="Ej: 10" />
+      </label>
+
+      <label>
+        Proveedor *
+        <input type="text" formControlName="proveedor" placeholder="Nombre del proveedor" />
+      </label>
+
+      <label>
+        Fecha y hora *
+        <input type="datetime-local" formControlName="fecha" />
+      </label>
+
+      <button type="submit" class="btn-primary" [disabled]="submitting() || form.invalid">
+        {{ submitting() ? 'Guardando...' : 'Registrar recepción' }}
+      </button>
+    </form>
+
+    <div class="history">
+      <h2>Últimas recepciones</h2>
+      @if (!history().length) {
+        <p class="state">No hay recepciones registradas.</p>
+      } @else {
+        <table>
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Cantidad</th>
+              <th>Proveedor</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (h of history(); track h.id) {
+              <tr>
+                <td>{{ h.material.nombre || '-' }}</td>
+                <td>{{ h.cantidad_recibida }} {{ h.material.unidad || '' }}</td>
+                <td>{{ h.proveedor }}</td>
+                <td>{{ formatDate(h.fecha) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+</section>
