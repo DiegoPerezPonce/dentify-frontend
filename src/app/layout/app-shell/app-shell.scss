@@ -1,14 +1,14 @@
 .shell {
   display: flex;
   min-height: 100vh;
-  background: #f0f4f8;
+  background: linear-gradient(180deg, #f7fafc 0%, #eef3f8 100%);
 }
 
 .sidebar {
-  width: 260px;
+  width: 272px;
   flex-shrink: 0;
   background: #fff;
-  border-right: 1px solid #e1e8ed;
+  border-right: var(--border-soft);
   display: flex;
   flex-direction: column;
   padding: 1.25rem 0 1rem;
@@ -26,8 +26,9 @@
 .brand-mark {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 11px;
   background: linear-gradient(145deg, #00c6d7, #48c6ef);
+  box-shadow: 0 6px 16px rgba(0, 198, 215, 0.35);
 }
 
 .brand-text {
@@ -94,9 +95,10 @@
 }
 
 .nav-block a.active {
-  background: linear-gradient(90deg, #e8f9fb, #f5fcfd);
+  background: linear-gradient(90deg, #e8f9fb, #f7feff);
   color: #008a96;
   font-weight: 600;
+  border: 1px solid #d8f2f4;
 }
 
 .badge {
@@ -165,9 +167,10 @@
 }
 
 .notice-banner {
-  margin: 1rem 1.5rem 0;
+  margin: 1rem auto 0;
+  width: min(calc(100% - 2rem), var(--layout-max-width));
   padding: 0.75rem 1rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: #e8f4fc;
   border: 1px solid #b8d4f0;
   font-family: 'Noto Sans', system-ui, sans-serif;
@@ -184,7 +187,9 @@
 
 .outlet-wrap {
   flex: 1;
-  padding: 1rem 1.5rem 2rem;
+  width: min(calc(100% - 2rem), var(--layout-max-width));
+  margin: 0 auto;
+  padding: 1rem 0 2rem;
 }
 
 @media (max-width: 900px) {
@@ -196,5 +201,14 @@
     width: 100%;
     border-right: none;
     border-bottom: 1px solid #e1e8ed;
+    padding-top: 0.9rem;
+  }
+
+  .outlet-wrap {
+    width: calc(100% - 1rem);
+  }
+
+  .notice-banner {
+    width: calc(100% - 1rem);
   }
 }
