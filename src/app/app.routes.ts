@@ -121,10 +121,10 @@ export const routes: Routes = [
         data: {
           ...clinicalOrAdmin,
           pageTitle: 'Pagos y facturación',
-          hint: 'Issue #26: módulo accesible para ROLE_USER y ROLE_ADMIN; reglas finas en API.'
+          hint: 'Issue #33: módulo accesible para ROLE_USER y ROLE_ADMIN; reglas finas en API.'
         },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/billing/billing-payments/billing-payments').then((m) => m.BillingPaymentsComponent)
       },
       {
         path: 'admin/odontologos',
