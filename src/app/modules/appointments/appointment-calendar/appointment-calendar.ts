@@ -1,6 +1,12 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { FullCalendarModule } from '@fullcalendar/angular';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  ViewChild
+} from '@angular/core';
+import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
 import {
   CalendarOptions,
   DateSelectArg,
@@ -24,6 +30,8 @@ import { Box } from '../../boxes/models/box.models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppointmentFormModalComponent } from '../appointment-form-modal/appointment-form-modal';
 
+export type AgendaLayoutView = 'day' | 'week';
+
 @Component({
   selector: 'app-appointment-calendar',
   standalone: true,
@@ -32,27 +40,84 @@ import { AppointmentFormModalComponent } from '../appointment-form-modal/appoint
   styleUrl: './appointment-calendar.scss'
 })
 export class AppointmentCalendarComponent implements OnInit {
+  readonly AppointmentStatus = AppointmentStatus;
+
   private appointmentService = inject(AppointmentService);
   private dentistService = inject(DentistService);
   private boxService = inject(BoxService);
-  private router = inject(Router);
+
+  @ViewChild('fullCalendar') fullCalendar?: FullCalendarComponent;
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly appointments = signal<Appointment[]>([]);
 
-  // Filter state
   readonly dentists = signal<Dentist[]>([]);
   readonly boxes = signal<Box[]>([]);
   readonly selectedDentistId = signal<number | null>(null);
   readonly selectedBoxId = signal<number | null>(null);
   readonly loadingFilters = signal(true);
 
-  // Modal state
   readonly showModal = signal(false);
   readonly selectedAppointment = signal<Appointment | null>(null);
   readonly preselectedStart = signal<string | null>(null);
   readonly preselectedEnd = signal<string | null>(null);
+
+  /** Mes mostrado en el mini calendario (siempre día 1, hora local). */
+  readonly displayMonthStart = signal(this.startOfMonth(new Date()));
+  /** Día seleccionado para la lista (YYYY-MM-DD local). */
+  readonly selectedDate = signal(this.toYmd(new Date()));
+  /** Vista día (mini + lista) o semana (FullCalendar). */
+  readonly agendaView = signal<AgendaLayoutView>('day');
+
+  readonly weekdayLabels = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'] as const;
+
+  readonly monthTitle = computed(() => {
+    const d = this.displayMonthStart();
+    const raw = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(d);
+    return raw.charAt(0).toUpperCase() + raw.slice(1);
+  });
+
+  readonly miniCalendarCells = computed(() => {
+    const ref = this.displayMonthStart();
+    const y = ref.getFullYear();
+    const m = ref.getMonth();
+    const selected = this.selectedDate();
+    const first = new Date(y, m, 1);
+    const mondayOffset = (first.getDay() + 6) % 7;
+    const start = new Date(y, m, 1 - mondayOffset);
+    const todayYmd = this.toYmd(new Date());
+    const cells: {
+      ymd: string;
+      dayLabel: number;
+      inMonth: boolean;
+      isToday: boolean;
+      isSelected: boolean;
+    }[] = [];
+
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      const ymd = this.toYmd(d);
+      cells.push({
+        ymd,
+        dayLabel: d.getDate(),
+        inMonth: d.getMonth() === m,
+        isToday: ymd === todayYmd,
+        isSelected: ymd === selected
+      });
+    }
+    return cells;
+  });
+
+  readonly appointmentsForSelectedDay = computed(() => {
+    const ymd = this.selectedDate();
+    return this.appointments()
+      .filter((a) => this.appointmentLocalYmd(a) === ymd)
+      .sort(
+        (a, b) =>
+          new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
+      );
+  });
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin],
@@ -92,6 +157,118 @@ export class AppointmentCalendarComponent implements OnInit {
     this.loadAppointments();
   }
 
+  setAgendaView(view: AgendaLayoutView): void {
+    this.agendaView.set(view);
+    if (view === 'week') {
+      queueMicrotask(() => {
+        const api = this.fullCalendar?.getApi();
+        if (api) {
+          api.gotoDate(this.parseLocalYmd(this.selectedDate()));
+        }
+      });
+    }
+  }
+
+  prevMiniMonth(): void {
+    const d = this.displayMonthStart();
+    const next = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+    this.displayMonthStart.set(next);
+    if (!this.ymdFallsInMonth(this.selectedDate(), next)) {
+      this.selectedDate.set(this.toYmd(next));
+    }
+    this.loadAppointments();
+  }
+
+  nextMiniMonth(): void {
+    const d = this.displayMonthStart();
+    const next = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+    this.displayMonthStart.set(next);
+    if (!this.ymdFallsInMonth(this.selectedDate(), next)) {
+      this.selectedDate.set(this.toYmd(next));
+    }
+    this.loadAppointments();
+  }
+
+  selectMiniDay(ymd: string, inMonth: boolean): void {
+    if (!inMonth) {
+      const parsed = this.parseLocalYmd(ymd);
+      this.displayMonthStart.set(this.startOfMonth(parsed));
+      this.loadAppointments();
+    }
+    this.selectedDate.set(ymd);
+  }
+
+  goToToday(): void {
+    const t = new Date();
+    this.displayMonthStart.set(this.startOfMonth(t));
+    this.selectedDate.set(this.toYmd(t));
+    this.loadAppointments();
+  }
+
+  formatSelectedDayHeading(): string {
+    const d = this.parseLocalYmd(this.selectedDate());
+    return new Intl.DateTimeFormat('es-ES', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(d);
+  }
+
+  formatTime(iso: string): string {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  statusLabel(status: AppointmentStatus): string {
+    switch (status) {
+      case AppointmentStatus.SCHEDULED:
+        return 'Programada';
+      case AppointmentStatus.CONFIRMED:
+        return 'Confirmada';
+      case AppointmentStatus.COMPLETED:
+        return 'Completada';
+      case AppointmentStatus.CANCELLED:
+        return 'Cancelada';
+      case AppointmentStatus.NO_SHOW:
+        return 'No asistió';
+      default:
+        return status;
+    }
+  }
+
+  statusPillClass(status: AppointmentStatus): string {
+    switch (status) {
+      case AppointmentStatus.CONFIRMED:
+        return 'day-row__pill day-row__pill--confirmed';
+      case AppointmentStatus.COMPLETED:
+        return 'day-row__pill day-row__pill--completed';
+      case AppointmentStatus.CANCELLED:
+        return 'day-row__pill day-row__pill--cancelled';
+      case AppointmentStatus.NO_SHOW:
+        return 'day-row__pill day-row__pill--noshow';
+      case AppointmentStatus.SCHEDULED:
+      default:
+        return 'day-row__pill day-row__pill--scheduled';
+    }
+  }
+
+  openInsertAppointment(): void {
+    const ymd = this.selectedDate();
+    this.preselectedStart.set(`${ymd}T09:00`);
+    this.preselectedEnd.set(`${ymd}T09:30`);
+    this.selectedAppointment.set(null);
+    this.showModal.set(true);
+  }
+
+  openAppointmentDetail(apt: Appointment): void {
+    this.selectedAppointment.set(apt);
+    this.preselectedStart.set(null);
+    this.preselectedEnd.set(null);
+    this.showModal.set(true);
+  }
+
   loadFilters(): void {
     this.loadingFilters.set(true);
 
@@ -114,24 +291,25 @@ export class AppointmentCalendarComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+    const ref = this.displayMonthStart();
+    const y = ref.getFullYear();
+    const m = ref.getMonth();
+    const start = new Date(y, m, 1);
+    const end = new Date(y, m + 1, 0);
 
-    const query: any = {
-      startDate: startOfMonth.toISOString().split('T')[0],
-      endDate: endOfMonth.toISOString().split('T')[0]
+    const query: Record<string, string | number> = {
+      startDate: this.toYmd(start),
+      endDate: this.toYmd(end)
     };
 
-    // Apply filters
     const dentistId = this.selectedDentistId();
     const boxId = this.selectedBoxId();
-    
+
     if (dentistId) {
-      query.dentistId = dentistId;
+      query['dentistId'] = dentistId;
     }
     if (boxId) {
-      query.boxId = boxId;
+      query['boxId'] = boxId;
     }
 
     this.appointmentService.list(query).subscribe({
@@ -207,36 +385,21 @@ export class AppointmentCalendarComponent implements OnInit {
 
   handleEventClick(clickInfo: EventClickArg): void {
     const appointment = clickInfo.event.extendedProps['appointment'] as Appointment;
-    
-    this.selectedAppointment.set(appointment);
-    this.preselectedStart.set(null);
-    this.preselectedEnd.set(null);
-    this.showModal.set(true);
+    this.openAppointmentDetail(appointment);
   }
 
-  handleEvents(events: EventApi[]): void {
-    // Este método se llama cuando cambian los eventos
-    // Útil para debugging o sincronización
-  }
+  handleEvents(_events: EventApi[]): void {}
 
-  handleEventDrop(info: any): void {
-    // Por ahora revertimos el cambio, la edición se hará desde el modal
+  handleEventDrop(info: { revert: () => void; event: { extendedProps: Record<string, unknown> } }): void {
     info.revert();
     const appointment = info.event.extendedProps['appointment'] as Appointment;
-    this.selectedAppointment.set(appointment);
-    this.preselectedStart.set(null);
-    this.preselectedEnd.set(null);
-    this.showModal.set(true);
+    this.openAppointmentDetail(appointment);
   }
 
-  handleEventResize(info: any): void {
-    // Por ahora revertimos el cambio, la edición se hará desde el modal
+  handleEventResize(info: { revert: () => void; event: { extendedProps: Record<string, unknown> } }): void {
     info.revert();
     const appointment = info.event.extendedProps['appointment'] as Appointment;
-    this.selectedAppointment.set(appointment);
-    this.preselectedStart.set(null);
-    this.preselectedEnd.set(null);
-    this.showModal.set(true);
+    this.openAppointmentDetail(appointment);
   }
 
   onModalClose(): void {
@@ -246,8 +409,7 @@ export class AppointmentCalendarComponent implements OnInit {
     this.preselectedEnd.set(null);
   }
 
-  onAppointmentSaved(appointment: Appointment): void {
-    console.log('Cita guardada:', appointment);
+  onAppointmentSaved(_appointment: Appointment): void {
     this.loadAppointments();
   }
 
@@ -307,6 +469,33 @@ export class AppointmentCalendarComponent implements OnInit {
 
   getDentistName(dentist: Dentist): string {
     return `${dentist.nombre} ${dentist.apellidos}`.trim();
+  }
+
+  private startOfMonth(d: Date): Date {
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  }
+
+  private toYmd(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  private parseLocalYmd(ymd: string): Date {
+    const [y, mo, da] = ymd.split('-').map((x) => Number(x));
+    return new Date(y, mo - 1, da);
+  }
+
+  /** Comprueba si `ymd` pertenece al mismo año/mes que `monthStart` (día 1). */
+  private ymdFallsInMonth(ymd: string, monthStart: Date): boolean {
+    const d = this.parseLocalYmd(ymd);
+    return d.getFullYear() === monthStart.getFullYear() && d.getMonth() === monthStart.getMonth();
+  }
+
+  /** Fecha local (YYYY-MM-DD) del inicio de la cita. */
+  private appointmentLocalYmd(apt: Appointment): string {
+    return this.toYmd(new Date(apt.startDateTime));
   }
 
   private getErrorMessage(err: unknown): string {

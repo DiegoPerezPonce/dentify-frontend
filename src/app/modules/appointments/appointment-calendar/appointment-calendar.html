@@ -1,139 +1,285 @@
-<div class="appointment-calendar-container">
-  <div class="calendar-header">
-    <h1 class="page-title">Agenda y Citas</h1>
-    <p class="page-subtitle">
-      Gestiona las citas de los pacientes. Haz clic en un espacio libre para crear una nueva
-      cita, o en una cita existente para ver detalles.
-    </p>
-  </div>
-
-  @if (error()) {
-    <div class="alert alert-error">
-      <svg
-        class="icon"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        ></path>
-      </svg>
-      <span>{{ error() }}</span>
-    </div>
-  }
-
-  <div class="filters-container">
-    <div class="filters-header">
-      <h3>Filtros</h3>
-      @if (hasActiveFilters()) {
-        <button type="button" class="clear-filters-btn" (click)="clearFilters()">
-          <svg
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            ></path>
-          </svg>
-          Limpiar filtros
-        </button>
-      }
-    </div>
-
-    @if (loadingFilters()) {
-      <div class="filters-loading">
-        <div class="spinner-small"></div>
-        <span>Cargando filtros...</span>
+<div class="appointment-calendar-page">
+  <div class="appointment-calendar-container">
+    <header class="calendar-hero">
+      <div class="calendar-hero-text">
+        <h1 class="calendar-hero-title">Agenda y Planificación</h1>
+        <p class="calendar-hero-subtitle">
+          Control de citas por paciente y box clínico. En vista día usa el mini calendario y la
+          lista; en vista semana verás el calendario clásico.
+        </p>
       </div>
-    } @else {
-      <div class="filters-grid">
-        <div class="filter-group">
-          <label for="dentist-filter">Odontólogo</label>
-          <select
-            id="dentist-filter"
-            class="filter-select"
-            [value]="selectedDentistId() || ''"
-            (change)="onDentistFilterChange($any($event.target).value)"
-          >
-            <option value="">Todos los odontólogos</option>
-            @for (dentist of dentists(); track dentist.id) {
-              <option [value]="dentist.id">{{ getDentistName(dentist) }}</option>
-            }
-          </select>
-        </div>
+    </header>
 
-        <div class="filter-group">
-          <label for="box-filter">Box</label>
-          <select
-            id="box-filter"
-            class="filter-select"
-            [value]="selectedBoxId() || ''"
-            (change)="onBoxFilterChange($any($event.target).value)"
-          >
-            <option value="">Todos los boxes</option>
-            @for (box of boxes(); track box.id) {
-              <option [value]="box.id">{{ box.nombre }}</option>
-            }
-          </select>
-        </div>
+    @if (error()) {
+      <div class="alert alert-error" role="alert">
+        <svg
+          class="icon"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
+        </svg>
+        <span>{{ error() }}</span>
       </div>
     }
-  </div>
 
-  @if (loading()) {
-    <div class="loading-overlay">
-      <div class="spinner"></div>
-      <p>Cargando calendario...</p>
+    <div class="agenda-layout" [class.agenda-layout--week]="agendaView() === 'week'">
+      <aside class="agenda-sidebar">
+        <div class="filters-container">
+          <div class="filters-header">
+            <h3>Filtros</h3>
+            @if (hasActiveFilters()) {
+              <button type="button" class="clear-filters-btn" (click)="clearFilters()">
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                </svg>
+                Limpiar filtros
+              </button>
+            }
+          </div>
+
+          @if (loadingFilters()) {
+            <div class="filters-loading">
+              <div class="spinner-small" aria-hidden="true"></div>
+              <span>Cargando filtros...</span>
+            </div>
+          } @else {
+            <div class="filters-grid">
+              <div class="filter-group">
+                <label for="dentist-filter">Odontólogo</label>
+                <select
+                  id="dentist-filter"
+                  class="filter-select"
+                  [value]="selectedDentistId() || ''"
+                  (change)="onDentistFilterChange($any($event.target).value)"
+                >
+                  <option value="">Todos los odontólogos</option>
+                  @for (dentist of dentists(); track dentist.id) {
+                    <option [value]="dentist.id">{{ getDentistName(dentist) }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="box-filter">Box</label>
+                <select
+                  id="box-filter"
+                  class="filter-select"
+                  [value]="selectedBoxId() || ''"
+                  (change)="onBoxFilterChange($any($event.target).value)"
+                >
+                  <option value="">Todos los boxes</option>
+                  @for (box of boxes(); track box.id) {
+                    <option [value]="box.id">{{ box.nombre }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="mini-calendar-card">
+          <div class="mini-calendar-toolbar">
+            <button type="button" class="mini-cal-nav" (click)="prevMiniMonth()" aria-label="Mes anterior">
+              <span class="mini-cal-nav-icon">‹</span>
+            </button>
+            <h3 class="mini-calendar-title">{{ monthTitle() }}</h3>
+            <button type="button" class="mini-cal-nav" (click)="nextMiniMonth()" aria-label="Mes siguiente">
+              <span class="mini-cal-nav-icon">›</span>
+            </button>
+          </div>
+          <button type="button" class="mini-cal-today-link" (click)="goToToday()">Ir a hoy</button>
+
+          <div class="mini-calendar-weekdays">
+            @for (w of weekdayLabels; track w) {
+              <span>{{ w }}</span>
+            }
+          </div>
+          <div class="mini-calendar-grid" role="grid" aria-label="Calendario mensual">
+            @for (cell of miniCalendarCells(); track cell.ymd + '-' + $index) {
+              <button
+                type="button"
+                class="mini-cal-cell"
+                [class.mini-cal-cell--muted]="!cell.inMonth"
+                [class.mini-cal-cell--today]="cell.isToday"
+                [class.mini-cal-cell--selected]="cell.isSelected"
+                (click)="selectMiniDay(cell.ymd, cell.inMonth)"
+              >
+                {{ cell.dayLabel }}
+              </button>
+            }
+          </div>
+        </div>
+      </aside>
+
+      <section class="agenda-main">
+        @if (agendaView() === 'day') {
+          <div class="day-panel">
+            <div class="day-panel-toolbar">
+              <h2 class="day-panel-title">
+                Citas del día:
+                <span class="day-panel-title-accent">{{ formatSelectedDayHeading() }}</span>
+              </h2>
+              <div class="view-toggle" role="group" aria-label="Tipo de vista">
+                <button
+                  type="button"
+                  class="view-toggle-btn"
+                  [class.view-toggle-btn--active]="agendaView() === 'day'"
+                  (click)="setAgendaView('day')"
+                >
+                  Día
+                </button>
+                <button
+                  type="button"
+                  class="view-toggle-btn"
+                  [class.view-toggle-btn--active]="agendaView() === 'week'"
+                  (click)="setAgendaView('week')"
+                >
+                  Semana
+                </button>
+              </div>
+            </div>
+
+            <div class="day-panel-card">
+              @if (loading()) {
+                <div class="day-panel-loading">
+                  <div class="spinner" aria-hidden="true"></div>
+                  <span>Cargando citas…</span>
+                </div>
+              } @else if (appointmentsForSelectedDay().length === 0) {
+                <div class="day-panel-empty">
+                  <p>No hay citas este día.</p>
+                  <button type="button" class="btn-link-primary" (click)="openInsertAppointment()">
+                    + Agendar cita
+                  </button>
+                </div>
+              } @else {
+                <ul class="day-appointment-list">
+                @for (apt of appointmentsForSelectedDay(); track apt.id) {
+                  <li>
+                    <button
+                      type="button"
+                      class="day-row"
+                      [class.day-row--cancelled]="apt.status === AppointmentStatus.CANCELLED"
+                      (click)="openAppointmentDetail(apt)"
+                    >
+                        <div class="day-row__time">
+                          <span class="day-row__time-start">{{ formatTime(apt.startDateTime) }}</span>
+                          <span class="day-row__time-dur">{{ apt.duration }} min</span>
+                        </div>
+                        <div class="day-row__body">
+                          <span class="day-row__name">{{ apt.patientName || 'Paciente' }}</span>
+                          <span class="day-row__treatment">{{ apt.treatment || 'Sin tratamiento indicado' }}</span>
+                        </div>
+                        <div class="day-row__meta">
+                          @if (apt.boxName || apt.boxId) {
+                            <span class="day-row__box-chip">
+                              {{ apt.boxName || 'Box ' + apt.boxId }}
+                            </span>
+                          }
+                          <span [class]="statusPillClass(apt.status)">{{ statusLabel(apt.status) }}</span>
+                        </div>
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+
+              <div class="day-panel-footer">
+                <button type="button" class="btn-link-primary" (click)="openInsertAppointment()">
+                  + Insertar cita en hueco disponible
+                </button>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div class="week-panel">
+            <div class="day-panel-toolbar week-panel-toolbar">
+              <h2 class="day-panel-title week-panel-title">Vista semanal</h2>
+              <div class="view-toggle" role="group" aria-label="Tipo de vista">
+                <button
+                  type="button"
+                  class="view-toggle-btn"
+                  [class.view-toggle-btn--active]="agendaView() === 'day'"
+                  (click)="setAgendaView('day')"
+                >
+                  Día
+                </button>
+                <button
+                  type="button"
+                  class="view-toggle-btn"
+                  [class.view-toggle-btn--active]="agendaView() === 'week'"
+                  (click)="setAgendaView('week')"
+                >
+                  Semana
+                </button>
+              </div>
+            </div>
+
+            <div class="calendar-main-card">
+              @if (loading()) {
+                <div class="loading-overlay">
+                  <div class="spinner" aria-hidden="true"></div>
+                  <p>Cargando calendario...</p>
+                </div>
+              }
+              <div class="calendar-wrapper" [class.calendar-wrapper--dimmed]="loading()">
+                <full-calendar #fullCalendar [options]="calendarOptions"></full-calendar>
+              </div>
+            </div>
+          </div>
+        }
+      </section>
     </div>
-  }
 
-  <div class="calendar-wrapper">
-    <full-calendar [options]="calendarOptions"></full-calendar>
-  </div>
-
-  <div class="calendar-footer">
-    <div class="legend">
-      <h3>Leyenda:</h3>
-      <div class="legend-items">
-        <div class="legend-item">
-          <span class="legend-color" style="background-color: #3788d8"></span>
-          <span>Programada</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-color" style="background-color: #28a745"></span>
-          <span>Confirmada</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-color" style="background-color: #6c757d"></span>
-          <span>Completada</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-color" style="background-color: #dc3545"></span>
-          <span>Cancelada</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-color" style="background-color: #ffc107"></span>
-          <span>No asistió</span>
+    <div class="calendar-footer">
+      <div class="legend">
+        <h3>Leyenda</h3>
+        <div class="legend-items">
+          <div class="legend-item">
+            <span class="legend-swatch legend-swatch--scheduled"></span>
+            <span>Programada</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch legend-swatch--confirmed"></span>
+            <span>Confirmada</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch legend-swatch--completed"></span>
+            <span>Completada</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch legend-swatch--cancelled"></span>
+            <span>Cancelada</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch legend-swatch--noshow"></span>
+            <span>No asistió</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="help-text">
-      <p><strong>Tip:</strong> Haz clic en un espacio libre para crear una cita.</p>
-      <p>
-        <strong>Nota:</strong> Haz clic en una cita para ver el detalle; desde ahí puedes editar,
-        cancelar o eliminar.
-      </p>
+      <div class="help-text">
+        <p><strong>Vista día:</strong> elige un día en el mini calendario y pulsa una fila para ver el detalle.</p>
+        <p><strong>Vista semana:</strong> arrastra en el calendario grande para crear una cita o pulsa un evento.</p>
+      </div>
     </div>
   </div>
 </div>

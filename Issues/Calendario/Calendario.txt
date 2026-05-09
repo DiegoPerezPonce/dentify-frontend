@@ -1,0 +1,4 @@
+Usa el siguiente diseño solo como referencia visual. 
+No copies el HTML tal cual ni generes una estructura final lista para producción. 
+Adáptalo a una aplicación Angular existente, respetando la arquitectura de componentes, la lógica TypeScript ya implementada, los bindings de Angular y los servicios existentes. 
+Solo modifica la capa de presentación (HTML de templates y estilos CSS/SCSS) para que el resultado final sea visualmente similar al diseño proporcionado.
