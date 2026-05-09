@@ -40,12 +40,15 @@ export interface AppointmentCreateDTO {
   treatment?: string;
   notes?: string;
   isInfectiousPatient?: boolean;
+  /** Si se omite, el API usa estado inicial programada. */
+  status?: AppointmentStatus;
 }
 
 /**
  * DTO para actualizar una cita existente
  */
 export interface AppointmentUpdateDTO {
+  patientId?: number;
   dentistId?: number;
   boxId?: number;
   startDateTime?: string;

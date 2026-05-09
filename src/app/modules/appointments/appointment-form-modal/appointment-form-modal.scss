@@ -208,6 +208,42 @@ form {
   }
 }
 
+.detail-body {
+  padding: 1.5rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(7rem, 10rem) 1fr;
+  gap: 0.75rem 1.25rem;
+  margin: 0;
+
+  dt {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #6b7280;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: #1f2937;
+  }
+
+  .multiline {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
+
+.detail-footer {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+}
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -249,6 +285,15 @@ form {
 
     &:hover:not(:disabled) {
       background-color: #d1d5db;
+    }
+  }
+
+  &.btn-danger {
+    background-color: #dc2626;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #b91c1c;
     }
   }
 }

@@ -3,21 +3,30 @@ import {
   EventEmitter,
   inject,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   signal
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AppointmentService } from '../appointment.service';
+import { AppointmentService, toDatetimeLocalInput } from '../appointment.service';
 import { DentistService } from '../dentist.service';
 import { BoxService } from '../../boxes/box.service';
 import { PatientService } from '../../patients/patient.service';
-import { Appointment, AppointmentCreateDTO, AppointmentStatus } from '../models/appointment.models';
+import {
+  Appointment,
+  AppointmentCreateDTO,
+  AppointmentStatus,
+  AppointmentUpdateDTO
+} from '../models/appointment.models';
 import { Dentist } from '../models/dentist.models';
 import { Box } from '../../boxes/models/box.models';
 import { PatientRow } from '../../patients/models/patient-list.models';
 import { HttpErrorResponse } from '@angular/common/http';
+
+export type AppointmentModalViewMode = 'create' | 'detail' | 'edit';
 
 @Component({
   selector: 'app-appointment-form-modal',
@@ -26,7 +35,10 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './appointment-form-modal.html',
   styleUrl: './appointment-form-modal.scss'
 })
-export class AppointmentFormModalComponent implements OnInit {
+export class AppointmentFormModalComponent implements OnInit, OnChanges {
+  /** Expuesto al template para comparar estado (p. ej. cita cancelada). */
+  readonly AppointmentStatus = AppointmentStatus;
+
   private fb = inject(FormBuilder);
   private appointmentService = inject(AppointmentService);
   private dentistService = inject(DentistService);
@@ -40,6 +52,8 @@ export class AppointmentFormModalComponent implements OnInit {
 
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<Appointment>();
+  @Output() cancelAppointment = new EventEmitter<Appointment>();
+  @Output() deleteAppointment = new EventEmitter<Appointment>();
 
   readonly form: FormGroup;
   readonly saving = signal(false);
@@ -49,6 +63,9 @@ export class AppointmentFormModalComponent implements OnInit {
   readonly dentists = signal<Dentist[]>([]);
   readonly boxes = signal<Box[]>([]);
   readonly patients = signal<PatientRow[]>([]);
+
+  /** create = nueva cita; detail = solo lectura al pulsar en el calendario; edit = formulario de edición. */
+  viewMode: AppointmentModalViewMode = 'create';
 
   readonly statusOptions = [
     { value: AppointmentStatus.SCHEDULED, label: 'Programada' },
@@ -74,21 +91,67 @@ export class AppointmentFormModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadResources();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes['isOpen'] ||
+      changes['appointment'] ||
+      changes['preselectedStart'] ||
+      changes['preselectedEnd']
+    ) {
+      this.syncModalFromInputs();
+    }
+  }
+
+  /** El modal permanece montado: hay que reaccionar cada vez que se abre o cambia la cita seleccionada. */
+  private syncModalFromInputs(): void {
+    if (!this.isOpen) {
+      this.viewMode = 'create';
+      return;
+    }
+
+    this.error.set(null);
 
     if (this.appointment) {
+      this.viewMode = 'detail';
       this.populateForm(this.appointment);
-    } else if (this.preselectedStart) {
+      return;
+    }
+
+    this.viewMode = 'create';
+    this.resetFormForCreate();
+    if (this.preselectedStart) {
       this.form.patchValue({
-        startDateTime: this.preselectedStart
+        startDateTime: toDatetimeLocalInput(this.preselectedStart)
       });
-      
       if (this.preselectedEnd && this.preselectedStart) {
         const start = new Date(this.preselectedStart);
         const end = new Date(this.preselectedEnd);
         const durationMinutes = (end.getTime() - start.getTime()) / 60000;
-        this.form.patchValue({ duration: Math.max(15, durationMinutes) });
+        this.form.patchValue({ duration: Math.max(15, Math.round(durationMinutes)) });
       }
     }
+  }
+
+  private resetFormForCreate(): void {
+    this.form.reset({
+      patientId: null,
+      dentistId: null,
+      boxId: null,
+      startDateTime: '',
+      duration: 30,
+      treatment: '',
+      notes: '',
+      status: AppointmentStatus.SCHEDULED,
+      isInfectiousPatient: false
+    });
+  }
+
+  switchToEdit(): void {
+    if (!this.appointment) return;
+    this.viewMode = 'edit';
+    this.populateForm(this.appointment);
   }
 
   private loadResources(): void {
@@ -116,8 +179,8 @@ export class AppointmentFormModalComponent implements OnInit {
     this.form.patchValue({
       patientId: appointment.patientId,
       dentistId: appointment.dentistId,
-      boxId: appointment.boxId,
-      startDateTime: appointment.startDateTime,
+      boxId: appointment.boxId ?? null,
+      startDateTime: toDatetimeLocalInput(appointment.startDateTime),
       duration: appointment.duration,
       treatment: appointment.treatment || '',
       notes: appointment.notes || '',
@@ -136,21 +199,30 @@ export class AppointmentFormModalComponent implements OnInit {
     this.error.set(null);
 
     const formValue = this.form.value;
-    
-    const dto: AppointmentCreateDTO = {
-      patientId: Number(formValue.patientId),
-      dentistId: Number(formValue.dentistId),
-      boxId: Number(formValue.boxId),
-      startDateTime: formValue.startDateTime,
-      duration: Number(formValue.duration),
-      treatment: formValue.treatment || undefined,
-      notes: formValue.notes || undefined,
-      isInfectiousPatient: formValue.isInfectiousPatient || false
-    };
 
-    const operation = this.appointment
-      ? this.appointmentService.update(this.appointment.id, dto)
-      : this.appointmentService.create(dto);
+    const operation = this.appointment && this.viewMode === 'edit'
+      ? this.appointmentService.update(this.appointment.id, {
+          patientId: Number(formValue.patientId),
+          dentistId: Number(formValue.dentistId),
+          boxId: Number(formValue.boxId),
+          startDateTime: formValue.startDateTime,
+          duration: Number(formValue.duration),
+          treatment: formValue.treatment || undefined,
+          notes: formValue.notes || undefined,
+          isInfectiousPatient: formValue.isInfectiousPatient || false,
+          status: formValue.status
+        } satisfies AppointmentUpdateDTO)
+      : this.appointmentService.create({
+          patientId: Number(formValue.patientId),
+          dentistId: Number(formValue.dentistId),
+          boxId: Number(formValue.boxId),
+          startDateTime: formValue.startDateTime,
+          duration: Number(formValue.duration),
+          treatment: formValue.treatment || undefined,
+          notes: formValue.notes || undefined,
+          isInfectiousPatient: formValue.isInfectiousPatient || false,
+          status: formValue.status
+        } satisfies AppointmentCreateDTO);
 
     operation.subscribe({
       next: (appointment) => {
@@ -166,17 +238,42 @@ export class AppointmentFormModalComponent implements OnInit {
   }
 
   onClose(): void {
-    this.form.reset();
+    this.viewMode = 'create';
+    this.resetFormForCreate();
     this.error.set(null);
     this.close.emit();
   }
 
   get isEditMode(): boolean {
-    return this.appointment !== null;
+    return this.appointment !== null && this.viewMode === 'edit';
   }
 
   get modalTitle(): string {
-    return this.isEditMode ? 'Editar Cita' : 'Nueva Cita';
+    if (this.viewMode === 'detail') return 'Detalles de la cita';
+    if (this.viewMode === 'edit') return 'Editar cita';
+    return 'Nueva cita';
+  }
+
+  getStatusLabel(status: AppointmentStatus): string {
+    return this.statusOptions.find((o) => o.value === status)?.label ?? status;
+  }
+
+  formatDateTimeDisplay(iso: string): string {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleString('es-ES', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    });
+  }
+
+  emitCancelAppointment(): void {
+    if (this.appointment) this.cancelAppointment.emit(this.appointment);
+  }
+
+  emitDeleteAppointment(): void {
+    if (this.appointment) this.deleteAppointment.emit(this.appointment);
   }
 
   private getErrorMessage(err: unknown): string {
@@ -193,6 +290,17 @@ export class AppointmentFormModalComponent implements OnInit {
           return 'Conflicto: Los pacientes infecciosos deben ser la última cita del día.';
         }
         return message || 'Conflicto en la programación de la cita.';
+      }
+      if (err.status === 422) {
+        const msg = err.error?.message || err.error?.detail;
+        const violations = err.error?.violations;
+        if (Array.isArray(violations) && violations.length) {
+          const first = violations[0];
+          const path = first.propertyPath ?? first.path ?? '';
+          const vmsg = first.message ?? first.title ?? '';
+          return path ? `${path}: ${vmsg}` : vmsg || msg || 'Datos no válidos para el servidor.';
+        }
+        return typeof msg === 'string' && msg ? msg : 'Datos no válidos (422). Revisa fecha, hora y campos obligatorios.';
       }
       if (err.status === 400) {
         return 'Datos inválidos. Verifica los campos del formulario.';

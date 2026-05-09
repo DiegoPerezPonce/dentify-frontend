@@ -131,8 +131,8 @@
     <div class="help-text">
       <p><strong>Tip:</strong> Haz clic en un espacio libre para crear una cita.</p>
       <p>
-        <strong>Nota:</strong> Haz clic en una cita existente para editarla o cancelarla.
-        El issue #13 añadirá filtros por box/odontólogo.
+        <strong>Nota:</strong> Haz clic en una cita para ver el detalle; desde ahí puedes editar,
+        cancelar o eliminar.
       </p>
     </div>
   </div>
@@ -145,4 +145,6 @@
   [preselectedEnd]="preselectedEnd()"
   (close)="onModalClose()"
   (saved)="onAppointmentSaved($event)"
+  (cancelAppointment)="onCancelAppointment($event)"
+  (deleteAppointment)="onDeleteAppointment($event)"
 ></app-appointment-form-modal>
