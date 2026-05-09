@@ -1,0 +1,91 @@
+<section class="notice-admin">
+  <header class="head">
+    <h1>Avisos pedagógicos</h1>
+    <button type="button" class="btn-primary" (click)="openCreateModal()">Crear aviso</button>
+  </header>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="state">Cargando avisos...</div>
+  } @else if (!notices().length) {
+    <div class="state">No hay avisos creados.</div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Activo</th>
+            <th>Obligatorio</th>
+            <th>Publicación</th>
+            <th>Expira</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of notices(); track item.id) {
+            <tr>
+              <td>
+                <strong>{{ item.title }}</strong>
+                <p>{{ item.body }}</p>
+              </td>
+              <td>{{ item.active ? 'Sí' : 'No' }}</td>
+              <td>{{ item.requires_ack ? 'Sí' : 'No' }}</td>
+              <td>{{ formatDateTime(item.published_at) }}</td>
+              <td>{{ formatDateTime(item.expires_at) }}</td>
+              <td class="actions">
+                <button type="button" class="btn-edit" (click)="openEditModal(item)">Editar</button>
+                <button type="button" class="btn-delete" (click)="delete(item)">Eliminar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (modalOpen()) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h2>{{ editingId() ? 'Editar aviso' : 'Crear aviso' }}</h2>
+
+        <label>
+          Título
+          <input type="text" [(ngModel)]="formTitle" />
+        </label>
+
+        <label>
+          Contenido
+          <textarea rows="5" [(ngModel)]="formBody"></textarea>
+        </label>
+
+        <div class="grid">
+          <label>
+            Publicar en
+            <input type="datetime-local" [(ngModel)]="formPublishedAt" />
+          </label>
+
+          <label>
+            Expira en (opcional)
+            <input type="datetime-local" [(ngModel)]="formExpiresAt" />
+          </label>
+        </div>
+
+        <div class="checks">
+          <label><input type="checkbox" [(ngModel)]="formActive" /> Activo</label>
+          <label><input type="checkbox" [(ngModel)]="formRequiresAck" /> Lectura obligatoria</label>
+        </div>
+
+        <div class="buttons">
+          <button type="button" class="btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="button" class="btn-primary" (click)="save()" [disabled]="saving()">
+            {{ saving() ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

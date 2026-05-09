@@ -9,6 +9,7 @@
       <p class="nav-label">General</p>
       <a routerLink="/app/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
       <a routerLink="/app/pacientes" routerLinkActive="active">Pacientes</a>
+      <a routerLink="/app/notificaciones" routerLinkActive="active">Notificaciones</a>
       <a routerLink="/app/agenda" routerLinkActive="active">Agenda</a>
       <a routerLink="/app/radiografias" routerLinkActive="active">Radiografías</a>
       <a routerLink="/app/asistente" routerLinkActive="active">Asistente <span class="badge">IA</span></a>
@@ -27,8 +28,11 @@
           <a routerLink="/app/admin/odontologos" routerLinkActive="active">Odontólogos</a>
           <a routerLink="/app/admin/boxes" routerLinkActive="active">Boxes</a>
           <a routerLink="/app/admin/stock" routerLinkActive="active">Stock</a>
+          <a routerLink="/app/admin/stock/recepciones" routerLinkActive="active">Recepciones</a>
           <a routerLink="/app/admin/protocolos" routerLinkActive="active">Protocolos</a>
+          <a routerLink="/app/admin/disponibilidad-odontologos" routerLinkActive="active">Disponibilidad</a>
           <a routerLink="/app/admin/usuarios" routerLinkActive="active">Usuarios</a>
+          <a routerLink="/app/admin/avisos" routerLinkActive="active">Avisos</a>
         }
       </nav>
     }
@@ -51,10 +55,10 @@
   </aside>
 
   <main class="main">
-    @if (showPedagogicalNotice()) {
+    @if (showPedagogicalNotice() && pedagogicalNoticeTitle()) {
       <div class="notice-banner" role="status">
-        <strong>Aviso del centro.</strong>
-        Actualiza el historial clínico tras cada intervención. Los pacientes en tratamiento activo requieren revisión periódica según protocolo del docente.
+        <strong>{{ pedagogicalNoticeTitle() }}</strong>
+        {{ pedagogicalNoticeBody() }}
       </div>
     }
     <div class="outlet-wrap">

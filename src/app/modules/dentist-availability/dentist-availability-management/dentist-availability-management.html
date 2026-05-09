@@ -1,0 +1,75 @@
+<section class="availability-page">
+  <header class="head">
+    <h1>Disponibilidad de odontólogos</h1>
+    <p>Define el horario semanal por odontólogo y evita solapes entre franjas del mismo día.</p>
+  </header>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="state">Cargando odontólogos...</div>
+  } @else {
+    <div class="panel">
+      <label class="dentist-select">
+        Odontólogo
+        <select [value]="selectedDentistId() ?? ''" (change)="onDentistChange($any($event.target).value)">
+          @for (d of dentists(); track d.id) {
+            <option [value]="d.id">{{ d.nombre }} {{ d.apellidos }}</option>
+          }
+        </select>
+      </label>
+
+      <form class="slot-form" (submit)="$event.preventDefault(); saveSlot();">
+        <label>
+          Día
+          <select [(ngModel)]="weekday" name="weekday">
+            @for (day of weekdays; track day.value) {
+              <option [ngValue]="day.value">{{ day.label }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Inicio
+          <input type="time" [(ngModel)]="startTime" name="startTime" />
+        </label>
+        <label>
+          Fin
+          <input type="time" [(ngModel)]="endTime" name="endTime" />
+        </label>
+        <div class="buttons">
+          <button type="submit" class="btn-primary" [disabled]="saving()">
+            {{ editingId() ? 'Actualizar franja' : 'Añadir franja' }}
+          </button>
+          @if (editingId()) {
+            <button type="button" class="btn-ghost" (click)="cancelEdit()">Cancelar</button>
+          }
+        </div>
+      </form>
+    </div>
+
+    <div class="grid-wrap">
+      @for (day of weekdays; track day.value) {
+        <article class="day-card">
+          <h3>{{ day.label }}</h3>
+          @if (!(groupedByDay().get(day.value)?.length)) {
+            <p class="empty">Sin franjas</p>
+          } @else {
+            <ul>
+              @for (slot of groupedByDay().get(day.value); track trackBySlotId($index, slot!)) {
+                <li>
+                  <span>{{ slot!.startTime }} - {{ slot!.endTime }}</span>
+                  <span class="actions">
+                    <button type="button" (click)="editSlot(slot!)">Editar</button>
+                    <button type="button" class="danger" (click)="deleteSlot(slot!)">Eliminar</button>
+                  </span>
+                </li>
+              }
+            </ul>
+          }
+        </article>
+      }
+    </div>
+  }
+</section>

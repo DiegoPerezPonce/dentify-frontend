@@ -74,6 +74,13 @@ export const routes: Routes = [
           import('./modules/patients/xray-gallery/xray-gallery').then((m) => m.XrayGalleryComponent)
       },
       {
+        path: 'notificaciones',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Centro de notificaciones', hint: 'Issue #21: alertas de citas y stock.' },
+        loadComponent: () =>
+          import('./pages/notification-center/notification-center').then((m) => m.NotificationCenterComponent)
+      },
+      {
         path: 'agenda',
         canActivate: [roleGuard],
         data: {
@@ -144,17 +151,44 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/stock/stock-list/stock-list').then((m) => m.StockListComponent)
       },
       {
+        path: 'admin/stock/recepciones',
+        canActivate: [roleGuard],
+        data: { ...adminOnly, pageTitle: 'Recepción de material', hint: 'Issue #23: entradas usando material existente.' },
+        loadComponent: () =>
+          import('./modules/stock/material-receiving-form/material-receiving-form').then(
+            (m) => m.MaterialReceivingFormComponent
+          )
+      },
+      {
         path: 'admin/protocolos',
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Protocolos de tratamiento', hint: 'Issue #18.' },
         loadComponent: () =>
-          import('./pages/placeholder-route/placeholder-route').then((m) => m.PlaceholderRouteComponent)
+          import('./modules/protocolos/protocolo-list/protocolo-list').then((m) => m.ProtocoloListComponent)
+      },
+      {
+        path: 'admin/disponibilidad-odontologos',
+        canActivate: [roleGuard],
+        data: { ...adminOnly, pageTitle: 'Disponibilidad de odontólogos', hint: 'Issue #22: horario semanal y solapes.' },
+        loadComponent: () =>
+          import('./modules/dentist-availability/dentist-availability-management/dentist-availability-management').then(
+            (m) => m.DentistAvailabilityManagementComponent
+          )
       },
       {
         path: 'admin/usuarios',
         canActivate: [roleGuard],
         data: { ...adminOnly, pageTitle: 'Usuarios y roles', hint: 'Issue #15: CRUD usuarios (solo admin).' },
         loadComponent: () => import('./modules/users/user-list/user-list').then((m) => m.UserListComponent)
+      },
+      {
+        path: 'admin/avisos',
+        canActivate: [roleGuard],
+        data: { ...adminOnly, pageTitle: 'Avisos pedagógicos', hint: 'Issue #36: admin publica avisos para alumnos.' },
+        loadComponent: () =>
+          import('./modules/notifications/pedagogical-notice-admin/pedagogical-notice-admin').then(
+            (m) => m.PedagogicalNoticeAdminComponent
+          )
       },
       {
         path: 'forbidden',
