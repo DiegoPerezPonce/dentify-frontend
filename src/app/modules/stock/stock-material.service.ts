@@ -6,7 +6,8 @@ import {
   StockMaterial,
   StockMaterialCreateDTO,
   StockMaterialListQuery,
-  StockMaterialListResult
+  StockMaterialListResult,
+  StockMaterialUpdateDTO
 } from './models/stock-material.models';
 
 @Injectable({
@@ -50,6 +51,10 @@ export class StockMaterialService {
 
   create(dto: StockMaterialCreateDTO): Observable<StockMaterial> {
     return this.http.post<StockMaterial>(this.base, dto);
+  }
+
+  update(id: number, dto: StockMaterialUpdateDTO): Observable<StockMaterial> {
+    return this.http.patch<StockMaterial>(`${this.base}/${id}`, dto);
   }
 
   delete(id: number): Observable<void> {

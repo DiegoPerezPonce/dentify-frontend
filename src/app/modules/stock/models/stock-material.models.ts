@@ -12,12 +12,14 @@ export interface StockMaterialCreateDTO {
   nombre: string;
   cantidad_actual: number;
   unidad: string;
+  umbral_minimo?: number;
 }
 
 export interface StockMaterialUpdateDTO {
   nombre?: string;
   cantidad_actual?: number;
   unidad?: string;
+  umbral_minimo?: number;
 }
 
 export interface StockMaterialListResult {

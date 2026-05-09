@@ -4,22 +4,35 @@ import { StockMaterialService } from '../stock-material.service';
 import { StockMaterial, LOW_STOCK_THRESHOLD } from '../models/stock-material.models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RestockFormModalComponent } from '../restock-form-modal/restock-form-modal';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-stock-list',
   standalone: true,
-  imports: [CommonModule, RestockFormModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, RestockFormModalComponent],
   templateUrl: './stock-list.html',
   styleUrl: './stock-list.scss'
 })
 export class StockListComponent implements OnInit {
   private stockService = inject(StockMaterialService);
+  private fb = inject(FormBuilder);
 
   readonly materials = signal<StockMaterial[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly showRestockModal = signal(false);
   readonly selectedMaterial = signal<StockMaterial | null>(null);
+  readonly showCatalogModal = signal(false);
+  readonly editingMaterial = signal<StockMaterial | null>(null);
+  readonly savingCatalog = signal(false);
+  readonly catalogError = signal<string | null>(null);
+
+  readonly catalogForm = this.fb.group({
+    nombre: ['', [Validators.required, Validators.maxLength(255)]],
+    cantidad_actual: [0, [Validators.required, Validators.min(0)]],
+    unidad: ['', [Validators.required, Validators.maxLength(50)]],
+    umbral_minimo: [10, [Validators.required, Validators.min(0)]]
+  });
 
   ngOnInit(): void {
     this.loadMaterials();
@@ -63,6 +76,87 @@ export class StockListComponent implements OnInit {
   onRestockSaved(): void {
     this.loadMaterials();
     this.closeRestockModal();
+  }
+
+  openCreateMaterialModal(): void {
+    this.editingMaterial.set(null);
+    this.catalogError.set(null);
+    this.catalogForm.reset({
+      nombre: '',
+      cantidad_actual: 0,
+      unidad: '',
+      umbral_minimo: 10
+    });
+    this.showCatalogModal.set(true);
+  }
+
+  openEditMaterialModal(material: StockMaterial): void {
+    this.editingMaterial.set(material);
+    this.catalogError.set(null);
+    this.catalogForm.reset({
+      nombre: material.nombre,
+      cantidad_actual: material.cantidad_actual,
+      unidad: material.unidad,
+      umbral_minimo: material.umbral_minimo ?? 10
+    });
+    this.showCatalogModal.set(true);
+  }
+
+  closeCatalogModal(): void {
+    this.showCatalogModal.set(false);
+    this.editingMaterial.set(null);
+    this.catalogError.set(null);
+  }
+
+  saveCatalogMaterial(): void {
+    if (this.catalogForm.invalid) {
+      this.catalogForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.catalogForm.getRawValue();
+    this.savingCatalog.set(true);
+    this.catalogError.set(null);
+
+    const payload = {
+      nombre: String(formValue.nombre).trim(),
+      cantidad_actual: Number(formValue.cantidad_actual),
+      unidad: String(formValue.unidad).trim(),
+      umbral_minimo: Number(formValue.umbral_minimo)
+    };
+
+    const editing = this.editingMaterial();
+    const request$ = editing
+      ? this.stockService.update(editing.id, payload)
+      : this.stockService.create(payload);
+
+    request$.subscribe({
+      next: () => {
+        this.savingCatalog.set(false);
+        this.closeCatalogModal();
+        this.loadMaterials();
+      },
+      error: (err: unknown) => {
+        this.savingCatalog.set(false);
+        this.catalogError.set(this.getErrorMessage(err));
+      }
+    });
+  }
+
+  deleteMaterial(material: StockMaterial): void {
+    if (!confirm(`¿Eliminar "${material.nombre}" del catálogo?`)) {
+      return;
+    }
+
+    this.loading.set(true);
+    this.error.set(null);
+    this.stockService.delete(material.id).subscribe({
+      next: () => this.loadMaterials(),
+      error: (err: unknown) => {
+        this.loading.set(false);
+        this.error.set(this.getErrorMessage(err));
+      }
+    });
   }
 
   private getErrorMessage(err: unknown): string {
