@@ -39,7 +39,58 @@
       </div>
     }
 
-    @if (loadingResources()) {
+    @if (viewMode === 'detail' && appointment) {
+      <div class="detail-body">
+        <dl class="detail-grid">
+          <dt>Paciente</dt>
+          <dd>{{ appointment.patientName || '—' }} (ID {{ appointment.patientId }})</dd>
+
+          <dt>Odontólogo</dt>
+          <dd>{{ appointment.dentistName || '—' }}</dd>
+
+          <dt>Box</dt>
+          <dd>{{ appointment.boxName || '—' }}</dd>
+
+          <dt>Inicio</dt>
+          <dd>{{ formatDateTimeDisplay(appointment.startDateTime) }}</dd>
+
+          <dt>Fin</dt>
+          <dd>{{ formatDateTimeDisplay(appointment.endDateTime) }}</dd>
+
+          <dt>Duración</dt>
+          <dd>{{ appointment.duration }} minutos</dd>
+
+          <dt>Estado</dt>
+          <dd>{{ getStatusLabel(appointment.status) }}</dd>
+
+          <dt>Tratamiento</dt>
+          <dd class="multiline">{{ appointment.treatment?.trim() || '—' }}</dd>
+
+          <dt>Notas</dt>
+          <dd class="multiline">{{ appointment.notes?.trim() || '—' }}</dd>
+
+          <dt>Paciente infeccioso</dt>
+          <dd>{{ appointment.isInfectiousPatient ? 'Sí' : 'No' }}</dd>
+        </dl>
+
+        <div class="modal-footer detail-footer">
+          <button type="button" class="btn btn-secondary" (click)="onClose()" [disabled]="saving()">
+            Cerrar
+          </button>
+          @if (appointment.status !== AppointmentStatus.CANCELLED) {
+            <button type="button" class="btn btn-secondary" (click)="emitCancelAppointment()" [disabled]="saving()">
+              Cancelar cita
+            </button>
+          }
+          <button type="button" class="btn btn-danger" (click)="emitDeleteAppointment()" [disabled]="saving()">
+            Eliminar
+          </button>
+          <button type="button" class="btn btn-primary" (click)="switchToEdit()" [disabled]="saving()">
+            Editar
+          </button>
+        </div>
+      </div>
+    } @else if (loadingResources()) {
       <div class="loading-state">
         <div class="spinner"></div>
         <p>Cargando recursos...</p>
@@ -118,8 +169,8 @@
             <div class="form-group">
               <label for="status">Estado</label>
               <select id="status" formControlName="status" class="form-control">
-                @for (status of statusOptions; track status.value) {
-                  <option [value]="status.value">{{ status.label }}</option>
+                @for (st of statusOptions; track st.value) {
+                  <option [value]="st.value">{{ st.label }}</option>
                 }
               </select>
             </div>
