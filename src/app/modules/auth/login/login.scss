@@ -7,6 +7,9 @@
 .login-panel-right{width:470px;display:flex;align-items:center;justify-content:center;padding:1.3rem}
 .login-card{width:100%;max-width:410px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:1.3rem}
 .mobile-logo{display:none;text-align:center;margin-bottom:.8rem}.mobile-logo img{width:150px}
+.login-lang-row{margin-bottom:.75rem}
+.login-lang-select{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:.4rem .55rem;font-size:.85rem;background:#f8fafc;color:#1e293b}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .login-header{margin-bottom:1rem}.login-header h1{margin:0 0 .2rem;font-size:1.6rem}.login-subtitle{margin:0;color:#64748b}
 .session-active,.session-expired-notice{border-radius:10px;padding:.6rem .7rem;margin-bottom:.8rem;font-size:.88rem}
 .session-active{background:#ecfeff;border:1px solid #a5f3fc}.session-expired-notice{background:#fffbeb;border:1px solid #fde68a;color:#92400e}

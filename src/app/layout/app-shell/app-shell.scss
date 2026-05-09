@@ -39,6 +39,33 @@
   letter-spacing: -0.02em;
 }
 
+.lang-switch {
+  padding: 0 1.25rem 0.75rem;
+}
+
+.lang-select {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #dce4ec;
+  padding: 0.4rem 0.5rem;
+  font-family: 'Noto Sans', system-ui, sans-serif;
+  font-size: 0.85rem;
+  background: #f8fafc;
+  color: #2c3e50;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .nav-block {
   display: flex;
   flex-direction: column;

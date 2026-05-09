@@ -59,19 +59,33 @@ export function getSessionRemainingMs(token: string | null): number | null {
   return expMs - Date.now();
 }
 
+export type SessionRemainingParts =
+  | { kind: 'none' }
+  | { kind: 'expired' }
+  | { kind: 'ok'; hours: number; minutes: number; seconds: number };
+
+/** Partes numéricas para i18n (ngx-translate); `none` si no hay `exp` en el token. */
+export function getSessionRemainingParts(token: string | null): SessionRemainingParts {
+  const rem = getSessionRemainingMs(token);
+  if (rem === null) return { kind: 'none' };
+  if (rem <= 0) return { kind: 'expired' };
+  const totalSeconds = Math.floor(rem / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return { kind: 'ok', hours, minutes, seconds };
+}
+
 /**
  * Texto corto para UI (p. ej. barra lateral). Null si el token no trae `exp`.
  */
 export function formatSessionRemainingLabel(token: string | null): string | null {
-  const rem = getSessionRemainingMs(token);
-  if (rem === null) return null;
-  if (rem <= 0) {
+  const parts = getSessionRemainingParts(token);
+  if (parts.kind === 'none') return null;
+  if (parts.kind === 'expired') {
     return 'caducada; vuelve a iniciar sesión';
   }
-  const totalSeconds = Math.floor(rem / 1000);
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = totalSeconds % 60;
+  const { hours: h, minutes: m, seconds: s } = parts;
   if (h > 0) {
     return `${h} h ${m} min`;
   }

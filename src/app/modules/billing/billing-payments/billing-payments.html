@@ -1,16 +1,14 @@
 <div class="billing-page">
   <header class="head">
     <div>
-      <h1>Pagos y facturacion</h1>
-      <p class="sub">
-        Modulo accesible para ROLE_USER y ROLE_ADMIN. Las reglas finas de permisos se consolidaran desde backend.
-      </p>
+      <h1>{{ 'BILLING.TITLE' | translate }}</h1>
+      <p class="sub">{{ 'BILLING.SUBTITLE' | translate }}</p>
     </div>
-    <button type="button" class="btn btn-primary" (click)="openCreate()">+ Nuevo cobro</button>
+    <button type="button" class="btn btn-primary" (click)="openCreate()">{{ 'BILLING.NEW_CHARGE' | translate }}</button>
   </header>
 
   @if (isAdmin()) {
-    <div class="admin-note">Vista administrador: incluye resumen extendido para seguimiento operativo.</div>
+    <div class="admin-note">{{ 'BILLING.ADMIN_NOTE' | translate }}</div>
   }
 
   @if (error()) {
@@ -18,26 +16,40 @@
   }
 
   <section class="summary">
-    <article class="card"><span>Total</span><strong>{{ summary().total }}</strong></article>
-    <article class="card"><span>Pendientes</span><strong>{{ summary().pending }}</strong></article>
-    <article class="card"><span>Pagados</span><strong>{{ summary().paid }}</strong></article>
-    <article class="card"><span>Anulados</span><strong>{{ summary().annulled }}</strong></article>
-    <article class="card money"><span>Pendiente EUR</span><strong>{{ summary().pendingAmount | number:'1.2-2' }}</strong></article>
-    <article class="card money"><span>Cobrado EUR</span><strong>{{ summary().paidAmount | number:'1.2-2' }}</strong></article>
+    <article class="card"><span>{{ 'BILLING.SUMMARY_TOTAL' | translate }}</span><strong>{{ summary().total }}</strong></article>
+    <article class="card"><span>{{ 'BILLING.SUMMARY_PENDING' | translate }}</span><strong>{{ summary().pending }}</strong></article>
+    <article class="card"><span>{{ 'BILLING.SUMMARY_PAID' | translate }}</span><strong>{{ summary().paid }}</strong></article>
+    <article class="card"><span>{{ 'BILLING.SUMMARY_ANNULLED' | translate }}</span><strong>{{ summary().annulled }}</strong></article>
+    <article class="card money"
+      ><span>{{ 'BILLING.SUMMARY_PENDING_AMOUNT' | translate }}</span
+      ><strong>{{ summary().pendingAmount | number: '1.2-2' }}</strong></article
+    >
+    <article class="card money"
+      ><span>{{ 'BILLING.SUMMARY_PAID_AMOUNT' | translate }}</span
+      ><strong>{{ summary().paidAmount | number: '1.2-2' }}</strong></article
+    >
   </section>
 
   <section class="filters">
     <input
       type="search"
-      placeholder="Buscar por paciente o concepto"
+      [attr.placeholder]="'BILLING.SEARCH_PLACEHOLDER' | translate"
       [value]="search()"
       (input)="setSearch($any($event.target).value)"
     />
     <div class="chips">
-      <button type="button" [class.active]="filterStatus()==='all'" (click)="setStatusFilter('all')">Todos</button>
-      <button type="button" [class.active]="filterStatus()==='pendiente'" (click)="setStatusFilter('pendiente')">Pendientes</button>
-      <button type="button" [class.active]="filterStatus()==='pagado'" (click)="setStatusFilter('pagado')">Pagados</button>
-      <button type="button" [class.active]="filterStatus()==='anulado'" (click)="setStatusFilter('anulado')">Anulados</button>
+      <button type="button" [class.active]="filterStatus() === 'all'" (click)="setStatusFilter('all')">
+        {{ 'BILLING.FILTER_ALL' | translate }}
+      </button>
+      <button type="button" [class.active]="filterStatus() === 'pendiente'" (click)="setStatusFilter('pendiente')">
+        {{ 'BILLING.FILTER_PENDING' | translate }}
+      </button>
+      <button type="button" [class.active]="filterStatus() === 'pagado'" (click)="setStatusFilter('pagado')">
+        {{ 'BILLING.FILTER_PAID' | translate }}
+      </button>
+      <button type="button" [class.active]="filterStatus() === 'anulado'" (click)="setStatusFilter('anulado')">
+        {{ 'BILLING.FILTER_ANNULLED' | translate }}
+      </button>
     </div>
   </section>
 
@@ -45,12 +57,12 @@
     <table>
       <thead>
         <tr>
-          <th>Paciente</th>
-          <th>Concepto</th>
-          <th>Importe</th>
-          <th>Vencimiento</th>
-          <th>Estado</th>
-          <th>Acciones</th>
+          <th>{{ 'BILLING.TH_PATIENT' | translate }}</th>
+          <th>{{ 'BILLING.TH_CONCEPT' | translate }}</th>
+          <th>{{ 'BILLING.TH_AMOUNT' | translate }}</th>
+          <th>{{ 'BILLING.TH_DUE' | translate }}</th>
+          <th>{{ 'BILLING.TH_STATUS' | translate }}</th>
+          <th>{{ 'BILLING.TH_ACTIONS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -58,21 +70,25 @@
           <tr>
             <td>{{ row.patient_name }}</td>
             <td>{{ row.concept }}</td>
-            <td>{{ row.amount | number:'1.2-2' }} EUR</td>
+            <td>{{ row.amount | number: '1.2-2' }} {{ 'COMMON.CURRENCY_EUR' | translate }}</td>
             <td>{{ row.due_date }}</td>
-            <td><span class="status" [class]="statusClass(row.status)">{{ statusLabel(row.status) }}</span></td>
+            <td><span class="status" [class]="statusClass(row.status)">{{ statusKey(row.status) | translate }}</span></td>
             <td class="actions">
-              <button type="button" class="btn" (click)="openEdit(row)" [disabled]="row.status!=='pendiente'">Editar</button>
-              <button type="button" class="btn btn-success" (click)="openPay(row)" [disabled]="row.status!=='pendiente'">
-                Marcar pagado
+              <button type="button" class="btn" (click)="openEdit(row)" [disabled]="row.status !== 'pendiente'">
+                {{ 'BILLING.BTN_EDIT' | translate }}
               </button>
-              <button type="button" class="btn btn-danger" (click)="openAnnul(row)" [disabled]="row.status==='anulado'">
-                Anular
+              <button type="button" class="btn btn-success" (click)="openPay(row)" [disabled]="row.status !== 'pendiente'">
+                {{ 'BILLING.BTN_MARK_PAID' | translate }}
+              </button>
+              <button type="button" class="btn btn-danger" (click)="openAnnul(row)" [disabled]="row.status === 'anulado'">
+                {{ 'BILLING.BTN_ANNUL' | translate }}
               </button>
             </td>
           </tr>
         } @empty {
-          <tr><td colspan="6" class="empty">Sin registros para los filtros actuales.</td></tr>
+          <tr>
+            <td colspan="6" class="empty">{{ 'BILLING.EMPTY_ROWS' | translate }}</td>
+          </tr>
         }
       </tbody>
     </table>
@@ -82,16 +98,16 @@
 @if (showEditModal()) {
   <div class="modal-overlay" (click)="closeAllModals()">
     <div class="modal" (click)="$event.stopPropagation()">
-      <h2>{{ editing() ? 'Editar cobro' : 'Nuevo cobro' }}</h2>
+      <h2>{{ editing() ? ('BILLING.MODAL_EDIT' | translate) : ('BILLING.MODAL_NEW' | translate) }}</h2>
       <form [formGroup]="editForm" (ngSubmit)="saveEdit()">
-        <label>Paciente<input type="text" formControlName="patient_name" /></label>
-        <label>Concepto<input type="text" formControlName="concept" /></label>
-        <label>Importe<input type="number" min="0.01" step="0.01" formControlName="amount" /></label>
-        <label>Vencimiento<input type="date" formControlName="due_date" /></label>
-        <label>Notas<textarea rows="3" formControlName="notes"></textarea></label>
+        <label>{{ 'BILLING.LABEL_PATIENT' | translate }}<input type="text" formControlName="patient_name" /></label>
+        <label>{{ 'BILLING.LABEL_CONCEPT' | translate }}<input type="text" formControlName="concept" /></label>
+        <label>{{ 'BILLING.LABEL_AMOUNT' | translate }}<input type="number" min="0.01" step="0.01" formControlName="amount" /></label>
+        <label>{{ 'BILLING.LABEL_DUE' | translate }}<input type="date" formControlName="due_date" /></label>
+        <label>{{ 'COMMON.NOTES' | translate }}<textarea rows="3" formControlName="notes"></textarea></label>
         <div class="modal-actions">
-          <button type="button" class="btn" (click)="closeAllModals()">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="button" class="btn" (click)="closeAllModals()">{{ 'COMMON.CANCEL' | translate }}</button>
+          <button type="submit" class="btn btn-primary">{{ 'COMMON.SAVE' | translate }}</button>
         </div>
       </form>
     </div>
@@ -101,22 +117,22 @@
 @if (showPayModal()) {
   <div class="modal-overlay" (click)="closeAllModals()">
     <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Registrar pago</h2>
+      <h2>{{ 'BILLING.MODAL_PAY_TITLE' | translate }}</h2>
       <form [formGroup]="payForm" (ngSubmit)="savePay()">
         <label>
-          Metodo
+          {{ 'BILLING.LABEL_METHOD' | translate }}
           <select formControlName="payment_method">
-            <option value="tarjeta">Tarjeta</option>
-            <option value="efectivo">Efectivo</option>
-            <option value="transferencia">Transferencia</option>
-            <option value="bizum">Bizum</option>
+            <option value="tarjeta">{{ 'BILLING.PAY_CARD' | translate }}</option>
+            <option value="efectivo">{{ 'BILLING.PAY_CASH' | translate }}</option>
+            <option value="transferencia">{{ 'BILLING.PAY_TRANSFER' | translate }}</option>
+            <option value="bizum">{{ 'BILLING.PAY_BIZUM' | translate }}</option>
           </select>
         </label>
-        <label>Fecha pago<input type="date" formControlName="paid_at" /></label>
-        <label>Notas<textarea rows="3" formControlName="notes"></textarea></label>
+        <label>{{ 'BILLING.LABEL_PAY_DATE' | translate }}<input type="date" formControlName="paid_at" /></label>
+        <label>{{ 'COMMON.NOTES' | translate }}<textarea rows="3" formControlName="notes"></textarea></label>
         <div class="modal-actions">
-          <button type="button" class="btn" (click)="closeAllModals()">Cancelar</button>
-          <button type="submit" class="btn btn-success">Confirmar pago</button>
+          <button type="button" class="btn" (click)="closeAllModals()">{{ 'COMMON.CANCEL' | translate }}</button>
+          <button type="submit" class="btn btn-success">{{ 'BILLING.BTN_CONFIRM_PAY' | translate }}</button>
         </div>
       </form>
     </div>
@@ -126,15 +142,14 @@
 @if (showAnnulModal()) {
   <div class="modal-overlay" (click)="closeAllModals()">
     <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Anular registro</h2>
+      <h2>{{ 'BILLING.MODAL_ANNUL_TITLE' | translate }}</h2>
       <form [formGroup]="annulForm" (ngSubmit)="saveAnnul()">
-        <label>Motivo<textarea rows="3" formControlName="reason"></textarea></label>
+        <label>{{ 'BILLING.LABEL_REASON' | translate }}<textarea rows="3" formControlName="reason"></textarea></label>
         <div class="modal-actions">
-          <button type="button" class="btn" (click)="closeAllModals()">Cancelar</button>
-          <button type="submit" class="btn btn-danger">Anular</button>
+          <button type="button" class="btn" (click)="closeAllModals()">{{ 'COMMON.CANCEL' | translate }}</button>
+          <button type="submit" class="btn btn-danger">{{ 'BILLING.BTN_ANNUL' | translate }}</button>
         </div>
       </form>
     </div>
   </div>
 }
-

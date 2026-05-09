@@ -1,38 +1,39 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth';
 import { ROLE_ADMIN } from '../../core/utils/jwt-roles';
 
 @Component({
   selector: 'app-home-dashboard',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslateModule],
   template: `
     <div class="page">
       <header class="head">
-        <h1>{{ isAdmin() ? 'Panel de administración' : 'Panel de alumno' }}</h1>
+        <h1>{{ isAdmin() ? ('HOME.TITLE_ADMIN' | translate) : ('HOME.TITLE_USER' | translate) }}</h1>
         <p class="sub">
-          {{ isAdmin() ? 'Resumen de la clínica y accesos clínicos.' : 'Accesos rápidos a tu práctica.' }}
+          {{ isAdmin() ? ('HOME.SUB_ADMIN' | translate) : ('HOME.SUB_USER' | translate) }}
         </p>
       </header>
 
       <div class="grid">
         <a class="card primary" routerLink="/app/pacientes">
-          <span class="card-title">Pacientes</span>
-          <span class="card-desc">Listado, filtros e historial</span>
+          <span class="card-title">{{ 'HOME.CARD_PATIENTS' | translate }}</span>
+          <span class="card-desc">{{ 'HOME.CARD_PATIENTS_DESC' | translate }}</span>
         </a>
         <a class="card" routerLink="/app/agenda">
-          <span class="card-title">Agenda</span>
-          <span class="card-desc">Calendario y citas</span>
+          <span class="card-title">{{ 'HOME.CARD_SCHEDULE' | translate }}</span>
+          <span class="card-desc">{{ 'HOME.CARD_SCHEDULE_DESC' | translate }}</span>
         </a>
         @if (isAdmin()) {
           <a class="card admin" routerLink="/app/admin/stock">
-            <span class="card-title">Stock</span>
-            <span class="card-desc">Inventario y alertas</span>
+            <span class="card-title">{{ 'HOME.CARD_STOCK' | translate }}</span>
+            <span class="card-desc">{{ 'HOME.CARD_STOCK_DESC' | translate }}</span>
           </a>
           <a class="card admin" routerLink="/app/admin/boxes">
-            <span class="card-title">Boxes</span>
-            <span class="card-desc">Gabinetes</span>
+            <span class="card-title">{{ 'HOME.CARD_BOXES' | translate }}</span>
+            <span class="card-desc">{{ 'HOME.CARD_BOXES_DESC' | translate }}</span>
           </a>
         }
       </div>

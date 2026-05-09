@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth';
 import { ROLE_ADMIN } from '../../../core/utils/jwt-roles';
 import { BillingService } from '../billing.service';
@@ -9,7 +10,7 @@ import { BillingRecord, BillingStatus, PaymentMethod } from '../models/billing.m
 @Component({
   selector: 'app-billing-payments',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './billing-payments.html',
   styleUrl: './billing-payments.scss'
 })
@@ -17,6 +18,7 @@ export class BillingPaymentsComponent {
   private fb = inject(FormBuilder);
   private billingService = inject(BillingService);
   private auth = inject(AuthService);
+  private translate = inject(TranslateService);
 
   readonly isAdmin = computed(() => this.auth.hasRole(ROLE_ADMIN));
   readonly records = signal<BillingRecord[]>([]);
@@ -122,7 +124,7 @@ export class BillingPaymentsComponent {
     const current = this.editing();
     const result = current ? this.billingService.update(current.id, payload) : this.billingService.create(payload);
     if (!result) {
-      this.error.set('No se pudo guardar el registro. Verifica que siga pendiente.');
+      this.error.set(this.translate.instant('BILLING.ERR_SAVE'));
       return;
     }
     this.showEditModal.set(false);
@@ -156,7 +158,7 @@ export class BillingPaymentsComponent {
       String(value.notes ?? '')
     );
     if (!result) {
-      this.error.set('No se pudo registrar el pago. El estado pudo cambiar.');
+      this.error.set(this.translate.instant('BILLING.ERR_PAY'));
       return;
     }
     this.showPayModal.set(false);
@@ -181,7 +183,7 @@ export class BillingPaymentsComponent {
     const reason = String(this.annulForm.getRawValue().reason ?? '').trim();
     const result = this.billingService.annul(target.id, reason);
     if (!result) {
-      this.error.set('No se pudo anular el registro.');
+      this.error.set(this.translate.instant('BILLING.ERR_ANNUL'));
       return;
     }
     this.showAnnulModal.set(false);
@@ -198,10 +200,11 @@ export class BillingPaymentsComponent {
     return `status-${status}`;
   }
 
-  statusLabel(status: BillingStatus): string {
-    if (status === 'pendiente') return 'Pendiente';
-    if (status === 'pagado') return 'Pagado';
-    return 'Anulado';
+  /** Clave ngx-translate (se actualiza al cambiar idioma vía pipe). */
+  statusKey(status: BillingStatus): string {
+    if (status === 'pendiente') return 'BILLING.STATUS_PENDING';
+    if (status === 'pagado') return 'BILLING.STATUS_PAID';
+    return 'BILLING.STATUS_ANNULLED';
   }
 }
 

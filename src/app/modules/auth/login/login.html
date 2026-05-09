@@ -1,11 +1,9 @@
 <div class="login-container">
-
-  <!-- Panel izquierdo decorativo -->
   <div class="login-panel-left">
     <div class="panel-content">
-      <img src="img/dentify_logo.png" alt="Dentify Logo" class="panel-logo">
-      <h2 class="panel-tagline">Clínica Digital</h2>
-      <p class="panel-description">Gestiona tu clínica odontológica de forma inteligente, segura y eficiente.</p>
+      <img src="img/dentify_logo.png" [attr.alt]="'AUTH.LOGO_ALT' | translate" class="panel-logo" />
+      <h2 class="panel-tagline">{{ 'AUTH.TAGLINE' | translate }}</h2>
+      <p class="panel-description">{{ 'AUTH.PANEL_BLURB' | translate }}</p>
       <div class="panel-decorations">
         <div class="deco-circle deco-1"></div>
         <div class="deco-circle deco-2"></div>
@@ -14,23 +12,34 @@
     </div>
   </div>
 
-  <!-- Panel derecho con el formulario -->
   <div class="login-panel-right">
     <div class="login-card">
-
-      <!-- Logo visible solo en móvil -->
       <div class="mobile-logo">
-        <img src="img/dentify_logo.png" alt="Dentify Logo">
+        <img src="img/dentify_logo.png" [attr.alt]="'AUTH.LOGO_ALT' | translate" />
+      </div>
+
+      <div class="login-lang-row">
+        <label class="sr-only" for="login-lang">{{ 'LANG.SELECT_ARIA' | translate }}</label>
+        <select
+          id="login-lang"
+          class="login-lang-select"
+          [value]="currentLang()"
+          (change)="setLang($any($event.target).value)"
+        >
+          <option value="es">{{ 'LANG.ES' | translate }}</option>
+          <option value="ca">{{ 'LANG.CA' | translate }}</option>
+          <option value="en">{{ 'LANG.EN' | translate }}</option>
+        </select>
       </div>
 
       <div class="login-header">
-        <h1>Bienvenido</h1>
-        <p class="login-subtitle">Accede a tu cuenta de Dentify</p>
+        <h1>{{ 'AUTH.TITLE_WELCOME' | translate }}</h1>
+        <p class="login-subtitle">{{ 'AUTH.SUBTITLE' | translate }}</p>
       </div>
 
       <div class="session-active" *ngIf="authService.isLoggedIn()">
-        <p>Ya tienes una sesión iniciada en este navegador.</p>
-        <a routerLink="/app/dashboard" class="session-active-link">Ir al panel</a>
+        <p>{{ 'AUTH.SESSION_ALREADY' | translate }}</p>
+        <a routerLink="/app/dashboard" class="session-active-link">{{ 'AUTH.GO_PANEL' | translate }}</a>
       </div>
 
       @if (sessionExpiredNotice(); as notice) {
@@ -40,74 +49,80 @@
       }
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
-
-        <!-- Campo: Correo o Nombre de usuario -->
         <div class="form-group" [class.has-error]="showError('identifier')">
           <label for="identifier">
             <span class="label-icon">✉</span>
-            Correo o Nombre de usuario
+            {{ 'AUTH.IDENTIFIER' | translate }}
             <span class="required-mark">*</span>
           </label>
           <div class="input-wrapper">
-            <input type="text" id="identifier" formControlName="identifier"
-              placeholder="ejemplo@correo.com o usuario123" autocomplete="username"
-              [class.input-error]="showError('identifier')" [class.input-valid]="isValid('identifier')">
+            <input
+              type="text"
+              id="identifier"
+              formControlName="identifier"
+              [attr.placeholder]="'AUTH.IDENTIFIER_PH' | translate"
+              autocomplete="username"
+              [class.input-error]="showError('identifier')"
+              [class.input-valid]="isValid('identifier')"
+            />
             <span class="input-icon" *ngIf="isValid('identifier')">✓</span>
           </div>
           <div class="error-message" *ngIf="showError('identifier')">
             <ng-container *ngIf="loginForm.get('identifier')?.errors?.['required']">
-              Este campo es obligatorio.
+              {{ 'AUTH.ERR_IDENTIFIER_REQUIRED' | translate }}
             </ng-container>
             <ng-container *ngIf="loginForm.get('identifier')?.errors?.['minlength']">
-              Debe tener al menos 3 caracteres.
+              {{ 'AUTH.ERR_IDENTIFIER_MIN' | translate }}
             </ng-container>
           </div>
         </div>
 
-        <!-- Campo: Contraseña -->
         <div class="form-group" [class.has-error]="showError('password')">
           <label for="password">
             <span class="label-icon">🔒</span>
-            Contraseña
+            {{ 'AUTH.PASSWORD' | translate }}
             <span class="required-mark">*</span>
           </label>
           <div class="input-wrapper">
-            <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"
-              placeholder="Introduce tu contraseña" autocomplete="current-password"
-              [class.input-error]="showError('password')" [class.input-valid]="isValid('password')">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              formControlName="password"
+              [attr.placeholder]="'AUTH.PASSWORD_PH' | translate"
+              autocomplete="current-password"
+              [class.input-error]="showError('password')"
+              [class.input-valid]="isValid('password')"
+            />
             <button type="button" class="toggle-password" (click)="togglePassword()" tabindex="-1">
-              {{ showPassword ? 'ocultar' : 'mostrar' }}
+              {{ showPassword ? ('AUTH.TOGGLE_HIDE' | translate) : ('AUTH.TOGGLE_SHOW' | translate) }}
             </button>
           </div>
           <div class="error-message" *ngIf="showError('password')">
             <ng-container *ngIf="loginForm.get('password')?.errors?.['required']">
-              La contraseña es obligatoria.
+              {{ 'AUTH.ERR_PASSWORD_REQUIRED' | translate }}
             </ng-container>
             <ng-container *ngIf="loginForm.get('password')?.errors?.['minlength']">
-              Debe tener al menos 6 caracteres.
+              {{ 'AUTH.ERR_PASSWORD_MIN' | translate }}
             </ng-container>
           </div>
         </div>
 
-        <!-- Error general del servidor -->
         <div class="server-error" *ngIf="serverError">
           <span>⚠️</span> {{ serverError }}
         </div>
 
-        <!-- Botón de submit -->
         <button type="submit" class="btn-login" [class.loading]="isLoading" [disabled]="isLoading">
-          <span *ngIf="!isLoading">Entrar al Sistema</span>
+          <span *ngIf="!isLoading">{{ 'AUTH.SUBMIT' | translate }}</span>
           <span *ngIf="isLoading" class="spinner"></span>
         </button>
-
       </form>
 
       <div class="login-footer">
-        <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
-        <p class="contact-info">¿No tienes cuenta? <span class="link">Contacta con el administrador</span></p>
+        <a href="#" class="forgot-link">{{ 'AUTH.FORGOT' | translate }}</a>
+        <p class="contact-info">
+          {{ 'AUTH.NO_ACCOUNT' | translate }} <span class="link">{{ 'AUTH.CONTACT_ADMIN' | translate }}</span>
+        </p>
       </div>
-
     </div>
   </div>
-
 </div>

@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-forbidden-route',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslateModule],
   template: `
     <div class="wrap">
-      <h1>Acceso no permitido</h1>
-      <p>No tienes permisos para ver esta sección.</p>
-      <a routerLink="/app/dashboard">Volver al inicio</a>
+      <h1>{{ 'FORBIDDEN.TITLE' | translate }}</h1>
+      <p>{{ 'FORBIDDEN.BODY' | translate }}</p>
+      <a routerLink="/app/dashboard">{{ 'FORBIDDEN.BACK' | translate }}</a>
     </div>
   `,
   styles: `
