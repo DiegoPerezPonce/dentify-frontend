@@ -5,52 +5,86 @@
       <span class="brand-text">DENTIFY</span>
     </div>
 
+    <div class="lang-switch">
+      <label class="sr-only" for="shell-lang">{{ 'LANG.SELECT_ARIA' | translate }}</label>
+      <select
+        id="shell-lang"
+        class="lang-select"
+        [value]="currentLang()"
+        (change)="setLang($any($event.target).value)"
+      >
+        <option value="es">{{ 'LANG.ES' | translate }}</option>
+        <option value="ca">{{ 'LANG.CA' | translate }}</option>
+        <option value="en">{{ 'LANG.EN' | translate }}</option>
+      </select>
+    </div>
+
     <nav class="nav-block">
-      <p class="nav-label">General</p>
-      <a routerLink="/app/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
-      <a routerLink="/app/pacientes" routerLinkActive="active">Pacientes</a>
-      <a routerLink="/app/notificaciones" routerLinkActive="active">Notificaciones</a>
-      <a routerLink="/app/agenda" routerLinkActive="active">Agenda</a>
-      <a routerLink="/app/radiografias" routerLinkActive="active">Radiografías</a>
-      <a routerLink="/app/asistente" routerLinkActive="active">Asistente <span class="badge">IA</span></a>
-      <a routerLink="/app/pagos" routerLinkActive="active">Pagos</a>
+      <p class="nav-label">{{ 'NAV.GENERAL' | translate }}</p>
+      <a routerLink="/app/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{
+        'NAV.HOME' | translate
+      }}</a>
+      <a routerLink="/app/pacientes" routerLinkActive="active">{{ 'NAV.PATIENTS' | translate }}</a>
+      <a routerLink="/app/notificaciones" routerLinkActive="active">{{ 'NAV.NOTIFICATIONS' | translate }}</a>
+      <a routerLink="/app/agenda" routerLinkActive="active">{{ 'NAV.SCHEDULE' | translate }}</a>
+      <a routerLink="/app/radiografias" routerLinkActive="active">{{ 'NAV.XRAYS' | translate }}</a>
+      <a routerLink="/app/asistente" routerLinkActive="active"
+        >{{ 'NAV.ASSISTANT' | translate }} <span class="badge">{{ 'NAV.AI_BADGE' | translate }}</span></a
+      >
+      <a routerLink="/app/pagos" routerLinkActive="active">{{ 'NAV.PAYMENTS' | translate }}</a>
     </nav>
 
     @if (auth.hasRole(ROLE_ADMIN)) {
       <nav class="nav-block admin-block" [class.collapsed]="adminNavCollapsed()">
         <div class="nav-label-row">
-          <p class="nav-label">Administración</p>
+          <p class="nav-label">{{ 'NAV.ADMIN_SECTION' | translate }}</p>
           <button type="button" class="collapse-btn" (click)="toggleAdminNav()" [attr.aria-expanded]="!adminNavCollapsed()">
-            {{ adminNavCollapsed() ? 'Mostrar' : 'Ocultar' }}
+            {{ adminNavCollapsed() ? ('ADMIN_NAV.SHOW' | translate) : ('ADMIN_NAV.HIDE' | translate) }}
           </button>
         </div>
         @if (!adminNavCollapsed()) {
-          <a routerLink="/app/admin/odontologos" routerLinkActive="active">Odontólogos</a>
-          <a routerLink="/app/admin/boxes" routerLinkActive="active">Boxes</a>
-          <a routerLink="/app/admin/stock" routerLinkActive="active">Stock</a>
-          <a routerLink="/app/admin/stock/recepciones" routerLinkActive="active">Recepciones</a>
-          <a routerLink="/app/admin/protocolos" routerLinkActive="active">Protocolos</a>
-          <a routerLink="/app/admin/disponibilidad-odontologos" routerLinkActive="active">Disponibilidad</a>
-          <a routerLink="/app/admin/usuarios" routerLinkActive="active">Usuarios</a>
-          <a routerLink="/app/admin/avisos" routerLinkActive="active">Avisos</a>
+          <a routerLink="/app/admin/odontologos" routerLinkActive="active">{{ 'NAV.ADM_DENTISTS' | translate }}</a>
+          <a routerLink="/app/admin/boxes" routerLinkActive="active">{{ 'NAV.ADM_BOXES' | translate }}</a>
+          <a routerLink="/app/admin/stock" routerLinkActive="active">{{ 'NAV.ADM_STOCK' | translate }}</a>
+          <a routerLink="/app/admin/stock/recepciones" routerLinkActive="active">{{ 'NAV.ADM_RESTOCK' | translate }}</a>
+          <a routerLink="/app/admin/protocolos" routerLinkActive="active">{{ 'NAV.ADM_PROTOCOLS' | translate }}</a>
+          <a routerLink="/app/admin/disponibilidad-odontologos" routerLinkActive="active">{{
+            'NAV.ADM_AVAILABILITY' | translate
+          }}</a>
+          <a routerLink="/app/admin/usuarios" routerLinkActive="active">{{ 'NAV.ADM_USERS' | translate }}</a>
+          <a routerLink="/app/admin/avisos" routerLinkActive="active">{{ 'NAV.ADM_NOTICES' | translate }}</a>
         }
       </nav>
     }
 
     <div class="sidebar-footer">
       <div class="user-line">
-        <span class="user-role">{{ auth.hasRole(ROLE_ADMIN) ? 'Administrador' : 'Alumno' }}</span>
+        <span class="user-role">{{
+          auth.hasRole(ROLE_ADMIN) ? ('ROLE.ADMIN' | translate) : ('ROLE.USER' | translate)
+        }}</span>
       </div>
-      @if (sessionRemainingLine(); as line) {
+      @if (sessionParts(); as p) {
         <p
           class="session-remaining"
           [class.session-remaining-urgent]="sessionRemainingUrgent()"
           role="status"
         >
-          Sesión: {{ line }}.
+          {{ 'SESSION.PREFIX' | translate }}
+          @if (p.kind === 'expired') {
+            {{ 'SESSION.EXPIRED' | translate }}
+          }
+          @if (p.kind === 'ok') {
+            @if (p.hours > 0) {
+              {{ 'SESSION.HOURS_MINUTES' | translate: { hours: p.hours, minutes: p.minutes } }}
+            } @else if (p.minutes > 0) {
+              {{ 'SESSION.MINUTES_SECONDS' | translate: { minutes: p.minutes, seconds: p.seconds } }}
+            } @else {
+              {{ 'SESSION.SECONDS' | translate: { seconds: p.seconds } }}
+            }
+          }
         </p>
       }
-      <button type="button" class="logout" (click)="logout()">Cerrar sesión</button>
+      <button type="button" class="logout" (click)="logout()">{{ 'NAV.LOGOUT' | translate }}</button>
     </div>
   </aside>
 
