@@ -1,7 +1,12 @@
 <div class="stock-container">
   <div class="stock-header">
-    <h1 class="page-title">Gestión de Inventario</h1>
-    <p class="page-subtitle">Visualiza y gestiona el stock de materiales dentales</p>
+    <div>
+      <h1 class="page-title">Gestión de Inventario</h1>
+      <p class="page-subtitle">Visualiza y gestiona el stock de materiales dentales</p>
+    </div>
+    <button type="button" class="btn btn-create" (click)="openCreateMaterialModal()">
+      + Nuevo material
+    </button>
   </div>
 
   @if (getLowStockCount() > 0) {
@@ -79,6 +84,12 @@
               </svg>
               Registrar Recepción
             </button>
+            <button type="button" class="btn btn-secondary" (click)="openEditMaterialModal(material)">
+              Editar
+            </button>
+            <button type="button" class="btn btn-danger" (click)="deleteMaterial(material)">
+              Eliminar
+            </button>
           </div>
         </div>
       } @empty {
@@ -104,3 +115,51 @@
   (close)="closeRestockModal()"
   (saved)="onRestockSaved()"
 ></app-restock-form-modal>
+
+@if (showCatalogModal()) {
+  <div class="catalog-modal-overlay" (click)="closeCatalogModal()">
+    <div class="catalog-modal" (click)="$event.stopPropagation()">
+      <div class="catalog-modal-header">
+        <h2>{{ editingMaterial() ? 'Editar material' : 'Nuevo material' }}</h2>
+        <button type="button" class="btn-close" (click)="closeCatalogModal()">×</button>
+      </div>
+
+      @if (catalogError()) {
+        <div class="alert alert-error">
+          <span>{{ catalogError() }}</span>
+        </div>
+      }
+
+      <form class="catalog-form" [formGroup]="catalogForm" (ngSubmit)="saveCatalogMaterial()">
+        <label>
+          Nombre *
+          <input type="text" formControlName="nombre" placeholder="Ej: Guantes de nitrilo" />
+        </label>
+
+        <label>
+          Unidad *
+          <input type="text" formControlName="unidad" placeholder="Ej: cajas, unidades, ml" />
+        </label>
+
+        <label>
+          Cantidad inicial/actual *
+          <input type="number" min="0" step="0.01" formControlName="cantidad_actual" />
+        </label>
+
+        <label>
+          Umbral mínimo (stock bajo) *
+          <input type="number" min="0" step="0.01" formControlName="umbral_minimo" />
+        </label>
+
+        <div class="catalog-modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeCatalogModal()" [disabled]="savingCatalog()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="savingCatalog() || catalogForm.invalid">
+            {{ savingCatalog() ? 'Guardando...' : (editingMaterial() ? 'Actualizar' : 'Crear') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
