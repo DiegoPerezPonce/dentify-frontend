@@ -93,6 +93,57 @@
                 <strong>Administrador:</strong> Acceso total (clínica + gestión).
               </p>
             </div>
+
+            @if (!isEditMode) {
+              <div class="form-group">
+                <label for="dentistNombre">Nombre Odontólogo *</label>
+                <input
+                  type="text"
+                  id="dentistNombre"
+                  formControlName="dentistNombre"
+                  placeholder="María"
+                  [class.error]="form.get('dentistNombre')?.touched && form.get('dentistNombre')?.invalid"
+                />
+                @if (getFieldError('dentistNombre'); as error) {
+                  <span class="error-message">{{ error }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="dentistApellidos">Apellidos Odontólogo *</label>
+                <input
+                  type="text"
+                  id="dentistApellidos"
+                  formControlName="dentistApellidos"
+                  placeholder="Pérez García"
+                  [class.error]="form.get('dentistApellidos')?.touched && form.get('dentistApellidos')?.invalid"
+                />
+                @if (getFieldError('dentistApellidos'); as error) {
+                  <span class="error-message">{{ error }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="dentistEspecialidad">Especialidad Odontólogo *</label>
+                <select
+                  id="dentistEspecialidad"
+                  formControlName="dentistEspecialidad"
+                  [class.error]="form.get('dentistEspecialidad')?.touched && form.get('dentistEspecialidad')?.invalid"
+                >
+                  <option value="">Selecciona especialidad</option>
+                  @for (sp of specialties; track sp) {
+                    <option [value]="sp">{{ sp }}</option>
+                  }
+                </select>
+                @if (getFieldError('dentistEspecialidad'); as error) {
+                  <span class="error-message">{{ error }}</span>
+                }
+              </div>
+
+              <p class="help-text">
+                La ficha de odontólogo se crea usando el mismo email del usuario.
+              </p>
+            }
           </div>
         </div>
 

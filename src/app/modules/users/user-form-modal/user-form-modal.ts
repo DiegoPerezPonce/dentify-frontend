@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../user.service';
 import { User, UserCreateDTO, UserUpdateDTO, AVAILABLE_ROLES } from '../models/user.models';
 import { HttpErrorResponse } from '@angular/common/http';
+import { DENTIST_SPECIALTIES } from '../../dentists/models/dentist.models';
 
 @Component({
   selector: 'app-user-form-modal',
@@ -25,6 +26,7 @@ export class UserFormModalComponent implements OnChanges {
   readonly form: FormGroup;
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
+  readonly specialties = DENTIST_SPECIALTIES;
   readonly availableRoles = AVAILABLE_ROLES;
 
   constructor() {
@@ -32,7 +34,10 @@ export class UserFormModalComponent implements OnChanges {
       email: ['', [Validators.required, Validators.email]],
       password: ['', []],
       nombre_usuario: ['', Validators.required],
-      role: ['ROLE_USER', Validators.required]
+      role: ['ROLE_USER', Validators.required],
+      dentistNombre: [''],
+      dentistApellidos: [''],
+      dentistEspecialidad: ['']
     });
   }
 
@@ -46,7 +51,7 @@ export class UserFormModalComponent implements OnChanges {
 
   resetForm(): void {
     this.error.set(null);
-    
+
     if (this.user) {
       // Edit mode
       const primaryRole = this.user.roles.find(r => r === 'ROLE_ADMIN') || 'ROLE_USER';
@@ -55,22 +60,30 @@ export class UserFormModalComponent implements OnChanges {
         email: this.user.email,
         password: '',
         nombre_usuario: this.user.nombre_usuario,
-        role: primaryRole
+        role: primaryRole,
+        dentistNombre: '',
+        dentistApellidos: '',
+        dentistEspecialidad: ''
       });
       
       // Password is optional when editing
       this.form.get('password')?.clearValidators();
+      this.setDentistValidators(false);
     } else {
       // Create mode
       this.form.reset({
         email: '',
         password: '',
         nombre_usuario: '',
-        role: 'ROLE_USER'
+        role: 'ROLE_USER',
+        dentistNombre: '',
+        dentistApellidos: '',
+        dentistEspecialidad: ''
       });
       
       // Password is required when creating
       this.form.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
+      this.setDentistValidators(true);
     }
     
     this.form.get('password')?.updateValueAndValidity();
@@ -125,7 +138,10 @@ export class UserFormModalComponent implements OnChanges {
         email: formValue.email,
         password: formValue.password,
         nombre_usuario: formValue.nombre_usuario,
-        roles: [selectedRole]
+        roles: [selectedRole],
+        dentistNombre: formValue.dentistNombre,
+        dentistApellidos: formValue.dentistApellidos,
+        dentistEspecialidad: formValue.dentistEspecialidad
       };
 
       this.userService.create(dto).subscribe({
@@ -147,6 +163,16 @@ export class UserFormModalComponent implements OnChanges {
       this.error.set(null);
       this.close.emit();
     }
+  }
+
+  private setDentistValidators(required: boolean): void {
+    const requiredValidator = required ? [Validators.required] : [];
+    this.form.get('dentistNombre')?.setValidators(requiredValidator);
+    this.form.get('dentistApellidos')?.setValidators(requiredValidator);
+    this.form.get('dentistEspecialidad')?.setValidators(requiredValidator);
+    this.form.get('dentistNombre')?.updateValueAndValidity();
+    this.form.get('dentistApellidos')?.updateValueAndValidity();
+    this.form.get('dentistEspecialidad')?.updateValueAndValidity();
   }
 
   getFieldError(fieldName: string): string | null {

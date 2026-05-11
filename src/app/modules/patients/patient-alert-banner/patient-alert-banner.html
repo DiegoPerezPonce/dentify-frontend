@@ -1,0 +1,30 @@
+@if (loading()) {
+  <div class="med-alert med-alert--loading" role="status">Cargando alertas médicas…</div>
+} @else if (error()) {
+  <div class="med-alert med-alert--error" role="alert">{{ error() }}</div>
+} @else if (severity()) {
+  <div
+    class="med-alert"
+    [class.med-alert--biosecurity]="severity() === 'biosecurity'"
+    [class.med-alert--allergy]="severity() === 'allergy'"
+    [class.med-alert--systemic]="severity() === 'systemic'"
+    role="alert"
+  >
+    <span class="med-alert__icon" aria-hidden="true">
+      @if (severity() === 'biosecurity') {
+        ☣
+      } @else if (severity() === 'allergy') {
+        ⚠
+      } @else {
+        ⓘ
+      }
+    </span>
+    <div class="med-alert__body">
+      <strong class="med-alert__title">Información médica crítica</strong>
+      <p class="med-alert__flags">{{ labels().join(' · ') }}</p>
+      @if (notes()) {
+        <p class="med-alert__notes">{{ notes() }}</p>
+      }
+    </div>
+  </div>
+}

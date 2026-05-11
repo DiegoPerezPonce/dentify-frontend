@@ -1,7 +1,7 @@
 <div class="shell">
   <aside class="sidebar">
     <div class="brand">
-      <span class="brand-mark"></span>
+      <span class="brand-mark"><span class="brand-d">D</span></span>
       <span class="brand-text">DENTIFY</span>
     </div>
 
@@ -21,33 +21,62 @@
 
     <nav class="nav-block">
       <p class="nav-label">{{ 'NAV.GENERAL' | translate }}</p>
-      <a routerLink="/app/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{
-        'NAV.HOME' | translate
-      }}</a>
-      <a routerLink="/app/pacientes" routerLinkActive="active">{{ 'NAV.PATIENTS' | translate }}</a>
-      <a routerLink="/app/notificaciones" routerLinkActive="active">{{ 'NAV.NOTIFICATIONS' | translate }}</a>
-      <a routerLink="/app/agenda" routerLinkActive="active">{{ 'NAV.SCHEDULE' | translate }}</a>
-      <a routerLink="/app/radiografias" routerLinkActive="active">{{ 'NAV.XRAYS' | translate }}</a>
-      <a routerLink="/app/asistente" routerLinkActive="active"
-        >{{ 'NAV.ASSISTANT' | translate }} <span class="badge">{{ 'NAV.AI_BADGE' | translate }}</span></a
-      >
-      <a routerLink="/app/pagos" routerLinkActive="active">{{ 'NAV.PAYMENTS' | translate }}</a>
+      <a routerLink="/app/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="nav-ico" aria-hidden="true">⌂</span>{{ 'NAV.HOME' | translate }}
+      </a>
+      <a routerLink="/app/agenda" routerLinkActive="active">
+        <span class="nav-ico" aria-hidden="true">▦</span>{{ 'NAV.CALENDAR' | translate }}
+      </a>
+      <a routerLink="/app/pacientes" routerLinkActive="active">
+        <span class="nav-ico" aria-hidden="true">◎</span>{{ 'NAV.PATIENTS' | translate }}
+      </a>
+    </nav>
+
+    <nav class="nav-block">
+      <p class="nav-label">{{ 'NAV.TOOLS_SECTION' | translate }}</p>
+      <a routerLink="/app/notificaciones" routerLinkActive="active">
+        <span class="nav-ico" aria-hidden="true">🔔</span>{{ 'NAV.NOTIFICATIONS' | translate }}
+      </a>
+      <a routerLink="/app/radiografias" routerLinkActive="active">
+        <span class="nav-ico" aria-hidden="true">📷</span>{{ 'NAV.XRAYS' | translate }}
+      </a>
+      <a routerLink="/app/asistente" routerLinkActive="active">
+        <span class="nav-ico" aria-hidden="true">✦</span>{{ 'NAV.ASSISTANT' | translate }}
+        <span class="badge">{{ 'NAV.AI_BADGE' | translate }}</span>
+      </a>
+      <a routerLink="/app/pagos" routerLinkActive="active">
+        <span class="nav-ico" aria-hidden="true">€</span>{{ 'NAV.PAYMENTS' | translate }}
+      </a>
     </nav>
 
     @if (auth.hasRole(ROLE_ADMIN)) {
       <nav class="nav-block admin-block" [class.collapsed]="adminNavCollapsed()">
         <div class="nav-label-row">
           <p class="nav-label">{{ 'NAV.ADMIN_SECTION' | translate }}</p>
-          <button type="button" class="collapse-btn" (click)="toggleAdminNav()" [attr.aria-expanded]="!adminNavCollapsed()">
+          <button
+            type="button"
+            class="collapse-btn"
+            (click)="toggleAdminNav()"
+            [attr.aria-expanded]="!adminNavCollapsed()"
+          >
             {{ adminNavCollapsed() ? ('ADMIN_NAV.SHOW' | translate) : ('ADMIN_NAV.HIDE' | translate) }}
           </button>
         </div>
         @if (!adminNavCollapsed()) {
-          <a routerLink="/app/admin/odontologos" routerLinkActive="active">{{ 'NAV.ADM_DENTISTS' | translate }}</a>
-          <a routerLink="/app/admin/boxes" routerLinkActive="active">{{ 'NAV.ADM_BOXES' | translate }}</a>
-          <a routerLink="/app/admin/stock" routerLinkActive="active">{{ 'NAV.ADM_STOCK' | translate }}</a>
+          <a routerLink="/app/admin/odontologos" routerLinkActive="active">
+            <span class="nav-ico" aria-hidden="true">🦷</span>{{ 'NAV.ADM_MANAGE_DENTISTS' | translate }}
+          </a>
+          <a routerLink="/app/admin/boxes" routerLinkActive="active">
+            <span class="nav-ico" aria-hidden="true">▣</span>{{ 'NAV.ADM_MANAGE_BOXES' | translate }}
+          </a>
+          <a routerLink="/app/admin/stock" routerLinkActive="active">
+            <span class="nav-ico" aria-hidden="true">📦</span>{{ 'NAV.ADM_MANAGE_STOCK' | translate }}
+          </a>
+          <a routerLink="/app/admin/protocolos" routerLinkActive="active">
+            <span class="nav-ico" aria-hidden="true">📖</span>{{ 'NAV.ADM_MANAGE_PROTOCOLS' | translate }}
+          </a>
+          <p class="nav-sub-label">{{ 'NAV.ADM_MORE_GROUP' | translate }}</p>
           <a routerLink="/app/admin/stock/recepciones" routerLinkActive="active">{{ 'NAV.ADM_RESTOCK' | translate }}</a>
-          <a routerLink="/app/admin/protocolos" routerLinkActive="active">{{ 'NAV.ADM_PROTOCOLS' | translate }}</a>
           <a routerLink="/app/admin/disponibilidad-odontologos" routerLinkActive="active">{{
             'NAV.ADM_AVAILABILITY' | translate
           }}</a>
@@ -58,6 +87,24 @@
     }
 
     <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" aria-hidden="true">{{ userInitials() }}</div>
+        <div class="sidebar-user-text">
+          <p class="sidebar-user-name">{{ userDisplayName() }}</p>
+          @if (userEmail(); as mail) {
+            <p class="sidebar-user-email">{{ mail }}</p>
+          } @else {
+            <p class="sidebar-user-email muted">{{ 'NAV.NO_EMAIL' | translate }}</p>
+          }
+        </div>
+        <button type="button" class="sidebar-logout-ico" (click)="logout()" [attr.aria-label]="'NAV.LOGOUT' | translate">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </button>
+      </div>
       <div class="user-line">
         <span class="user-role">{{
           auth.hasRole(ROLE_ADMIN) ? ('ROLE.ADMIN' | translate) : ('ROLE.USER' | translate)

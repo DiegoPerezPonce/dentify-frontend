@@ -25,6 +25,14 @@ export class UserService {
     );
   }
 
+  /** Usuarios con ficha de odontólogo (alta unificada). */
+  listClinicalProfiles(): Observable<UserListResult> {
+    const url = `${this.base}?clinicalProfiles=1`;
+    return this.http.get<unknown>(url, { observe: 'response' }).pipe(
+      map((resp: HttpResponse<unknown>) => normalizeListResponse(resp.body))
+    );
+  }
+
   getById(id: number): Observable<User> {
     return this.http.get<User>(`${this.base}/${id}`);
   }

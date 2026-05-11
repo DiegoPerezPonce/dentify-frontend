@@ -13,6 +13,7 @@ import {
   MAX_FILE_SIZE
 } from '../models/radiografia.models';
 import { Patient } from '../models/patient.models';
+import { getPacienteIdFromRoute } from '../patient-route-id.util';
 
 @Component({
   selector: 'app-xray-gallery',
@@ -59,8 +60,8 @@ export class XrayGalleryComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id && id !== 'nuevo') {
+    const id = getPacienteIdFromRoute(this.route);
+    if (id && id !== 'nuevo' && /^\d+$/.test(id)) {
       this.loadPatientAndRadiografias(Number(id));
     } else {
       this.error.set('ID de paciente no válido');

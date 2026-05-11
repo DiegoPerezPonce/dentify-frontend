@@ -4,11 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PatientService } from '../patient.service';
 import { PatientCreateDTO, PatientUpdateDTO } from '../models/patient.models';
+import { getPacienteIdFromRoute } from '../patient-route-id.util';
+import { MedicalFlagsPickerComponent } from '../medical-flags-picker/medical-flags-picker';
 
 @Component({
   selector: 'app-patient-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MedicalFlagsPickerComponent],
   templateUrl: './patient-form.html',
   styleUrl: './patient-form.scss'
 })
@@ -30,6 +32,8 @@ export class PatientFormComponent implements OnInit {
     nss: [''],
     telefono: ['', [Validators.pattern(/^[0-9]{9}$/)]],
     email: ['', [Validators.email]],
+    medical_flags: this.fb.control<string[]>([]),
+    medical_notes: ['', [Validators.maxLength(8000)]],
     enfermedades: [''],
     alergias: [''],
     historial_clinico: [''],
@@ -37,11 +41,11 @@ export class PatientFormComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id && id !== 'nuevo') {
+    const idStr = getPacienteIdFromRoute(this.route);
+    if (idStr && idStr !== 'nuevo' && /^\d+$/.test(idStr)) {
       this.isEditMode.set(true);
-      this.patientId.set(Number(id));
-      this.loadPatient(Number(id));
+      this.patientId.set(Number(idStr));
+      this.loadPatient(Number(idStr));
     }
   }
 
@@ -50,6 +54,9 @@ export class PatientFormComponent implements OnInit {
     this.error.set(null);
     this.patientService.getById(id).subscribe({
       next: (patient) => {
+        const flags = Array.isArray(patient.medical_flags)
+          ? patient.medical_flags.filter((x): x is string => typeof x === 'string')
+          : [];
         this.patientForm.patchValue({
           nombre: patient.nombre,
           apellidos: patient.apellidos,
@@ -57,6 +64,8 @@ export class PatientFormComponent implements OnInit {
           nss: patient.nss ?? '',
           telefono: patient.telefono ?? '',
           email: patient.email ?? '',
+          medical_flags: flags,
+          medical_notes: patient.medical_notes ?? '',
           enfermedades: patient.enfermedades ?? '',
           alergias: patient.alergias ?? '',
           historial_clinico: patient.historial_clinico ?? '',
@@ -82,6 +91,8 @@ export class PatientFormComponent implements OnInit {
     this.error.set(null);
 
     const formValue = this.patientForm.getRawValue();
+    const flags = (formValue.medical_flags as string[]) ?? [];
+    const notesTrim = (formValue.medical_notes ?? '').trim();
 
     if (this.isEditMode()) {
       const dto: PatientUpdateDTO = {
@@ -91,6 +102,8 @@ export class PatientFormComponent implements OnInit {
         nss: formValue.nss || undefined,
         telefono: formValue.telefono || undefined,
         email: formValue.email || undefined,
+        medical_flags: flags,
+        medical_notes: notesTrim,
         enfermedades: formValue.enfermedades || undefined,
         alergias: formValue.alergias || undefined,
         historial_clinico: formValue.historial_clinico || undefined,
@@ -116,6 +129,8 @@ export class PatientFormComponent implements OnInit {
         nss: formValue.nss || undefined,
         telefono: formValue.telefono || undefined,
         email: formValue.email || undefined,
+        medical_flags: flags.length ? flags : undefined,
+        medical_notes: notesTrim || undefined,
         enfermedades: formValue.enfermedades || undefined,
         alergias: formValue.alergias || undefined,
         historial_clinico: formValue.historial_clinico || undefined,
@@ -175,6 +190,9 @@ export class PatientFormComponent implements OnInit {
 
     if (control.errors['required']) return 'Este campo es obligatorio';
     if (control.errors['minlength']) return `Mínimo ${control.errors['minlength'].requiredLength} caracteres`;
+    if (control.errors['maxlength']) {
+      return `Máximo ${control.errors['maxlength'].requiredLength} caracteres`;
+    }
     if (control.errors['pattern']) {
       if (field === 'dni') return 'Formato: 8 dígitos + letra (ej: 12345678A)';
       if (field === 'telefono') return 'Formato: 9 dígitos (ej: 612345678)';

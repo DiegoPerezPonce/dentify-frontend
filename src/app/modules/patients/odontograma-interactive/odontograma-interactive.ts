@@ -14,6 +14,7 @@ import {
   OdontogramaColor
 } from '../models/odontograma.models';
 import { Patient } from '../models/patient.models';
+import { getPacienteIdFromRoute } from '../patient-route-id.util';
 
 interface ToothSelection {
   toothId: string;
@@ -58,8 +59,8 @@ export class OdontogramaInteractiveComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id && id !== 'nuevo') {
+    const id = getPacienteIdFromRoute(this.route);
+    if (id && id !== 'nuevo' && /^\d+$/.test(id)) {
       this.loadPatientAndOdontograma(Number(id));
     } else {
       this.error.set('ID de paciente no válido');

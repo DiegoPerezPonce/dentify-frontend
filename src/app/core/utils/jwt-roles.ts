@@ -2,7 +2,7 @@
 export const ROLE_USER = 'ROLE_USER';
 export const ROLE_ADMIN = 'ROLE_ADMIN';
 
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
+export function decodeJwtPayload(token: string): Record<string, unknown> | null {
   const parts = token.split('.');
   if (parts.length < 2) return null;
   try {
@@ -76,9 +76,60 @@ export function getSessionRemainingParts(token: string | null): SessionRemaining
   return { kind: 'ok', hours, minutes, seconds };
 }
 
+/** Payload JWT decodificado (sin verificar firma). */
+export function getJwtPayload(token: string | null): Record<string, unknown> | null {
+  if (!token?.trim()) return null;
+  return decodeJwtPayload(token);
+}
+
 /**
- * Texto corto para UI (p. ej. barra lateral). Null si el token no trae `exp`.
+ * Nombre legible para saludos UI: `name`, `given_name`, parte local de `email` (antes que `username`
+ * por si el token lleva el login tipo `dr_odontologo` en `username`), luego `username`, `sub`.
  */
+export function getJwtDisplayName(token: string | null): string | null {
+  const p = getJwtPayload(token);
+  if (!p) return null;
+  const pick = (k: string): string | null => {
+    const v = p[k];
+    return typeof v === 'string' && v.trim() ? v.trim() : null;
+  };
+  const emailLocal = (() => {
+    const em = pick('email');
+    if (!em) return null;
+    const at = em.indexOf('@');
+    return at > 0 ? em.slice(0, at) : em;
+  })();
+  return (
+    pick('name') ??
+    pick('given_name') ??
+    pick('preferred_username') ??
+    emailLocal ??
+    pick('username') ??
+    pick('sub')
+  );
+}
+
+export function getJwtEmail(token: string | null): string | null {
+  const p = getJwtPayload(token);
+  if (!p) return null;
+  const v = p['email'];
+  return typeof v === 'string' && v.trim() ? v.trim() : null;
+}
+
+/** Id de odontólogo vinculado al usuario (JWT emitido tras login; requiere email coincidente con `Dentist`). */
+export function getJwtDentistId(token: string | null): number | null {
+  const p = getJwtPayload(token);
+  if (!p) return null;
+  const raw = p['dentistId'] ?? p['dentist_id'];
+  if (typeof raw === 'number' && Number.isFinite(raw)) {
+    return raw;
+  }
+  if (typeof raw === 'string' && /^\d+$/.test(raw)) {
+    return Number(raw);
+  }
+  return null;
+}
+
 export function formatSessionRemainingLabel(token: string | null): string | null {
   const parts = getSessionRemainingParts(token);
   if (parts.kind === 'none') return null;

@@ -39,39 +39,55 @@ export const routes: Routes = [
           import('./modules/patients/patient-list/patient-list').then((m) => m.PatientListComponent)
       },
       {
-        path: 'pacientes/:id',
+        path: 'pacientes/nuevo',
         canActivate: [roleGuard],
-        data: { ...clinicalOrAdmin, pageTitle: 'Paciente' },
+        data: { ...clinicalOrAdmin, pageTitle: 'Nuevo paciente' },
         loadComponent: () =>
           import('./modules/patients/patient-form/patient-form').then((m) => m.PatientFormComponent)
       },
       {
-        path: 'pacientes/:id/historial',
+        path: 'pacientes/:id',
         canActivate: [roleGuard],
-        data: { ...clinicalOrAdmin, pageTitle: 'Historial clínico' },
+        data: { ...clinicalOrAdmin, pageTitle: 'Paciente' },
         loadComponent: () =>
-          import('./modules/patients/medical-history/medical-history').then((m) => m.MedicalHistoryComponent)
-      },
-      {
-        path: 'pacientes/:id/primera-visita',
-        canActivate: [roleGuard],
-        data: { ...clinicalOrAdmin, pageTitle: 'Primera visita' },
-        loadComponent: () =>
-          import('./modules/patients/first-visit-form/first-visit-form').then((m) => m.FirstVisitFormComponent)
-      },
-      {
-        path: 'pacientes/:id/odontograma',
-        canActivate: [roleGuard],
-        data: { ...clinicalOrAdmin, pageTitle: 'Odontograma' },
-        loadComponent: () =>
-          import('./modules/patients/odontograma-interactive/odontograma-interactive').then((m) => m.OdontogramaInteractiveComponent)
-      },
-      {
-        path: 'pacientes/:id/radiografias',
-        canActivate: [roleGuard],
-        data: { ...clinicalOrAdmin, pageTitle: 'Radiografías' },
-        loadComponent: () =>
-          import('./modules/patients/xray-gallery/xray-gallery').then((m) => m.XrayGalleryComponent)
+          import('./modules/patients/patient-clinical-shell/patient-clinical-shell').then(
+            (m) => m.PatientClinicalShellComponent
+          ),
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            data: { pageTitle: 'Ficha paciente' },
+            loadComponent: () =>
+              import('./modules/patients/patient-form/patient-form').then((m) => m.PatientFormComponent)
+          },
+          {
+            path: 'historial',
+            data: { pageTitle: 'Historial clínico' },
+            loadComponent: () =>
+              import('./modules/patients/medical-history/medical-history').then((m) => m.MedicalHistoryComponent)
+          },
+          {
+            path: 'primera-visita',
+            data: { pageTitle: 'Primera visita' },
+            loadComponent: () =>
+              import('./modules/patients/first-visit-form/first-visit-form').then((m) => m.FirstVisitFormComponent)
+          },
+          {
+            path: 'odontograma',
+            data: { pageTitle: 'Odontograma' },
+            loadComponent: () =>
+              import('./modules/patients/odontograma-interactive/odontograma-interactive').then(
+                (m) => m.OdontogramaInteractiveComponent
+              )
+          },
+          {
+            path: 'radiografias',
+            data: { pageTitle: 'Radiografías' },
+            loadComponent: () =>
+              import('./modules/patients/xray-gallery/xray-gallery').then((m) => m.XrayGalleryComponent)
+          }
+        ]
       },
       {
         path: 'notificaciones',

@@ -15,3 +15,8 @@
 .warning-text{color:#b91c1c}.modal-actions{justify-content:flex-end;border-top:1px solid #e2e8f0}.btn-cancel{background:#e2e8f0}.btn-delete{background:#dc2626;color:#fff}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:768px){.page-head,.pager{flex-direction:column;align-items:flex-start}}
+.cell-patient-name{display:inline-flex;align-items:center;gap:.35rem;flex-wrap:wrap}
+.patient-risk-ico{display:inline-flex;align-items:center;justify-content:center;width:1.15rem;height:1.15rem;border-radius:999px;font-size:.72rem;font-weight:900;line-height:1;color:#fff;flex-shrink:0}
+.patient-risk-ico--red{background:#dc2626;box-shadow:0 0 0 2px #fecaca;font-size:.62rem}
+.patient-risk-ico--amber{background:#f59e0b;color:#1c1917;box-shadow:0 0 0 2px #fde68a}
+.patient-risk-ico--blue{background:#2563eb;box-shadow:0 0 0 2px #bfdbfe}

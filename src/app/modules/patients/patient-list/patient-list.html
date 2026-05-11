@@ -50,7 +50,19 @@
         <tbody>
           @for (p of items(); track trackById($index, p)) {
             <tr>
-              <td class="cell-strong">{{ displayName(p) }}</td>
+              <td class="cell-strong cell-patient-name">
+                @if (rowMedicalSeverity(p); as sev) {
+                  <span
+                    class="patient-risk-ico"
+                    [class.patient-risk-ico--red]="sev === 'biosecurity'"
+                    [class.patient-risk-ico--amber]="sev === 'allergy'"
+                    [class.patient-risk-ico--blue]="sev === 'systemic'"
+                    [attr.title]="rowMedicalTitle(p)"
+                    aria-hidden="true"
+                    >{{ sev === 'biosecurity' ? '☣' : '!' }}</span>
+                }
+                {{ displayName(p) }}
+              </td>
               <td>{{ dniLine(p) }}</td>
               <td class="cell-muted">{{ contactLine(p) }}</td>
               <td class="actions-cell">

@@ -1,0 +1,120 @@
+<div class="mfp" [class.mfp--disabled]="disabled()">
+  @if (selectedSorted().length) {
+    <ul class="mfp__chips" aria-label="Condiciones seleccionadas">
+      @for (id of selectedSorted(); track id) {
+        <li
+          class="mfp__chip"
+          [class.mfp__chip--l1]="chipLevel(id) === 1"
+          [class.mfp__chip--l2]="chipLevel(id) === 2"
+          [class.mfp__chip--l3]="chipLevel(id) === 3"
+        >
+          <span class="mfp__chip-label">{{ labelFor(id) }}</span>
+          <button
+            type="button"
+            class="mfp__chip-remove"
+            [disabled]="disabled()"
+            (click)="removeFlag(id, $event)"
+            [attr.aria-label]="'Quitar ' + labelFor(id)"
+          >
+            ×
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  <div class="mfp__combo">
+    <input
+      type="search"
+      class="mfp__search"
+      autocomplete="off"
+      [disabled]="disabled()"
+      [value]="filterText()"
+      (input)="onFilterInput($any($event.target).value)"
+      (focus)="openPanel()"
+      placeholder="Buscar o añadir condición…"
+      aria-autocomplete="list"
+      [attr.aria-expanded]="panelOpen()"
+      aria-controls="mfp-panel"
+    />
+    <button
+      type="button"
+      class="mfp__toggle"
+      [disabled]="disabled()"
+      (click)="togglePanel(); $event.stopPropagation()"
+      [attr.aria-expanded]="panelOpen()"
+      aria-controls="mfp-panel"
+    >
+      {{ panelOpen() ? '▲' : '▼' }}
+    </button>
+  </div>
+
+  @if (panelOpen()) {
+    <div id="mfp-panel" class="mfp__panel" role="listbox" aria-multiselectable="true">
+      @for (lvl of levels; track lvl) {
+        @let opts = filteredByLevel()[lvl];
+        <section class="mfp__group mfp__group--lvl{{ lvl }}">
+          <header class="mfp__group-head">
+            <span class="mfp__group-title">{{ categoryMeta(lvl).title }}</span>
+            <span class="mfp__group-sub">{{ categoryMeta(lvl).subtitle }}</span>
+          </header>
+          @if (opts.length) {
+            <ul class="mfp__opts">
+              @for (opt of opts; track opt.id) {
+                <li>
+                  <button
+                    type="button"
+                    class="mfp__opt"
+                    [class.mfp__opt--on]="isSelected(opt.id)"
+                    role="option"
+                    [attr.aria-selected]="isSelected(opt.id)"
+                    (click)="toggleFlag(opt.id)"
+                  >
+                    <span class="mfp__opt-label">{{ opt.label }}</span>
+                    @if (isSelected(opt.id)) {
+                      <span class="mfp__check" aria-hidden="true">✓</span>
+                    }
+                  </button>
+                </li>
+              }
+            </ul>
+          } @else if (filterText().trim()) {
+            <p class="mfp__muted">Sin coincidencias en la lista fija de este nivel.</p>
+          }
+          <div class="mfp__add-row">
+            <button type="button" class="mfp__add-other" (click)="startAddCustom(lvl, $event)">
+              {{ addOtherLabel[lvl] }}
+            </button>
+          </div>
+          @if (addingLevel() === lvl) {
+            <div class="mfp__custom-box" (click)="$event.stopPropagation()">
+              <label class="mfp__custom-lbl" [attr.for]="'mfp-custom-' + lvl">Nombre de la condición</label>
+              <input
+                type="text"
+                class="mfp__custom-input"
+                [id]="'mfp-custom-' + lvl"
+                [value]="customDraft()"
+                (input)="onCustomDraftInput($any($event.target).value)"
+                [attr.maxlength]="customLabelMax"
+                [disabled]="disabled()"
+                placeholder="Ej.: Virus X"
+                (keydown.enter)="confirmCustomAdd($event)"
+              />
+              @if (customAddError()) {
+                <p class="mfp__custom-err">{{ customAddError() }}</p>
+              }
+              <div class="mfp__custom-actions">
+                <button type="button" class="mfp__btn mfp__btn--ghost" (click)="cancelCustomAdd($event)">
+                  Cancelar
+                </button>
+                <button type="button" class="mfp__btn mfp__btn--primary" (click)="confirmCustomAdd($event)">
+                  Añadir
+                </button>
+              </div>
+            </div>
+          }
+        </section>
+      }
+    </div>
+  }
+</div>

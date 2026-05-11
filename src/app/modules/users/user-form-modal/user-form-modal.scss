@@ -31,6 +31,13 @@
   animation: slideUp 0.3s ease-out;
 }
 
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
 @keyframes slideUp {
   from {
     transform: translateY(1rem);
@@ -86,6 +93,7 @@
   padding: 1.5rem;
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
 }
 
 .alert {
@@ -184,6 +192,17 @@
     color: #6b7280;
     margin: 0;
     line-height: 1.4;
+
+    code {
+      font-size: 0.7rem;
+      background: #f3f4f6;
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.25rem;
+    }
+
+    &.help-text--warn {
+      color: #92400e;
+    }
   }
 }
 

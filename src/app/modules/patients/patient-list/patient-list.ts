@@ -1,15 +1,21 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PatientService } from '../patient.service';
 import { PatientListQuery, PatientRow } from '../models/patient-list.models';
+import {
+  medicalFlagLabels,
+  patientMedicalSeverity,
+  type MedicalAlertSeverity
+} from '../medical-flags.constants';
 
 @Component({
   selector: 'app-patient-list',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './patient-list.html',
   styleUrl: './patient-list.scss'
 })
@@ -94,6 +100,16 @@ export class PatientListComponent implements OnInit {
   displayName(p: PatientRow): string {
     const parts = [p.nombre, p.apellidos ?? p.apellido].filter(Boolean);
     return parts.join(' ').trim() || '(Sin nombre)';
+  }
+
+  rowMedicalSeverity(p: PatientRow): MedicalAlertSeverity {
+    return patientMedicalSeverity(p.medical_flags);
+  }
+
+  rowMedicalTitle(p: PatientRow): string {
+    const f = p.medical_flags;
+    if (!f?.length) return '';
+    return medicalFlagLabels(f).join(', ');
   }
 
   contactLine(p: PatientRow): string {
