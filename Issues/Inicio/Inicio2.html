@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DENTIFY: Inicio Administrador</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13daec",
+                        "primary-dark": "#0ea5b5", 
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102022",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#162a2d",
+                        "teal-dark": "#0c4a52", // Custom dark turquoise for contrast
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display antialiased min-h-screen flex flex-col md:flex-row transition-colors duration-300">
+<!-- Sidebar Navigation -->
+<aside class="w-full md:w-64 bg-surface-light dark:bg-surface-dark border-r border-teal-dark/10 dark:border-teal-dark/30 flex flex-col fixed md:relative h-screen z-50 shadow-xl md:shadow-none hidden md:flex">
+<!-- Logo Area -->
+<div class="h-20 flex items-center px-8 border-b border-teal-dark/5 dark:border-teal-dark/20">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold text-xl">D</div>
+<span class="text-xl font-bold tracking-tight text-teal-dark dark:text-primary">DENTIFY</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+<div class="mb-6">
+<p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">General</p>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary-dark dark:text-primary rounded-lg font-medium transition-colors" href="#">
+<span class="material-icons text-xl">dashboard</span>
+                    Inicio
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-teal-dark/20 rounded-lg font-medium transition-colors" href="#">
+<span class="material-icons text-xl">calendar_today</span>
+                    Calendario
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-teal-dark/20 rounded-lg font-medium transition-colors" href="#">
+<span class="material-icons text-xl">people</span>
+                    Pacientes
+                </a>
+</div>
+<div class="mb-6">
+<p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Administración</p>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-teal-dark/20 rounded-lg font-medium transition-colors" href="#">
+<span class="material-icons text-xl">medical_services</span>
+                    Gestión Odontólogos
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-teal-dark/20 rounded-lg font-medium transition-colors" href="#">
+<span class="material-icons text-xl">chair_alt</span>
+                    Gestión de Boxes
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-teal-dark/20 rounded-lg font-medium transition-colors" href="#">
+<span class="material-icons text-xl">inventory_2</span>
+                    Gestión de Stock
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-teal-dark/20 rounded-lg font-medium transition-colors" href="#">
+<span class="material-icons text-xl">menu_book</span>
+                    Protocolos
+                </a>
+</div>
+</nav>
+<!-- User Profile (Bottom) -->
+<div class="p-4 border-t border-teal-dark/5 dark:border-teal-dark/20">
+<div class="flex items-center gap-3 px-2">
+<img alt="Admin Avatar" class="h-10 w-10 rounded-full object-cover border-2 border-primary" data-alt="Administrator user profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDe7IaZVppFPCLVpGbBEvFaxJm_KH5XwOvBPZL5kL94zVEg5SaayKLWZ0Cu2XottZt7v7r0MHXWwdCfXTx_h2fCadY2AbIWloELJ3ZqxmRM5LOjZMqHnsHOIMaLymaPIlah_UmUCfDMWNkgaEWTId-I4hNhR8dQo1BjdYJ0RDBr133L-Is2O16kQsDdXFb5-CdMZf0X57MCUeOSKQRNAgUzXAJDbZiYtcAZ4RGJGRQg8Zvt0xVuW5wNfQoXcCnlatUu5SYcsWu81MIo"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium text-slate-900 dark:text-white truncate">Admin Principal</p>
+<p class="text-xs text-slate-500 truncate">admin@dentify.edu</p>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-icons text-xl">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Mobile Header (Visible only on small screens) -->
+<div class="md:hidden w-full bg-surface-light dark:bg-surface-dark border-b border-teal-dark/10 p-4 flex items-center justify-between sticky top-0 z-40">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold text-xl">D</div>
+<span class="text-xl font-bold text-teal-dark dark:text-primary">DENTIFY</span>
+</div>
+<button class="text-slate-600 dark:text-slate-300">
+<span class="material-icons text-2xl">menu</span>
+</button>
+</div>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden">
+<!-- Top Header Bar -->
+<header class="h-20 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-teal-dark/5 dark:border-teal-dark/20 flex items-center justify-between px-8 sticky top-0 z-30">
+<div class="flex-1 max-w-xl">
+<div class="relative">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 rounded-lg border-none bg-slate-100 dark:bg-teal-dark/20 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary/50 text-sm" placeholder="Buscar pacientes, stock o doctores..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4 ml-4">
+<button class="relative p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-icons">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
+</button>
+<button class="p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-icons">settings</span>
+</button>
+</div>
+</header>
+<!-- Dashboard Content Scrollable Area -->
+<div class="flex-1 overflow-y-auto p-4 md:p-8">
+<!-- Welcome Section -->
+<div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h1 class="text-2xl md:text-3xl font-bold text-teal-dark dark:text-white mb-1">Panel de Control</h1>
+<p class="text-slate-500 dark:text-slate-400">Bienvenido de nuevo. Aquí está el resumen de la clínica hoy.</p>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface-light dark:bg-surface-dark border border-teal-dark/10 dark:border-teal-dark/30 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-teal-dark/20 transition-colors flex items-center gap-2">
+<span class="material-icons text-sm">download</span> Reporte
+                    </button>
+<button class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg font-medium shadow-lg shadow-primary/30 transition-colors flex items-center gap-2">
+<span class="material-icons text-sm">add</span> Nueva Cita
+                    </button>
+</div>
+</div>
+<!-- KPI Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<!-- Stat Card 1 -->
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-teal-dark/5 dark:border-teal-dark/20 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons text-6xl text-primary">medical_services</span>
+</div>
+<div class="relative z-10">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Odontólogos Activos</p>
+<h3 class="text-3xl font-bold text-slate-800 dark:text-white">12</h3>
+<div class="flex items-center mt-2 text-xs font-medium text-emerald-500">
+<span class="material-icons text-sm mr-1">trending_up</span>
+<span>2 nuevos esta semana</span>
+</div>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-teal-dark/5 dark:border-teal-dark/20 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons text-6xl text-primary">chair_alt</span>
+</div>
+<div class="relative z-10">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Boxes Ocupados</p>
+<h3 class="text-3xl font-bold text-slate-800 dark:text-white">8/10</h3>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 80%"></div>
+</div>
+</div>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-teal-dark/5 dark:border-teal-dark/20 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons text-6xl text-primary">inventory_2</span>
+</div>
+<div class="relative z-10">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Alertas de Stock</p>
+<h3 class="text-3xl font-bold text-slate-800 dark:text-white">3</h3>
+<div class="flex items-center mt-2 text-xs font-medium text-red-500">
+<span class="material-icons text-sm mr-1">warning</span>
+<span>Requiere atención</span>
+</div>
+</div>
+</div>
+<!-- Stat Card 4 -->
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-teal-dark/5 dark:border-teal-dark/20 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons text-6xl text-primary">people_alt</span>
+</div>
+<div class="relative z-10">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Pacientes Hoy</p>
+<h3 class="text-3xl font-bold text-slate-800 dark:text-white">45</h3>
+<div class="flex items-center mt-2 text-xs font-medium text-slate-500">
+<span>Próxima cita en 15 min</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Split -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+<!-- Left Column (Wider) -->
+<div class="lg:col-span-2 space-y-8">
+<!-- Quick Actions -->
+<div>
+<h2 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Acciones Rápidas</h2>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<button class="flex flex-col items-center justify-center p-4 bg-surface-light dark:bg-surface-dark rounded-xl border border-teal-dark/5 dark:border-teal-dark/20 hover:border-primary/50 hover:shadow-md transition-all group">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-icons">person_add</span>
+</div>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300 text-center">Registrar Odontólogo</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-light dark:bg-surface-dark rounded-xl border border-teal-dark/5 dark:border-teal-dark/20 hover:border-primary/50 hover:shadow-md transition-all group">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-icons">add_shopping_cart</span>
+</div>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300 text-center">Reponer Stock</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-light dark:bg-surface-dark rounded-xl border border-teal-dark/5 dark:border-teal-dark/20 hover:border-primary/50 hover:shadow-md transition-all group">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-icons">assignment</span>
+</div>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300 text-center">Nuevo Protocolo</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-light dark:bg-surface-dark rounded-xl border border-teal-dark/5 dark:border-teal-dark/20 hover:border-primary/50 hover:shadow-md transition-all group">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-icons">event_note</span>
+</div>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300 text-center">Ver Agenda</span>
+</button>
+</div>
+</div>
+<!-- Boxes Status (Visual) -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-teal-dark/5 dark:border-teal-dark/20 overflow-hidden">
+<div class="px-6 py-4 border-b border-teal-dark/5 dark:border-teal-dark/20 flex justify-between items-center">
+<h2 class="text-lg font-semibold text-slate-800 dark:text-white">Estado de Boxes</h2>
+<a class="text-sm text-primary font-medium hover:underline" href="#">Ver todos</a>
+</div>
+<div class="p-6">
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+<!-- Box 1: Occupied -->
+<div class="aspect-square rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 flex flex-col items-center justify-center p-2 relative group cursor-pointer hover:shadow-md transition-shadow">
+<span class="absolute top-2 left-2 text-xs font-bold text-red-700 dark:text-red-400">Box 01</span>
+<span class="material-icons text-3xl text-red-400 mb-1">person</span>
+<span class="text-xs text-center text-red-600 dark:text-red-300 leading-tight">Dr. López<br/><span class="opacity-70">Endodoncia</span></span>
+</div>
+<!-- Box 2: Occupied -->
+<div class="aspect-square rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 flex flex-col items-center justify-center p-2 relative group cursor-pointer hover:shadow-md transition-shadow">
+<span class="absolute top-2 left-2 text-xs font-bold text-red-700 dark:text-red-400">Box 02</span>
+<span class="material-icons text-3xl text-red-400 mb-1">person</span>
+<span class="text-xs text-center text-red-600 dark:text-red-300 leading-tight">Dra. Ruiz<br/><span class="opacity-70">Limpieza</span></span>
+</div>
+<!-- Box 3: Available -->
+<div class="aspect-square rounded-lg bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-900/30 flex flex-col items-center justify-center p-2 relative group cursor-pointer hover:shadow-md transition-shadow">
+<span class="absolute top-2 left-2 text-xs font-bold text-emerald-700 dark:text-emerald-400">Box 03</span>
+<span class="material-icons text-3xl text-emerald-400 mb-1">check_circle_outline</span>
+<span class="text-xs text-center text-emerald-600 dark:text-emerald-300 font-medium">Disponible</span>
+</div>
+<!-- Box 4: Maintenance -->
+<div class="aspect-square rounded-lg bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center p-2 relative group cursor-pointer hover:shadow-md transition-shadow opacity-75">
+<span class="absolute top-2 left-2 text-xs font-bold text-slate-500">Box 04</span>
+<span class="material-icons text-3xl text-slate-400 mb-1">build</span>
+<span class="text-xs text-center text-slate-500 font-medium">Mant.</span>
+</div>
+<!-- Box 5: Occupied -->
+<div class="aspect-square rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 flex flex-col items-center justify-center p-2 relative group cursor-pointer hover:shadow-md transition-shadow">
+<span class="absolute top-2 left-2 text-xs font-bold text-red-700 dark:text-red-400">Box 05</span>
+<span class="material-icons text-3xl text-red-400 mb-1">person</span>
+<span class="text-xs text-center text-red-600 dark:text-red-300 leading-tight">Alumno J.<br/><span class="opacity-70">Práctica</span></span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Table -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-teal-dark/5 dark:border-teal-dark/20 overflow-hidden">
+<div class="px-6 py-4 border-b border-teal-dark/5 dark:border-teal-dark/20">
+<h2 class="text-lg font-semibold text-slate-800 dark:text-white">Actividad Reciente</h2>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left">
+<thead class="text-xs text-slate-500 uppercase bg-slate-50 dark:bg-teal-dark/10 border-b border-teal-dark/5 dark:border-teal-dark/20">
+<tr>
+<th class="px-6 py-3" scope="col">Hora</th>
+<th class="px-6 py-3" scope="col">Usuario</th>
+<th class="px-6 py-3" scope="col">Acción</th>
+<th class="px-6 py-3" scope="col">Detalle</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-teal-dark/5 dark:divide-teal-dark/20">
+<tr class="hover:bg-slate-50 dark:hover:bg-teal-dark/10 transition-colors">
+<td class="px-6 py-4 text-slate-500">10:42 AM</td>
+<td class="px-6 py-4 font-medium text-slate-900 dark:text-white">Dr. Alejandro M.</td>
+<td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">Reserva</span></td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">Reservó Box 02 para paciente #334</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-teal-dark/10 transition-colors">
+<td class="px-6 py-4 text-slate-500">10:15 AM</td>
+<td class="px-6 py-4 font-medium text-slate-900 dark:text-white">Sistema Stock</td>
+<td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300">Alerta</span></td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">Guantes Nitrilo M bajo mínimo (5 cajas)</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-teal-dark/10 transition-colors">
+<td class="px-6 py-4 text-slate-500">09:55 AM</td>
+<td class="px-6 py-4 font-medium text-slate-900 dark:text-white">Admin Principal</td>
+<td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">Edición</span></td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">Actualizó protocolo de "Extracción Simple"</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column (Sidebar Widgets) -->
+<div class="space-y-8">
+<!-- Calendar Widget (Mini) -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-teal-dark/5 dark:border-teal-dark/20 p-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-semibold text-slate-800 dark:text-white">Calendario</h3>
+<span class="text-xs font-medium text-slate-500">Octubre 2023</span>
+</div>
+<!-- Simplified Visual Representation of a Calendar Grid -->
+<div class="grid grid-cols-7 gap-1 text-center text-xs mb-2 text-slate-400">
+<div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
+</div>
+<div class="grid grid-cols-7 gap-1 text-center text-sm">
+<div class="p-1.5 text-slate-300">28</div>
+<div class="p-1.5 text-slate-300">29</div>
+<div class="p-1.5 text-slate-300">30</div>
+<div class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-teal-dark/20 cursor-pointer">1</div>
+<div class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-teal-dark/20 cursor-pointer relative">
+                                 2 <div class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full"></div>
+</div>
+<div class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-teal-dark/20 cursor-pointer">3</div>
+<div class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-teal-dark/20 cursor-pointer text-red-400">4</div>
+<div class="p-1.5 rounded-full bg-primary text-white shadow-sm shadow-primary/40">5</div>
+<div class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-teal-dark/20 cursor-pointer">6</div>
+<div class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-teal-dark/20 cursor-pointer relative">
+                                 7 <div class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full"></div>
+</div>
+<div class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-teal-dark/20 cursor-pointer">8</div>
+<div class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-teal-dark/20 cursor-pointer">9</div>
+<div class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-teal-dark/20 cursor-pointer">10</div>
+<div class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-teal-dark/20 cursor-pointer text-red-400">11</div>
+</div>
+<div class="mt-4 pt-4 border-t border-teal-dark/5 dark:border-teal-dark/20 space-y-3">
+<div class="flex items-start gap-3">
+<div class="w-1 h-8 bg-primary rounded-full mt-1"></div>
+<div>
+<p class="text-xs font-semibold text-slate-800 dark:text-white">Reunión Docentes</p>
+<p class="text-xs text-slate-500">14:00 - Sala de Juntas</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-1 h-8 bg-orange-400 rounded-full mt-1"></div>
+<div>
+<p class="text-xs font-semibold text-slate-800 dark:text-white">Inventario General</p>
+<p class="text-xs text-slate-500">17:00 - Almacén</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Stock Alerts -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-teal-dark/5 dark:border-teal-dark/20 overflow-hidden">
+<div class="px-6 py-4 border-b border-teal-dark/5 dark:border-teal-dark/20 flex justify-between items-center bg-red-50/50 dark:bg-red-900/10">
+<h3 class="font-semibold text-red-700 dark:text-red-400 flex items-center gap-2">
+<span class="material-icons text-sm">warning</span>
+                                Stock Crítico
+                            </h3>
+</div>
+<div class="divide-y divide-teal-dark/5 dark:divide-teal-dark/20">
+<div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-teal-dark/10 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+<span class="material-icons">medical_services</span>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-800 dark:text-white">Anestesia Local</p>
+<p class="text-xs text-red-500 font-semibold">Quedan: 12 un.</p>
+</div>
+</div>
+<button class="text-primary hover:text-primary-dark text-sm font-medium">Pedir</button>
+</div>
+<div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-teal-dark/10 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+<span class="material-icons">clean_hands</span>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-800 dark:text-white">Guantes S</p>
+<p class="text-xs text-red-500 font-semibold">Quedan: 2 cajas</p>
+</div>
+</div>
+<button class="text-primary hover:text-primary-dark text-sm font-medium">Pedir</button>
+</div>
+<div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-teal-dark/10 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+<span class="material-icons">description</span>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-800 dark:text-white">Gasas Estériles</p>
+<p class="text-xs text-orange-500 font-semibold">Quedan: 15 pq.</p>
+</div>
+</div>
+<button class="text-primary hover:text-primary-dark text-sm font-medium">Pedir</button>
+</div>
+</div>
+<div class="p-3 bg-slate-50 dark:bg-teal-dark/10 text-center">
+<a class="text-xs font-medium text-slate-500 hover:text-primary" href="#">Ver inventario completo</a>
+</div>
+</div>
+<!-- Promo / Educational Banner -->
+<div class="rounded-xl overflow-hidden relative min-h-[140px] shadow-sm">
+<img alt="Modern dental office equipment" class="absolute inset-0 w-full h-full object-cover" data-alt="Modern dental office equipment blur" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCt9g5xzftSAHmAWUbw7s3EBUpqcom-HtcZzptOklRG04zh5E3EIRmBHIFOUwI1Bh60aJpJp2wJxX2Do3yYaZP0G45q8E233AFWEM5cWcooIVJ8nAGnxU24sKF6llAfkOGAqrfewo2ufremaEd3puauXNmH1Er230ZWrnHkJlbPXsPQR_6SE76wgOi375VkKDua-XS3iIFNyJqo0fYtFwebYVsYm_k1MECqE3e-oCNsKZyhrLRIw68UVuUVx9HLaKH9ltvIybfqtkOo"/>
+<div class="absolute inset-0 bg-gradient-to-r from-teal-dark/90 to-primary/80 p-6 flex flex-col justify-center text-white">
+<h4 class="font-bold text-lg mb-1">Nuevos Protocolos</h4>
+<p class="text-xs text-white/90 mb-3 max-w-[200px]">Actualización de normativas COVID-19 y esterilización de instrumentos.</p>
+<a class="inline-block bg-white text-teal-dark text-xs font-bold py-2 px-4 rounded shadow-lg hover:bg-slate-100 transition w-max" href="#">Leer Documento</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

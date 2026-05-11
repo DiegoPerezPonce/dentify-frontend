@@ -1,0 +1,8 @@
+<div class="patient-clinical-shell">
+  @if (showAlertBanner()) {
+    <app-patient-alert-banner [patientId]="patientNumericId()!" />
+  }
+  <div class="patient-clinical-shell__outlet">
+    <router-outlet />
+  </div>
+</div>

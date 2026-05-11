@@ -42,6 +42,33 @@ export class AppShellComponent implements OnInit {
     return ms != null && ms <= 5 * 60 * 1000;
   });
 
+  /** Re-evalúa nombre/email del JWT junto con el tick de sesión. */
+  readonly userDisplayName = computed(() => {
+    this.sessionTick();
+    this.langRefresh();
+    const n = this.auth.getDisplayName()?.trim();
+    return n || this.translate.instant('NAV.DEFAULT_USER');
+  });
+
+  readonly userEmail = computed(() => {
+    this.sessionTick();
+    this.langRefresh();
+    const e = this.auth.getEmail()?.trim();
+    return e || null;
+  });
+
+  readonly userInitials = computed(() => {
+    this.sessionTick();
+    this.langRefresh();
+    const n = this.auth.getDisplayName()?.trim();
+    if (!n) return '?';
+    const parts = n.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return n.slice(0, 2).toUpperCase();
+  });
+
   /** Solo UI: oculta el bloque Administración sin cambiar permisos. */
   readonly adminNavCollapsed = signal(false);
 

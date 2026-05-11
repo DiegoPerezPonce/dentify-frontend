@@ -1,0 +1,10 @@
+.patient-clinical-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.patient-clinical-shell__outlet {
+  flex: 1;
+  min-height: 0;
+}

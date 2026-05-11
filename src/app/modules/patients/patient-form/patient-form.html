@@ -136,6 +136,31 @@
       </div>
     </div>
 
+    <!-- Información médica crítica (flags + notas) -->
+    <div class="form-section form-section--critical">
+      <h2 class="section-title">Información médica crítica</h2>
+      <p class="section-intro">
+        Añade condiciones por categoría (bioseguridad, alergias, riesgo sistémico). Las alertas en ficha y listado
+        respetan la prioridad visual del nivel más alto.
+      </p>
+      <div class="form-group">
+        <label class="mfp-field-label">Marcadores médicos</label>
+        <app-medical-flags-picker formControlName="medical_flags" />
+      </div>
+      <div class="form-group">
+        <label for="medical_notes">Otras observaciones médicas</label>
+        <textarea
+          id="medical_notes"
+          formControlName="medical_notes"
+          rows="3"
+          placeholder="Detalle adicional (tratamientos, riesgos, medicación crítica…)"
+        ></textarea>
+        @if (hasError('medical_notes')) {
+          <span class="error-message">{{ getErrorMessage('medical_notes') }}</span>
+        }
+      </div>
+    </div>
+
     <!-- Sección: Información clínica -->
     <div class="form-section">
       <h2 class="section-title">Información clínica</h2>

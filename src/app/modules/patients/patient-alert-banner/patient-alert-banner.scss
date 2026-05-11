@@ -1,0 +1,80 @@
+.med-alert {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  margin: 0 0 0.75rem;
+  border-radius: 0.5rem;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.med-alert--biosecurity {
+  background: #dc2626;
+  color: #fff;
+  border-color: #991b1b;
+}
+
+.med-alert--allergy {
+  background: #f59e0b;
+  color: #1c1917;
+  border-color: #d97706;
+}
+
+.med-alert--systemic {
+  background: #2563eb;
+  color: #fff;
+  border-color: #1d4ed8;
+}
+
+.med-alert--loading,
+.med-alert--error {
+  background: #f1f5f9;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+.med-alert__icon {
+  font-size: 1.35rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.med-alert__body {
+  min-width: 0;
+}
+
+.med-alert__title {
+  display: block;
+  font-size: 0.95rem;
+  margin: 0 0 0.25rem;
+}
+
+.med-alert__flags {
+  margin: 0;
+  font-weight: 600;
+}
+
+.med-alert__notes {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  opacity: 0.95;
+  white-space: pre-wrap;
+}
+
+.med-alert--biosecurity .med-alert__notes {
+  color: #fecaca;
+}
+
+.med-alert--allergy .med-alert__notes {
+  color: #422006;
+}
+
+.med-alert--systemic .med-alert__notes {
+  color: #dbeafe;
+}

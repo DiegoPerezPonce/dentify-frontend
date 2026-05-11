@@ -1,7 +1,7 @@
 .shell {
   display: flex;
   min-height: 100vh;
-  background: linear-gradient(180deg, #f7fafc 0%, #eef3f8 100%);
+  background: #f6f8f8;
 }
 
 .sidebar {
@@ -26,9 +26,20 @@
 .brand-mark {
   width: 36px;
   height: 36px;
-  border-radius: 11px;
-  background: linear-gradient(145deg, #00c6d7, #48c6ef);
+  border-radius: 10px;
+  background: linear-gradient(145deg, #13daec, #00a8b8);
   box-shadow: 0 6px 16px rgba(0, 198, 215, 0.35);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.brand-d {
+  font-family: Exo, system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #fff;
+  line-height: 1;
 }
 
 .brand-text {
@@ -106,14 +117,34 @@
 }
 
 .nav-block a {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
   padding: 0.55rem 0.85rem;
   border-radius: 10px;
   font-family: 'Noto Sans', system-ui, sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: #2c3e50;
   text-decoration: none;
   transition: background 0.12s, color 0.12s;
+}
+
+.nav-ico {
+  width: 1.35rem;
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1;
+  opacity: 0.92;
+}
+
+.nav-sub-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin: 0.55rem 0.5rem 0.15rem;
 }
 
 .nav-block a:hover {
@@ -122,10 +153,10 @@
 }
 
 .nav-block a.active {
-  background: linear-gradient(90deg, #e8f9fb, #f7feff);
-  color: #008a96;
+  background: rgba(19, 218, 236, 0.12);
+  color: #0c4a52;
   font-weight: 600;
-  border: 1px solid #d8f2f4;
+  border: 1px solid rgba(19, 218, 236, 0.35);
 }
 
 .badge {
@@ -144,6 +175,81 @@
   margin-top: auto;
   padding: 1rem 1.25rem 0;
   border-top: 1px solid #eef2f5;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.sidebar-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-family: 'Noto Sans', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.78rem;
+  color: #fff;
+  background: linear-gradient(145deg, #13daec, #00a8b8);
+  border: 2px solid rgba(19, 218, 236, 0.65);
+}
+
+.sidebar-user-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-user-name {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1e293b;
+  font-family: 'Noto Sans', system-ui, sans-serif;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-user-email {
+  margin: 0.1rem 0 0;
+  font-size: 0.72rem;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-user-email.muted {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.sidebar-logout-ico {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+
+.sidebar-logout-ico:hover {
+  background: #f1f5f9;
+  color: #0f172a;
 }
 
 .user-line {

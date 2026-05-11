@@ -5,10 +5,7 @@
 }
 
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 0.75rem;
 
   h1 {
     font-size: 1.875rem;
@@ -16,28 +13,13 @@
     color: #1f2937;
     margin: 0;
   }
+}
 
-  .btn-primary {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    &:hover {
-      background-color: #2563eb;
-    }
-
-    svg {
-      flex-shrink: 0;
-    }
-  }
+.intro {
+  margin: 0 0 1.5rem;
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.5;
 }
 
 .alert {

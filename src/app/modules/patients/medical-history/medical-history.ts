@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { PatientService } from '../patient.service';
 import { ClinicalHistory, HISTORY_TYPE_COLORS, HISTORY_TYPE_LABELS } from '../models/clinical-history.models';
 import { Patient } from '../models/patient.models';
+import { getPacienteIdFromRoute } from '../patient-route-id.util';
 
 @Component({
   selector: 'app-medical-history',
@@ -26,8 +27,8 @@ export class MedicalHistoryComponent implements OnInit {
   readonly typeLabels = HISTORY_TYPE_LABELS;
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id && id !== 'nuevo') {
+    const id = getPacienteIdFromRoute(this.route);
+    if (id && id !== 'nuevo' && /^\d+$/.test(id)) {
       this.loadPatientAndHistory(Number(id));
     } else {
       this.error.set('ID de paciente no válido');

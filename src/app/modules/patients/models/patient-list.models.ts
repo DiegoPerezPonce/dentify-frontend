@@ -11,6 +11,7 @@ export interface PatientRow {
   telefon?: string;
   email?: string;
   mail?: string;
+  medical_flags?: string[] | null;
 }
 
 export interface PatientListQuery {

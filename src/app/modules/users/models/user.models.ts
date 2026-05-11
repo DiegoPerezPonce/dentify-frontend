@@ -4,6 +4,13 @@ export interface User {
   nombre_usuario: string;
   roles: string[];
   ultimo_acceso?: string;
+  /** Odontólogo vinculado en BD; define `dentistId` en el JWT tras login. */
+  dentistId?: number | null;
+  /** Relleno en listados API cuando existe ficha `Dentist`. */
+  dentistNombre?: string | null;
+  dentistApellidos?: string | null;
+  dentistEspecialidad?: string | null;
+  dentistBoxes?: string[];
 }
 
 export interface UserCreateDTO {
@@ -11,6 +18,9 @@ export interface UserCreateDTO {
   password: string;
   nombre_usuario: string;
   roles: string[];
+  dentistNombre?: string | null;
+  dentistApellidos?: string | null;
+  dentistEspecialidad?: string | null;
 }
 
 export interface UserUpdateDTO {
@@ -18,6 +28,7 @@ export interface UserUpdateDTO {
   password?: string;
   nombre_usuario?: string;
   roles?: string[];
+  dentistId?: number | null;
 }
 
 export interface UserListResult {

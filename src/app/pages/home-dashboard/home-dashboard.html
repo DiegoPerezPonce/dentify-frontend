@@ -1,0 +1,252 @@
+<div class="dash">
+  @if (error()) {
+    <div class="dash-banner dash-banner--error" role="alert">
+      {{ error() }}
+      <button type="button" class="dash-retry" (click)="loadDashboard()">{{ 'HOME_DASH.RETRY' | translate }}</button>
+    </div>
+  }
+
+  <header class="dash-top">
+    <div class="dash-top__lead">
+      <h1 class="dash-title">{{ greetingKey() | translate: { name: doctorName() } }}</h1>
+      <p class="dash-sub">{{ 'HOME_DASH.SUBTITLE' | translate }}</p>
+      @if (hasDentistScope()) {
+        <p class="dash-scope">{{ 'HOME_DASH.APPTS_SCOPE_MINE' | translate }}</p>
+      } @else {
+        <p class="dash-scope">{{ 'HOME_DASH.APPTS_SCOPE_ALL' | translate }}</p>
+      }
+    </div>
+    <div class="dash-top__search">
+      <span class="dash-search-ico" aria-hidden="true">⌕</span>
+      <input
+        type="search"
+        class="dash-search-input"
+        [placeholder]="'HOME_DASH.SEARCH_PH' | translate"
+        autocomplete="off"
+      />
+    </div>
+    <div class="dash-top__actions">
+      <a routerLink="/app/notificaciones" class="dash-icon-btn" [attr.aria-label]="'HOME_DASH.NOTIF_ARIA' | translate">
+        <span class="dash-bell" aria-hidden="true">🔔</span>
+        <span class="dash-dot"></span>
+      </a>
+      <a routerLink="/app/agenda" class="dash-icon-btn" [attr.aria-label]="'HOME_DASH.SETTINGS_ARIA' | translate">
+        <span aria-hidden="true">⚙</span>
+      </a>
+      <a routerLink="/app/agenda" class="dash-btn dash-btn--ghost">{{ 'HOME_DASH.REPORT' | translate }}</a>
+      <a routerLink="/app/agenda" class="dash-btn dash-btn--primary">{{ 'HOME_DASH.NEW_APPT' | translate }}</a>
+    </div>
+  </header>
+
+  <section class="dash-panel">
+    <div class="dash-panel__head">
+      <div>
+        <h2 class="dash-h2">{{ 'HOME_DASH.PANEL_TITLE' | translate }}</h2>
+        <p class="dash-panel__sub">{{ 'HOME_DASH.PANEL_SUB' | translate }}</p>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="dash-loading">{{ 'HOME_DASH.LOADING' | translate }}</p>
+    }
+
+    <div class="dash-stats" [class.dash-stats--muted]="loading()">
+      <article class="dash-stat">
+        <div class="dash-stat__ico" aria-hidden="true">🪑</div>
+        <div>
+          <p class="dash-stat__label">{{ 'HOME_DASH.STAT_BOXES' | translate }}</p>
+          <p class="dash-stat__value">{{ boxesOccupiedCount() }}/{{ boxesTotal() || '—' }}</p>
+          @if (boxesTotal()) {
+            <div class="dash-stat__bar">
+              <span class="dash-stat__fill" [style.width.%]="boxesOccupiedPct()"></span>
+            </div>
+          }
+        </div>
+      </article>
+      <article class="dash-stat" [class.dash-stat--alert]="stockAlertTotal() > 0">
+        <div class="dash-stat__ico" aria-hidden="true">📦</div>
+        <div>
+          <p class="dash-stat__label">{{ 'HOME_DASH.STAT_STOCK' | translate }}</p>
+          <p class="dash-stat__value">{{ stockAlertTotal() }}</p>
+          @if (stockAlertTotal() > 0) {
+            <p class="dash-stat__hint">{{ 'HOME_DASH.STAT_STOCK_HINT' | translate }}</p>
+          } @else {
+            <p class="dash-stat__hint dash-stat__hint--ok">{{ 'HOME_DASH.STAT_STOCK_OK' | translate }}</p>
+          }
+        </div>
+      </article>
+      <article class="dash-stat">
+        <div class="dash-stat__ico" aria-hidden="true">👥</div>
+        <div>
+          <p class="dash-stat__label">{{ 'HOME_DASH.STAT_PATIENTS' | translate }}</p>
+          <p class="dash-stat__value">{{ patientsTodayCount() }}</p>
+          <p class="dash-stat__hint dash-stat__hint--muted">{{ nextApptHint() }}</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="dash-quick">
+      @if (isAdmin()) {
+        <a routerLink="/app/admin/stock" class="dash-quick__card">
+          <span class="dash-quick__ico" aria-hidden="true">🛒</span>
+          <span>{{ 'HOME_DASH.QUICK_RESTOCK' | translate }}</span>
+        </a>
+        <a routerLink="/app/admin/protocolos" class="dash-quick__card">
+          <span class="dash-quick__ico" aria-hidden="true">📋</span>
+          <span>{{ 'HOME_DASH.QUICK_PROTO' | translate }}</span>
+        </a>
+      }
+      <a routerLink="/app/agenda" class="dash-quick__card">
+        <span class="dash-quick__ico" aria-hidden="true">▦</span>
+        <span>{{ 'HOME_DASH.QUICK_AGENDA' | translate }}</span>
+      </a>
+    </div>
+
+    <div class="dash-columns">
+      <div class="dash-col dash-col--main">
+        <section class="dash-section">
+          <h3 class="dash-h3">{{ 'HOME_DASH.APPOINTMENTS_TITLE' | translate }}</h3>
+          @if (!loading() && !appointments().length) {
+            <p class="dash-empty">{{ 'HOME_DASH.EMPTY_APPTS' | translate }}</p>
+          }
+          <ul class="dash-appt-list">
+            @for (a of appointments(); track a.id) {
+              <li
+                class="dash-appt"
+                [class.dash-appt--active]="a.active"
+                [class.dash-appt--locked]="a.status === 'locked'"
+              >
+                <div class="dash-appt__time">
+                  <span class="dash-appt__clock">{{ a.timeLabel }}</span>
+                  <span
+                    class="dash-appt__pill"
+                    [class.dash-appt__pill--reg]="a.status === 'registered'"
+                    [class.dash-appt__pill--conf]="a.status === 'confirmed'"
+                    [class.dash-appt__pill--tent]="a.status === 'tentative'"
+                    [class.dash-appt__pill--lock]="a.status === 'locked'"
+                  >
+                    @if (a.status === 'registered') {
+                      {{ 'HOME_DASH.ST_REGISTERED' | translate }}
+                    } @else if (a.status === 'confirmed') {
+                      {{ 'HOME_DASH.ST_CONFIRMED' | translate }}
+                    } @else if (a.status === 'tentative') {
+                      {{ 'HOME_DASH.ST_TENTATIVE' | translate }}
+                    } @else {
+                      {{ 'HOME_DASH.ST_LOCKED' | translate }}
+                    }
+                  </span>
+                </div>
+                <div class="dash-appt__body">
+                  <div class="dash-appt__row1">
+                    <span class="dash-appt__name">{{ a.patientName }}</span>
+                    <span class="dash-appt__ref">{{ a.patientRef }}</span>
+                  </div>
+                  <p class="dash-appt__treat">{{ a.treatmentLine }}</p>
+                  @if (a.status === 'locked') {
+                    <p class="dash-appt__lock-msg">🔒 {{ 'HOME_DASH.FILE_LOCKED' | translate }}</p>
+                  }
+                  <div class="dash-appt__btns">
+                    <a routerLink="/app/agenda" class="dash-appt__btn dash-appt__btn--pri">{{
+                      'HOME_DASH.BTN_START' | translate
+                    }}</a>
+                    <a [routerLink]="['/app/pacientes', a.patientId, 'historial']" class="dash-appt__btn dash-appt__btn--sec">{{
+                      'HOME_DASH.BTN_HISTORY' | translate
+                    }}</a>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="dash-section">
+          <div class="dash-section__head">
+            <h3 class="dash-h3">{{ 'HOME_DASH.BOXES_TITLE' | translate }}</h3>
+            @if (isAdmin()) {
+              <a routerLink="/app/admin/boxes" class="dash-link">{{ 'HOME_DASH.BOXES_SEE' | translate }}</a>
+            }
+          </div>
+          @if (!loading() && !boxCards().length) {
+            <p class="dash-empty">{{ 'HOME_DASH.EMPTY_BOXES' | translate }}</p>
+          }
+          <div class="dash-boxes">
+            @for (b of boxCards(); track b.id) {
+              <article class="dash-box" [class]="'dash-box--' + b.state">
+                <span class="dash-box__tag">{{ b.label }}</span>
+                <p class="dash-box__detail">{{ b.detail }}</p>
+              </article>
+            }
+          </div>
+        </section>
+      </div>
+
+      <aside class="dash-col dash-col--side">
+        <section class="dash-widget dash-cal">
+          <h3 class="dash-h3 dash-cal__title">{{ monthTitle() }}</h3>
+          <div class="dash-cal__weekdays">
+            <span>{{ 'HOME_DASH.WD_MON' | translate }}</span>
+            <span>{{ 'HOME_DASH.WD_TUE' | translate }}</span>
+            <span>{{ 'HOME_DASH.WD_WED' | translate }}</span>
+            <span>{{ 'HOME_DASH.WD_THU' | translate }}</span>
+            <span>{{ 'HOME_DASH.WD_FRI' | translate }}</span>
+            <span>{{ 'HOME_DASH.WD_SAT' | translate }}</span>
+            <span>{{ 'HOME_DASH.WD_SUN' | translate }}</span>
+          </div>
+          <div class="dash-cal__grid">
+            @for (w of calendarWeeks(); track $index) {
+              <div class="dash-cal__row">
+                @for (c of w; track $index) {
+                  @if (c) {
+                    <div
+                      class="dash-cal__cell"
+                      [class.dash-cal__cell--today]="c.isToday"
+                      [class.dash-cal__cell--muted]="!c.isToday"
+                    >
+                      {{ c.day }}
+                    </div>
+                  } @else {
+                    <div class="dash-cal__cell dash-cal__cell--empty"></div>
+                  }
+                }
+              </div>
+            }
+          </div>
+          <ul class="dash-cal__events">
+            @for (ev of calendarEvents(); track ev.id) {
+              <li class="dash-cal__ev" [class.dash-cal__ev--amber]="ev.accent === 'amber'">
+                <span class="dash-cal__ev-time">{{ ev.timeLabel }}</span>
+                <span class="dash-cal__ev-title">{{ ev.title }}</span>
+              </li>
+            }
+            @if (!calendarEvents().length && !loading()) {
+              <li class="dash-cal__ev-empty">{{ 'HOME_DASH.EMPTY_CAL_EVENTS' | translate }}</li>
+            }
+          </ul>
+        </section>
+
+        <section class="dash-widget dash-stockw">
+          <h3 class="dash-h3 dash-stockw__title">{{ 'HOME_DASH.STOCK_TITLE' | translate }}</h3>
+          @if (!loading() && !stockItems().length) {
+            <p class="dash-empty">{{ 'HOME_DASH.EMPTY_STOCK' | translate }}</p>
+          }
+          <ul class="dash-stockw__list">
+            @for (s of stockItems(); track s.id) {
+              <li class="dash-stockw__row">
+                <div>
+                  <p class="dash-stockw__name">{{ s.nombre }}</p>
+                  <p class="dash-stockw__detail">{{ stockDetail(s) }}</p>
+                </div>
+                @if (isAdmin()) {
+                  <a routerLink="/app/admin/stock" class="dash-stockw__link">{{ 'HOME_DASH.STOCK_ORDER' | translate }}</a>
+                }
+              </li>
+            }
+          </ul>
+          @if (isAdmin()) {
+            <a routerLink="/app/admin/stock" class="dash-link dash-stockw__foot">{{ 'HOME_DASH.STOCK_SEE' | translate }}</a>
+          }
+        </section>
+      </aside>
+    </div>
+  </section>
+</div>

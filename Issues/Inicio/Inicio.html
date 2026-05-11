@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Panel de Control Alumno - Clínica Dental</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#25aff4",
+                        "primary-50": "#eef9ff",
+                        "primary-100": "#dcf1fe",
+                        "primary-200": "#bfe5fe",
+                        "primary-600": "#0c8ec8",
+                        "primary-700": "#0b71a1",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101c22",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-600 antialiased h-screen flex overflow-hidden">
+<aside class="w-64 bg-white dark:bg-[#15232b] h-full flex flex-col border-r border-slate-200 dark:border-slate-800 hidden md:flex shrink-0">
+<div class="h-20 flex items-center px-8 border-b border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-icons text-xl">medication</span>
+</div>
+<span class="text-xl font-bold text-slate-800 dark:text-white tracking-tight">Denti<span class="text-primary">Edu</span></span>
+</div>
+</div>
+<nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-medium" href="#">
+<span class="material-icons-outlined">dashboard</span>
+                Panel de Control
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-400 hover:text-slate-900 transition-colors" href="#">
+<span class="material-icons-outlined">people</span>
+                Pacientes
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-400 hover:text-slate-900 transition-colors" href="#">
+<span class="material-icons-outlined">calendar_today</span>
+                Agenda
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-400 hover:text-slate-900 transition-colors" href="#">
+<span class="material-icons-outlined">camera_alt</span>
+                Radiografías
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-400 hover:text-slate-900 transition-colors group" href="#">
+<span class="material-icons-outlined group-hover:text-primary transition-colors">smart_toy</span>
+                Asistente IA
+            </a>
+</nav>
+<div class="p-4 border-t border-slate-100 dark:border-slate-800">
+<button class="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<img alt="Perfil" class="w-10 h-10 rounded-full object-cover border-2 border-primary/20" data-alt="Young female student portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpflVzhlkZDhhFmxpZUYOGodTO2wFYD_OjyZP6DCB87X1dgkkeot-BToFuV4U23s8YS-bXxFkWkJCFIJjyxW30cOFNx2in90YYXtGH25vWy8c234aZyzKdAX1GiiUH6MpisrGicdEq3ALiyopYkIFiqa-OTctqMfOx0K-cvye8_jBvSoRvFzkrCHD1BHbvV55UfJ94ckw4LyxqFyWSxStsoptSZB8V7ECsUeCQsWKFBbz8msjuSZ0qpBoWFFOdEAofcfLEuPSoIr4"/>
+<div class="text-left">
+<p class="text-sm font-semibold text-slate-800 dark:text-white">Sara Molina</p>
+<p class="text-xs text-slate-400">Estudiante • 4º Año</p>
+</div>
+<span class="material-icons-outlined ml-auto text-slate-400">expand_more</span>
+</button>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<header class="h-20 bg-white dark:bg-[#15232b] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 shrink-0">
+<div>
+<h1 class="text-2xl font-bold text-slate-800 dark:text-white">¡Buenos días, Sara!</h1>
+<p class="text-sm text-slate-500 dark:text-slate-400">Aquí tienes tu horario para hoy.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+<span class="material-icons-outlined text-slate-400 text-sm mr-2">event</span>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-300">24 Oct, 2023</span>
+</div>
+<button class="relative p-2 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-icons-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#15232b]"></span>
+</button>
+<button class="bg-primary hover:bg-primary-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm shadow-primary/30">
+<span class="material-icons text-sm">add</span>
+                    Nuevo Registro
+                </button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-8 space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+<div class="col-span-1 md:col-span-3 lg:col-span-1 bg-gradient-to-br from-primary to-primary-600 rounded-xl p-6 text-white shadow-lg shadow-primary/20 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform duration-500">
+<span class="material-icons" style="font-size: 120px;">chair</span>
+</div>
+<div class="relative z-10 h-full flex flex-col justify-between">
+<div>
+<p class="text-primary-100 font-medium mb-1 flex items-center gap-2">
+<span class="material-icons-outlined text-sm">location_on</span> Box Asignado
+                            </p>
+<h2 class="text-5xl font-bold tracking-tighter">14</h2>
+<p class="text-sm text-primary-50 mt-2 opacity-90">Sector Dr. H. Reynolds</p>
+</div>
+<div class="mt-4 pt-4 border-t border-white/20 flex justify-between items-center">
+<span class="text-xs font-medium bg-white/20 px-2 py-1 rounded">Turno Mañana</span>
+<span class="text-xs">08:00 - 12:00</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#15232b] rounded-xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div class="bg-blue-50 dark:bg-blue-900/20 p-2 rounded-lg text-primary">
+<span class="material-icons-outlined">pie_chart</span>
+</div>
+<span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">+5% esta semana</span>
+</div>
+<div class="mt-4">
+<h3 class="text-3xl font-bold text-slate-800 dark:text-white">85%</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Requisitos Completados</p>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full mt-3">
+<div class="bg-primary h-2 rounded-full" style="width: 85%"></div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#15232b] rounded-xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div class="bg-purple-50 dark:bg-purple-900/20 p-2 rounded-lg text-purple-500">
+<span class="material-icons-outlined">people_outline</span>
+</div>
+</div>
+<div class="mt-4">
+<h3 class="text-3xl font-bold text-slate-800 dark:text-white">12</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Pacientes Activos</p>
+<p class="text-xs text-slate-400 mt-2">2 nuevos asignados este mes</p>
+</div>
+</div>
+<div class="bg-white dark:bg-[#15232b] rounded-xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div class="bg-orange-50 dark:bg-orange-900/20 p-2 rounded-lg text-orange-500">
+<span class="material-icons-outlined">pending_actions</span>
+</div>
+<span class="text-xs font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded-full">Acción Requerida</span>
+</div>
+<div class="mt-4">
+<h3 class="text-3xl font-bold text-slate-800 dark:text-white">3</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Aprobación Pendiente</p>
+<p class="text-xs text-slate-400 mt-2">Radiografías para revisión</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
+<div class="lg:col-span-2 flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-bold text-slate-800 dark:text-white">Mis Citas de Hoy</h2>
+<a class="text-sm font-medium text-primary hover:text-primary-700" href="#">Ver Horario Completo</a>
+</div>
+<div class="space-y-4">
+<div class="bg-white dark:bg-[#15232b] rounded-xl border border-primary/30 shadow-sm overflow-hidden flex flex-col sm:flex-row relative">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="p-6 sm:w-48 border-b sm:border-b-0 sm:border-r border-slate-100 dark:border-slate-800 flex flex-col justify-center bg-slate-50/50 dark:bg-slate-900/20">
+<span class="text-2xl font-bold text-slate-800 dark:text-white">09:00</span>
+<span class="text-sm text-slate-500 font-medium uppercase tracking-wide">AM</span>
+<div class="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-2.5 py-1 rounded-full w-fit">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                    Registrado
+                                </div>
+</div>
+<div class="p-6 flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold text-slate-800 dark:text-white">Juana García</h3>
+<span class="text-xs font-mono text-slate-400">#PAC-4829</span>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<span class="text-sm font-medium text-slate-600 dark:text-slate-300">Mantenimiento Periodontal</span>
+<span class="w-1 h-1 rounded-full bg-slate-300"></span>
+<span class="text-sm text-slate-500">Limpieza y Revisión</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors">Iniciar Sesión</button>
+<button class="text-slate-500 hover:text-primary transition-colors text-sm font-medium flex items-center gap-1">
+<span class="material-icons-outlined text-base">history</span> Historial
+                                    </button>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#15232b] rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col sm:flex-row opacity-90 hover:opacity-100 transition-opacity">
+<div class="p-6 sm:w-48 border-b sm:border-b-0 sm:border-r border-slate-100 dark:border-slate-800 flex flex-col justify-center bg-slate-50/50 dark:bg-slate-900/20">
+<span class="text-2xl font-bold text-slate-700 dark:text-slate-300">11:00</span>
+<span class="text-sm text-slate-500 font-medium uppercase tracking-wide">AM</span>
+<div class="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400 px-2.5 py-1 rounded-full w-fit">
+                                    Confirmado
+                                </div>
+</div>
+<div class="p-6 flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold text-slate-800 dark:text-white">Miguel Rodríguez</h3>
+<span class="text-xs font-mono text-slate-400">#PAC-9921</span>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<span class="text-sm font-medium text-slate-600 dark:text-slate-300">Restauración</span>
+<span class="w-1 h-1 rounded-full bg-slate-300"></span>
+<span class="text-sm text-slate-500">Obturación (Diente 14)</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-primary hover:text-primary-700 bg-primary/10 hover:bg-primary/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors">Ver Ficha</button>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#15232b] rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col sm:flex-row opacity-60 hover:opacity-100 transition-opacity">
+<div class="p-6 sm:w-48 border-b sm:border-b-0 sm:border-r border-slate-100 dark:border-slate-800 flex flex-col justify-center bg-slate-50/50 dark:bg-slate-900/20">
+<span class="text-2xl font-bold text-slate-500 dark:text-slate-400">02:30</span>
+<span class="text-sm text-slate-500 font-medium uppercase tracking-wide">PM</span>
+<div class="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full w-fit">
+                                    Tentativo
+                                </div>
+</div>
+<div class="p-6 flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold text-slate-700 dark:text-slate-300">Elena Sánchez</h3>
+<span class="text-xs font-mono text-slate-400">#PAC-1102</span>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<span class="text-sm font-medium text-slate-600 dark:text-slate-300">Consulta</span>
+<span class="w-1 h-1 rounded-full bg-slate-300"></span>
+<span class="text-sm text-slate-500">Valoración de Implante</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-400 hover:text-slate-600 text-sm font-medium flex items-center gap-1 cursor-not-allowed">
+<span class="material-icons-outlined text-base">lock</span> Ficha Bloqueada
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="bg-white dark:bg-[#15232b] rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-bold text-slate-800 dark:text-white">Noticias de la Clínica</h3>
+<span class="material-icons-outlined text-slate-400">campaign</span>
+</div>
+<div class="space-y-4">
+<div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-900/50">
+<div class="flex gap-3">
+<span class="material-icons text-blue-500 text-sm mt-1">info</span>
+<div>
+<p class="text-sm font-medium text-blue-800 dark:text-blue-300">Protocolo de Esterilización</p>
+<p class="text-xs text-blue-600 dark:text-blue-400 mt-1">Nuevos procedimientos de autoclave a partir del lunes. Por favor revisar manual.</p>
+</div>
+</div>
+</div>
+<div class="flex gap-3 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
+<div class="w-2 h-2 rounded-full bg-primary mt-2 shrink-0"></div>
+<div>
+<p class="text-sm font-medium text-slate-700 dark:text-slate-300">Feedback Dr. Reynolds</p>
+<p class="text-xs text-slate-500 mt-0.5">Aprobó tu plan de tratamiento para el Paciente #4829.</p>
+<p class="text-[10px] text-slate-400 mt-1">Hace 2 horas</p>
+</div>
+</div>
+<div class="flex gap-3 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
+<div class="w-2 h-2 rounded-full bg-slate-300 mt-2 shrink-0"></div>
+<div>
+<p class="text-sm font-medium text-slate-700 dark:text-slate-300">Evaluación de Mitad de Curso</p>
+<p class="text-xs text-slate-500 mt-0.5">Las inscripciones están abiertas.</p>
+<p class="text-[10px] text-slate-400 mt-1">Ayer</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
+<div class="absolute -right-10 -bottom-10 w-40 h-40 bg-primary/20 rounded-full blur-2xl"></div>
+<div class="relative z-10">
+<div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center mb-4 backdrop-blur-sm">
+<span class="material-icons text-primary-200">auto_awesome</span>
+</div>
+<h3 class="font-bold text-lg mb-2">Asistente de Diagnóstico IA</h3>
+<p class="text-sm text-slate-300 mb-4">¿Necesitas una segunda opinión sobre esa radiografía? Sube la imagen para un análisis instantáneo.</p>
+<button class="w-full py-2 bg-white text-slate-900 font-medium rounded-lg hover:bg-slate-100 transition-colors text-sm">
+                                Abrir Asistente
+                            </button>
+</div>
+</div>
+<div class="bg-white dark:bg-[#15232b] rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
+<h3 class="font-bold text-slate-800 dark:text-white mb-4">Próximamente</h3>
+<div class="flex items-center gap-4 mb-3">
+<div class="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center shrink-0">
+<span class="text-xs text-slate-500 uppercase font-bold">Oct</span>
+<span class="text-lg font-bold text-slate-800 dark:text-white">25</span>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-800 dark:text-white">Junta de Revisión Clínica</p>
+<p class="text-xs text-slate-500">10:00 AM • Sala 3B</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center shrink-0">
+<span class="text-xs text-slate-500 uppercase font-bold">Oct</span>
+<span class="text-lg font-bold text-slate-800 dark:text-white">27</span>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-800 dark:text-white">Rotación Pediátrica</p>
+<p class="text-xs text-slate-500">08:00 AM • Ala Oeste</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer class="mt-8 pb-4 text-center text-xs text-slate-400">
+<p>© 2023 Sistema DentiEdu. Solo para uso educativo. Los datos de los pacientes son simulados para demostración.</p>
+</footer>
+</div>
+</main>
+
+</body></html>

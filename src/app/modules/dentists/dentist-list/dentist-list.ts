@@ -1,9 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DentistService } from '../dentist.service';
-import { Dentist } from '../models/dentist.models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DentistFormModalComponent } from '../dentist-form-modal/dentist-form-modal';
+import { DentistService } from '../dentist.service';
+import { Dentist } from '../models/dentist.models';
+import { UserService } from '../../users/user.service';
+import { User } from '../../users/models/user.models';
 
 @Component({
   selector: 'app-dentist-list',
@@ -13,43 +15,53 @@ import { DentistFormModalComponent } from '../dentist-form-modal/dentist-form-mo
   styleUrl: './dentist-list.scss'
 })
 export class DentistListComponent implements OnInit {
+  private userService = inject(UserService);
   private dentistService = inject(DentistService);
 
-  readonly dentists = signal<Dentist[]>([]);
+  readonly clinicalUsers = signal<User[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly showModal = signal(false);
   readonly selectedDentist = signal<Dentist | null>(null);
 
   ngOnInit(): void {
-    this.loadDentists();
+    this.loadClinicalUsers();
   }
 
-  loadDentists(): void {
+  loadClinicalUsers(): void {
     this.loading.set(true);
     this.error.set(null);
 
-    this.dentistService.list().subscribe({
+    this.userService.listClinicalProfiles().subscribe({
       next: (result) => {
-        this.dentists.set(result.items);
+        this.clinicalUsers.set(result.items);
         this.loading.set(false);
       },
       error: (err: unknown) => {
-        this.dentists.set([]);
+        this.clinicalUsers.set([]);
         this.loading.set(false);
         this.error.set(this.getErrorMessage(err));
       }
     });
   }
 
-  openCreateModal(): void {
-    this.selectedDentist.set(null);
-    this.showModal.set(true);
-  }
-
-  openEditModal(dentist: Dentist): void {
-    this.selectedDentist.set(dentist);
-    this.showModal.set(true);
+  openEditModal(user: User): void {
+    const id = user.dentistId;
+    if (id == null) {
+      return;
+    }
+    this.loading.set(true);
+    this.dentistService.getById(id).subscribe({
+      next: (d) => {
+        this.selectedDentist.set(d);
+        this.showModal.set(true);
+        this.loading.set(false);
+      },
+      error: (err: unknown) => {
+        this.loading.set(false);
+        this.error.set(this.getErrorMessage(err));
+      }
+    });
   }
 
   closeModal(): void {
@@ -58,21 +70,26 @@ export class DentistListComponent implements OnInit {
   }
 
   onDentistSaved(): void {
-    this.loadDentists();
+    this.loadClinicalUsers();
     this.closeModal();
   }
 
-  deleteDentist(dentist: Dentist): void {
-    if (!confirm(`¿Estás seguro de que deseas eliminar al odontólogo "${dentist.nombre} ${dentist.apellidos}"?`)) {
+  deleteClinicalProfile(user: User): void {
+    const id = user.dentistId;
+    if (id == null) {
+      return;
+    }
+    const name = this.getDentistFullName(user);
+    if (!confirm(`¿Eliminar la ficha de odontólogo de "${name}"? La cuenta de usuario seguirá existiendo sin ficha clínica.`)) {
       return;
     }
 
     this.loading.set(true);
     this.error.set(null);
 
-    this.dentistService.delete(dentist.id).subscribe({
+    this.dentistService.delete(id).subscribe({
       next: () => {
-        this.loadDentists();
+        this.loadClinicalUsers();
       },
       error: (err: unknown) => {
         this.loading.set(false);
@@ -81,8 +98,11 @@ export class DentistListComponent implements OnInit {
     });
   }
 
-  getFullName(dentist: Dentist): string {
-    return `${dentist.nombre} ${dentist.apellidos}`;
+  getDentistFullName(user: User): string {
+    const n = (user.dentistNombre ?? '').trim();
+    const a = (user.dentistApellidos ?? '').trim();
+    const joined = `${n} ${a}`.trim();
+    return joined || user.nombre_usuario;
   }
 
   private getErrorMessage(err: unknown): string {
@@ -98,6 +118,6 @@ export class DentistListComponent implements OnInit {
       }
       return `Error del servidor (${err.status}). Intenta nuevamente.`;
     }
-    return 'Error al cargar los odontólogos.';
+    return 'Error al cargar los datos.';
   }
 }

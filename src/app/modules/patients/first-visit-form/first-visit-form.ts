@@ -6,6 +6,7 @@ import { PrimeraVisitaService } from '../primera-visita.service';
 import { PatientService } from '../patient.service';
 import { PrimeraVisitaCreateDTO, PAIN_LEVELS } from '../models/primera-visita.models';
 import { Patient } from '../models/patient.models';
+import { getPacienteIdFromRoute } from '../patient-route-id.util';
 
 @Component({
   selector: 'app-first-visit-form',
@@ -36,8 +37,8 @@ export class FirstVisitFormComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id && id !== 'nuevo') {
+    const id = getPacienteIdFromRoute(this.route);
+    if (id && id !== 'nuevo' && /^\d+$/.test(id)) {
       this.patientId.set(Number(id));
       this.loadPatient(Number(id));
     } else {
