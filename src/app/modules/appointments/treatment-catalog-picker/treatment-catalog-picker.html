@@ -1,0 +1,83 @@
+<div class="tcp" [class.tcp--disabled]="disabled()">
+  @if (selectedTreatment(); as sel) {
+    <div class="tcp__selected" aria-live="polite">
+      <span class="tcp__selected-cat">{{ sel.categoryName }}</span>
+      <span class="tcp__selected-name">{{ sel.name }}</span>
+      <button
+        type="button"
+        class="tcp__clear"
+        [disabled]="disabled()"
+        (click)="clearSelection($event)"
+        aria-label="Quitar tratamiento seleccionado"
+      >
+        ×
+      </button>
+    </div>
+  }
+
+  <div class="tcp__combo">
+    <input
+      type="search"
+      class="tcp__search"
+      autocomplete="off"
+      [disabled]="disabled() || loading"
+      [value]="filterText()"
+      (input)="onFilterInput($any($event.target).value)"
+      (focus)="openPanel()"
+      [placeholder]="
+        loading ? 'Cargando catálogo…' : selectedTreatment() ? displayLabel() : placeholder
+      "
+      aria-autocomplete="list"
+      [attr.aria-expanded]="panelOpen()"
+      aria-controls="tcp-panel"
+    />
+    <button
+      type="button"
+      class="tcp__toggle"
+      [disabled]="disabled() || loading"
+      (click)="togglePanel(); $event.stopPropagation()"
+      [attr.aria-expanded]="panelOpen()"
+      aria-controls="tcp-panel"
+    >
+      {{ panelOpen() ? '▲' : '▼' }}
+    </button>
+  </div>
+
+  @if (panelOpen()) {
+    <div id="tcp-panel" class="tcp__panel" role="listbox">
+      @if (loading) {
+        <p class="tcp__muted">Cargando tratamientos…</p>
+      } @else if (filteredGroups().length === 0) {
+        <p class="tcp__muted">No hay tratamientos que coincidan con la búsqueda.</p>
+      } @else {
+        @for (group of filteredGroups(); track group.id) {
+          <section class="tcp__group">
+            <header class="tcp__group-head">
+              <span class="tcp__group-title">{{ group.name }}</span>
+            </header>
+            <ul class="tcp__opts">
+              @for (t of group.treatments; track t.id) {
+                <li>
+                  <button
+                    type="button"
+                    class="tcp__opt"
+                    [class.tcp__opt--on]="isSelected(t)"
+                    role="option"
+                    [attr.aria-selected]="isSelected(t)"
+                    (click)="selectTreatment(t)"
+                  >
+                    <span class="tcp__opt-label">{{ t.name }}</span>
+                    <span class="tcp__opt-meta">{{ t.defaultDurationMinutes }} min</span>
+                    @if (isSelected(t)) {
+                      <span class="tcp__check" aria-hidden="true">✓</span>
+                    }
+                  </button>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      }
+    </div>
+  }
+</div>

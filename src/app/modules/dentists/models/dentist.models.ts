@@ -28,6 +28,7 @@ export interface DentistListResult {
 
 // Common specialties for dentists
 export const DENTIST_SPECIALTIES = [
+  'Limpieza dental',
   'Odontología General',
   'Ortodoncia',
   'Endodoncia',

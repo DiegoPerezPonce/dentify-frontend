@@ -188,6 +188,55 @@ form {
     color: #dc2626;
   }
 
+  .field-hint {
+    margin: 0.25rem 0 0;
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.4;
+  }
+
+  .btn-link {
+    margin-top: 0.35rem;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #3788d8;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      color: #2c6eb8;
+    }
+  }
+
+  .custom-treatment-panel {
+    padding: 0.75rem;
+    border: 1px dashed #d1d5db;
+    border-radius: 0.5rem;
+    background: #f9fafb;
+  }
+
+  .custom-treatment-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+
+    .form-control {
+      flex: 1 1 10rem;
+    }
+
+    .duration-input {
+      flex: 0 0 5.5rem;
+    }
+  }
+
+  .field-hint-cat {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+
   .checkbox-label {
     display: flex;
     align-items: center;

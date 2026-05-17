@@ -86,7 +86,6 @@ Issues Frontend
 - Dentist Schedule Management (Availability) #22
 - Description: Grid or list-style interface for defining weekly appointment schedules per dentist. Schedule overlap validation.
 - Branch: feature/22-dentist-schedule-management-availability
-
 - Material Receiving Form (Stock Entries) #23
 - Description: Form for selecting **existing** catalog material only (no creation of new stock lines here). Creating/editing/deleting catalog items is **#26** to avoid mixing scopes with #14 (receipts / inventory view).
 - Branch: feature/23-material-receiving-form-stock-entries
