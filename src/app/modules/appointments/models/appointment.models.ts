@@ -1,3 +1,5 @@
+import { AppointmentKind } from './clinical-catalog.models';
+
 /**
  * Appointment entity
  */
@@ -12,6 +14,9 @@ export interface Appointment {
   startDateTime: string; // ISO 8601
   endDateTime: string; // ISO 8601
   duration: number; // minutes
+  appointmentKind?: AppointmentKind | string;
+  catalogTreatmentId?: number;
+  specialtyName?: string;
   treatment?: string;
   notes?: string;
   status: AppointmentStatus;
@@ -37,6 +42,8 @@ export interface AppointmentCreateDTO {
   boxId?: number;
   startDateTime: string;
   duration: number;
+  appointmentKind?: AppointmentKind | string;
+  catalogTreatmentId?: number;
   treatment?: string;
   notes?: string;
   isInfectiousPatient?: boolean;
@@ -53,6 +60,8 @@ export interface AppointmentUpdateDTO {
   boxId?: number;
   startDateTime?: string;
   duration?: number;
+  appointmentKind?: AppointmentKind | string;
+  catalogTreatmentId?: number;
   treatment?: string;
   notes?: string;
   status?: AppointmentStatus;

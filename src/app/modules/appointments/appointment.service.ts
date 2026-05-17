@@ -162,6 +162,8 @@ interface ApiAppointmentCreateBody {
   duracion: number;
   prioridad: string;
   estado: string;
+  appointment_kind: string;
+  catalog_treatment_id: number | null;
   treatment: string | null;
   isInfectious: boolean;
   notes: string | null;
@@ -177,6 +179,8 @@ interface ApiAppointmentUpdateBody {
   duracion?: number;
   prioridad?: string;
   estado?: string;
+  appointment_kind?: string;
+  catalog_treatment_id?: number | null;
   treatment?: string;
   notes?: string;
   isInfectious?: boolean;
@@ -195,8 +199,10 @@ function toApiCreateBody(dto: AppointmentCreateDTO): ApiAppointmentCreateBody {
     fecha,
     hora_inicio,
     duracion: dto.duration,
-    prioridad: 'media',
+    prioridad: dto.appointmentKind === 'urgencia' ? 'alta' : 'media',
     estado: mapStatusToEstado(dto.status),
+    appointment_kind: dto.appointmentKind ?? 'tratamiento',
+    catalog_treatment_id: dto.catalogTreatmentId ?? null,
     treatment: dto.treatment ?? null,
     isInfectious: dto.isInfectiousPatient ?? false,
     notes: dto.notes ?? null
@@ -214,6 +220,10 @@ function toApiUpdateBody(dto: AppointmentUpdateDTO): ApiAppointmentUpdateBody {
     body.hora_inicio = hora_inicio;
   }
   if (dto.duration != null) body.duracion = dto.duration;
+  if (dto.appointmentKind != null) body.appointment_kind = String(dto.appointmentKind);
+  if (dto.catalogTreatmentId !== undefined) {
+    body.catalog_treatment_id = dto.catalogTreatmentId ?? null;
+  }
   if (dto.treatment !== undefined) body.treatment = dto.treatment;
   if (dto.notes !== undefined) body.notes = dto.notes;
   if (dto.isInfectiousPatient !== undefined) body.isInfectious = dto.isInfectiousPatient;
@@ -299,6 +309,13 @@ export function normalizeAppointmentFromApi(raw: unknown): Appointment {
   const patientName = (o['patientName'] ?? o['pacienteNombre']) as string | undefined;
   const dentistName = (o['dentistName'] ?? o['odontologoNombre']) as string | undefined;
   const boxName = (o['boxName'] ?? o['boxNombre']) as string | undefined;
+  const appointmentKind = (o['appointmentKind'] ?? o['appointment_kind']) as string | undefined;
+  const catalogTreatmentIdRaw = o['catalogTreatmentId'] ?? o['catalog_treatment_id'];
+  const catalogTreatmentId =
+    catalogTreatmentIdRaw != null && catalogTreatmentIdRaw !== ''
+      ? Number(catalogTreatmentIdRaw)
+      : undefined;
+  const specialtyName = (o['specialtyName'] ?? o['specialty_name']) as string | undefined;
   const treatment = (o['treatment'] as string | undefined) ?? undefined;
   const notes = (o['notes'] as string | undefined) ?? undefined;
   const isInfectiousPatient = Boolean(o['isInfectiousPatient'] ?? o['isInfectious'] ?? false);
@@ -314,6 +331,9 @@ export function normalizeAppointmentFromApi(raw: unknown): Appointment {
     startDateTime,
     endDateTime,
     duration,
+    appointmentKind: appointmentKind || undefined,
+    catalogTreatmentId: Number.isFinite(catalogTreatmentId) ? catalogTreatmentId : undefined,
+    specialtyName: specialtyName?.trim() || undefined,
     treatment,
     notes,
     status,
