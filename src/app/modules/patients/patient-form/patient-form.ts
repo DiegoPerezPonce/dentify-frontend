@@ -113,7 +113,7 @@ export class PatientFormComponent implements OnInit {
       this.patientService.update(this.patientId()!, dto).subscribe({
         next: () => {
           this.loading.set(false);
-          this.router.navigate(['/app/pacientes']);
+          this.router.navigate(['/app/pacientes', this.patientId()]);
         },
         error: (err) => {
           this.loading.set(false);
@@ -152,30 +152,16 @@ export class PatientFormComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/app/pacientes']);
-  }
-
-  goToHistory(): void {
-    if (this.patientId()) {
-      this.router.navigate(['/app/pacientes', this.patientId(), 'historial']);
+    if (this.isEditMode() && this.patientId()) {
+      this.router.navigate(['/app/pacientes', this.patientId()]);
+    } else {
+      this.router.navigate(['/app/pacientes']);
     }
   }
 
-  goToFirstVisit(): void {
+  goToRecord(): void {
     if (this.patientId()) {
-      this.router.navigate(['/app/pacientes', this.patientId(), 'primera-visita']);
-    }
-  }
-
-  goToOdontograma(): void {
-    if (this.patientId()) {
-      this.router.navigate(['/app/pacientes', this.patientId(), 'odontograma']);
-    }
-  }
-
-  goToRadiografias(): void {
-    if (this.patientId()) {
-      this.router.navigate(['/app/pacientes', this.patientId(), 'radiografias']);
+      this.router.navigate(['/app/pacientes', this.patientId()]);
     }
   }
 

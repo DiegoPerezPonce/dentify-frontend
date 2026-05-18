@@ -2,7 +2,7 @@
   <!-- Header -->
   <div class="page-header">
     <button type="button" class="btn-back" (click)="goBack()">
-      ← Volver a pacientes
+      ← Volver a ficha
     </button>
     
     @if (patient()) {
@@ -57,29 +57,91 @@
             <span>Verde: Prevención</span>
           </div>
           <div class="legend-item">
+            <span class="legend-color" style="background: #eab308;"></span>
+            <span>Amarillo: Sellado de fosas y fisuras</span>
+          </div>
+          <div class="legend-item">
             <span class="legend-color" style="background: #2d3748;"></span>
             <span>Negro: Estado base</span>
           </div>
+          <div class="legend-item legend-item--x">
+            <span class="legend-x" style="color: #e53e3e;">✕</span>
+            <span>Rojo: Extracción futura</span>
+          </div>
+          <div class="legend-item legend-item--x">
+            <span class="legend-x" style="color: #3182ce;">✕</span>
+            <span>Azul: Extracción realizada</span>
+          </div>
+          <div class="legend-item legend-item--x">
+            <span class="legend-x" style="color: #2d3748;">✕</span>
+            <span>Negro: Ausencia natural</span>
+          </div>
+          <div class="legend-item legend-item--bridge">
+            <span class="legend-bridge-sample" style="color: #3182ce;">○—○</span>
+            <span>Azul: Puente realizado</span>
+          </div>
+          <div class="legend-item legend-item--bridge">
+            <span class="legend-bridge-sample" style="color: #e53e3e;">○—○</span>
+            <span>Rojo: Puente a realizar</span>
+          </div>
+          <div class="legend-item legend-item--endo">
+            <span class="legend-endo-sample" style="color: #e53e3e;">E</span>
+            <span>Rojo: Endodoncia a realizar</span>
+          </div>
+          <div class="legend-item legend-item--endo">
+            <span class="legend-endo-sample" style="color: #3182ce;">E</span>
+            <span>Azul: Endodoncia realizada</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: #e53e3e;"></span>
+            <span>Rojo: Corona a colocar (diente entero)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: #3182ce;"></span>
+            <span>Azul: Corona colocada (diente entero)</span>
+          </div>
         </div>
+        <p class="chart-hint">
+          Clic en el número o contorno del diente para extracción/ausencia (X) o endodoncia (E).
+          Clic en cada cara (V, M, O, D, L) para patologías y tratamientos.
+          En el panel: «Puente», «Endodoncia», etc.
+        </p>
 
         <!-- Dentadura superior -->
         <div class="jaw upper-jaw">
           <div class="quadrant-label">Superior</div>
-          <div class="teeth-row">
+          <div class="teeth-row teeth-row--with-bridges" #upperRow>
+            <svg class="bridge-overlay" aria-hidden="true">
+              @for (line of upperBridgeLines(); track line.id) {
+                <line
+                  [attr.x1]="line.x1"
+                  [attr.y1]="line.y1"
+                  [attr.x2]="line.x2"
+                  [attr.y2]="line.y2"
+                  [attr.stroke]="line.color"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                />
+              }
+            </svg>
             <!-- Cuadrante 1: Superior derecho (18-11) -->
             <div class="quadrant q1">
               <span class="quadrant-number">1</span>
               @for (tooth of FDI_TEETH.quadrant1.slice().reverse(); track tooth) {
-                <button
-                  type="button"
-                  class="tooth"
-                  [class.selected]="isToothSelected(tooth)"
-                  [style.background-color]="getToothColor(tooth.toString())"
-                  (click)="selectTooth(tooth)"
-                  [title]="'Diente ' + tooth"
-                >
-                  <span class="tooth-number">{{ tooth }}</span>
-                </button>
+                <div class="tooth-slot" #toothSlot [attr.data-tooth]="tooth">
+                  <app-odontograma-tooth-chart
+                    [toothNumber]="tooth"
+                    [selected]="isToothSelected(tooth)"
+                    [selectedFace]="selectedFaceForTooth(tooth)"
+                    [faceColors]="getToothFaceColors(tooth)"
+                    [toothMarkColor]="getToothMarkColor(tooth)"
+                    [bridgeRingColor]="getBridgeRingColor(tooth)"
+                    [endoMarkColor]="getEndoMarkColor(tooth)"
+                    [coronaFillColor]="getCoronaFillColor(tooth)"
+                    (toothSelect)="selectTooth($event)"
+                    (faceSelect)="onFaceSelect(tooth, $event)"
+                  />
+                </div>
               }
             </div>
             
@@ -87,16 +149,20 @@
             <div class="quadrant q2">
               <span class="quadrant-number">2</span>
               @for (tooth of FDI_TEETH.quadrant2; track tooth) {
-                <button
-                  type="button"
-                  class="tooth"
-                  [class.selected]="isToothSelected(tooth)"
-                  [style.background-color]="getToothColor(tooth.toString())"
-                  (click)="selectTooth(tooth)"
-                  [title]="'Diente ' + tooth"
-                >
-                  <span class="tooth-number">{{ tooth }}</span>
-                </button>
+                <div class="tooth-slot" #toothSlot [attr.data-tooth]="tooth">
+                  <app-odontograma-tooth-chart
+                    [toothNumber]="tooth"
+                    [selected]="isToothSelected(tooth)"
+                    [selectedFace]="selectedFaceForTooth(tooth)"
+                    [faceColors]="getToothFaceColors(tooth)"
+                    [toothMarkColor]="getToothMarkColor(tooth)"
+                    [bridgeRingColor]="getBridgeRingColor(tooth)"
+                    [endoMarkColor]="getEndoMarkColor(tooth)"
+                    [coronaFillColor]="getCoronaFillColor(tooth)"
+                    (toothSelect)="selectTooth($event)"
+                    (faceSelect)="onFaceSelect(tooth, $event)"
+                  />
+                </div>
               }
             </div>
           </div>
@@ -104,21 +170,38 @@
 
         <!-- Dentadura inferior -->
         <div class="jaw lower-jaw">
-          <div class="teeth-row">
+          <div class="teeth-row teeth-row--with-bridges" #lowerRow>
+            <svg class="bridge-overlay" aria-hidden="true">
+              @for (line of lowerBridgeLines(); track line.id) {
+                <line
+                  [attr.x1]="line.x1"
+                  [attr.y1]="line.y1"
+                  [attr.x2]="line.x2"
+                  [attr.y2]="line.y2"
+                  [attr.stroke]="line.color"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                />
+              }
+            </svg>
             <!-- Cuadrante 4: Inferior derecho (48-41) -->
             <div class="quadrant q4">
               <span class="quadrant-number">4</span>
               @for (tooth of FDI_TEETH.quadrant4.slice().reverse(); track tooth) {
-                <button
-                  type="button"
-                  class="tooth"
-                  [class.selected]="isToothSelected(tooth)"
-                  [style.background-color]="getToothColor(tooth.toString())"
-                  (click)="selectTooth(tooth)"
-                  [title]="'Diente ' + tooth"
-                >
-                  <span class="tooth-number">{{ tooth }}</span>
-                </button>
+                <div class="tooth-slot" #toothSlot [attr.data-tooth]="tooth">
+                  <app-odontograma-tooth-chart
+                    [toothNumber]="tooth"
+                    [selected]="isToothSelected(tooth)"
+                    [selectedFace]="selectedFaceForTooth(tooth)"
+                    [faceColors]="getToothFaceColors(tooth)"
+                    [toothMarkColor]="getToothMarkColor(tooth)"
+                    [bridgeRingColor]="getBridgeRingColor(tooth)"
+                    [endoMarkColor]="getEndoMarkColor(tooth)"
+                    [coronaFillColor]="getCoronaFillColor(tooth)"
+                    (toothSelect)="selectTooth($event)"
+                    (faceSelect)="onFaceSelect(tooth, $event)"
+                  />
+                </div>
               }
             </div>
             
@@ -126,16 +209,20 @@
             <div class="quadrant q3">
               <span class="quadrant-number">3</span>
               @for (tooth of FDI_TEETH.quadrant3; track tooth) {
-                <button
-                  type="button"
-                  class="tooth"
-                  [class.selected]="isToothSelected(tooth)"
-                  [style.background-color]="getToothColor(tooth.toString())"
-                  (click)="selectTooth(tooth)"
-                  [title]="'Diente ' + tooth"
-                >
-                  <span class="tooth-number">{{ tooth }}</span>
-                </button>
+                <div class="tooth-slot" #toothSlot [attr.data-tooth]="tooth">
+                  <app-odontograma-tooth-chart
+                    [toothNumber]="tooth"
+                    [selected]="isToothSelected(tooth)"
+                    [selectedFace]="selectedFaceForTooth(tooth)"
+                    [faceColors]="getToothFaceColors(tooth)"
+                    [toothMarkColor]="getToothMarkColor(tooth)"
+                    [bridgeRingColor]="getBridgeRingColor(tooth)"
+                    [endoMarkColor]="getEndoMarkColor(tooth)"
+                    [coronaFillColor]="getCoronaFillColor(tooth)"
+                    (toothSelect)="selectTooth($event)"
+                    (faceSelect)="onFaceSelect(tooth, $event)"
+                  />
+                </div>
               }
             </div>
           </div>
@@ -146,6 +233,79 @@
       <!-- Panel de control -->
       <div class="control-panel">
         <h2 class="section-title">⚙️ Panel de control</h2>
+
+        @if (odontograma()) {
+          <div class="bridge-section selection-info">
+            <h4 class="subsection-title">Puente</h4>
+            <p class="bridge-hint">Selecciona dos dientes pilastro (misma arcada) y une con una línea.</p>
+
+            <div class="bridge-pillars">
+              <div class="bridge-pillar">
+                <span class="bridge-pillar-label">Pilastro 1</span>
+                <strong>{{ bridgePillarA() ?? '—' }}</strong>
+                <button type="button" class="btn-pillar" (click)="assignBridgePillar('a')" [disabled]="!selectedTooth()">
+                  Usar diente seleccionado
+                </button>
+              </div>
+              <div class="bridge-pillar">
+                <span class="bridge-pillar-label">Pilastro 2</span>
+                <strong>{{ bridgePillarB() ?? '—' }}</strong>
+                <button type="button" class="btn-pillar" (click)="assignBridgePillar('b')" [disabled]="!selectedTooth()">
+                  Usar diente seleccionado
+                </button>
+              </div>
+            </div>
+
+            <div class="state-options tooth-level-options">
+              @for (item of bridgeStateOptions; track item[0]) {
+                <label class="state-option">
+                  <input
+                    type="radio"
+                    name="bridgeState"
+                    [value]="item[0]"
+                    [(ngModel)]="selectedBridgeState"
+                  />
+                  <span class="state-label state-label--x" [style.border-color]="item[1].color">
+                    <span class="legend-bridge-sample" [style.color]="item[1].color">○—○</span>
+                    {{ item[1].label }}
+                  </span>
+                </label>
+              }
+            </div>
+
+            <div class="apply-actions">
+              <button
+                type="button"
+                class="btn-apply"
+                (click)="applyBridge()"
+                [disabled]="saving() || !canApplyBridge()"
+              >
+                {{ saving() ? 'Guardando...' : 'Aplicar puente' }}
+              </button>
+            </div>
+
+            @if (odontograma()!.puentes.length > 0) {
+              <ul class="bridge-list">
+                @for (bridge of odontograma()!.puentes; track bridge.id) {
+                  <li class="bridge-list-item">
+                    <span [style.color]="bridge.color">
+                      ○ {{ bridge.diente_inicio }} — {{ bridge.diente_fin }} ○
+                    </span>
+                    <span class="bridge-list-label">{{ getBridgeStateLabel(bridge.estado) }}</span>
+                    <button
+                      type="button"
+                      class="btn-clear-face btn-clear-face--compact"
+                      (click)="removeBridge(bridge)"
+                      [disabled]="saving()"
+                    >
+                      Quitar
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        }
         
         <!-- Diente seleccionado -->
         @if (selectedTooth()) {
@@ -153,23 +313,178 @@
             <h3>Diente seleccionado</h3>
             <div class="tooth-badge">{{ selectedTooth()!.toothId }}</div>
             
-            <!-- Selección de cara -->
-            <div class="face-selector">
-              <label>Selecciona la cara del diente:</label>
-              <div class="face-buttons">
-                @for (face of faces; track face) {
-                  <button
-                    type="button"
-                    class="face-btn"
-                    [class.selected]="isFaceSelected(face)"
-                    [style.background-color]="getFaceColor(selectedTooth()!.toothId, face)"
-                    (click)="selectFace(face)"
-                    [title]="FACE_LABELS[face]"
+            @if (selectedTooth()!.face) {
+              <p class="face-selected-label">
+                Cara seleccionada:
+                <strong>{{ selectedTooth()!.face }}</strong>
+                ({{ FACE_LABELS[selectedTooth()!.face!] }})
+              </p>
+            } @else {
+              <p class="instruction-inline">Patologías por cara. Extracción (X), endodoncia (E), corona y puente en el panel.</p>
+            }
+
+            <!-- Extracción dental / ausencia -->
+            <div class="tooth-level-section">
+              <h4 class="subsection-title">Extracción Dental</h4>
+              @if (getToothLevelStatus(selectedTooth()!.toothId)) {
+                <div class="status-display tooth-level-current">
+                  <strong>Marca actual:</strong>
+                  <span
+                    class="status-badge status-badge--x"
+                    [style.color]="getToothLevelStatus(selectedTooth()!.toothId)!.color"
                   >
-                    {{ face }}
-                    <small>{{ FACE_LABELS[face] }}</small>
-                  </button>
+                    ✕ {{ getToothLevelStateLabel(getToothLevelStatus(selectedTooth()!.toothId)!.estado) }}
+                  </span>
+                </div>
+              } @else {
+                <p class="no-status">Sin marca de extracción/ausencia</p>
+              }
+
+              <div class="state-options tooth-level-options">
+                @for (item of toothLevelStateOptions; track item[0]) {
+                  <label class="state-option">
+                    <input
+                      type="radio"
+                      name="toothLevelState"
+                      [value]="item[0]"
+                      [(ngModel)]="selectedToothLevelState"
+                    />
+                    <span class="state-label state-label--x" [style.border-color]="item[1].color">
+                      <span class="legend-x-inline" [style.color]="item[1].color">✕</span>
+                      {{ item[1].label }}
+                    </span>
+                  </label>
                 }
+              </div>
+
+              <div class="apply-actions">
+                <button
+                  type="button"
+                  class="btn-apply btn-apply--secondary"
+                  (click)="applyToothLevelState()"
+                  [disabled]="saving()"
+                >
+                  {{ saving() ? 'Guardando...' : 'Aplicar' }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-clear-face"
+                  (click)="clearToothLevelState()"
+                  [disabled]="saving() || !hasToothLevelStatus()"
+                  title="Quitar la X del diente"
+                >
+                  Quitar marca X
+                </button>
+              </div>
+            </div>
+
+            <!-- Endodoncia (E central) -->
+            <div class="tooth-level-section">
+              <h4 class="subsection-title">Endodoncia</h4>
+              @if (getEndodonciaStatus(selectedTooth()!.toothId)) {
+                <div class="status-display tooth-level-current">
+                  <strong>Marca actual:</strong>
+                  <span
+                    class="status-badge status-badge--endo"
+                    [style.color]="getEndodonciaStatus(selectedTooth()!.toothId)!.color"
+                  >
+                    E — {{ getEndodonciaStateLabel(getEndodonciaStatus(selectedTooth()!.toothId)!.estado) }}
+                  </span>
+                </div>
+              } @else {
+                <p class="no-status">Sin marca de endodoncia</p>
+              }
+
+              <div class="state-options tooth-level-options">
+                @for (item of endoStateOptions; track item[0]) {
+                  <label class="state-option">
+                    <input
+                      type="radio"
+                      name="endoState"
+                      [value]="item[0]"
+                      [(ngModel)]="selectedEndoState"
+                    />
+                    <span class="state-label state-label--endo" [style.border-color]="item[1].color">
+                      <span class="legend-endo-sample" [style.color]="item[1].color">E</span>
+                      {{ item[1].label }}
+                    </span>
+                  </label>
+                }
+              </div>
+
+              <div class="apply-actions">
+                <button
+                  type="button"
+                  class="btn-apply btn-apply--secondary"
+                  (click)="applyEndodonciaMark()"
+                  [disabled]="saving()"
+                >
+                  {{ saving() ? 'Guardando...' : 'Aplicar' }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-clear-face"
+                  (click)="clearEndodonciaMark()"
+                  [disabled]="saving() || !hasEndodonciaMark()"
+                  title="Quitar la E del diente"
+                >
+                  Quitar E
+                </button>
+              </div>
+            </div>
+
+            <!-- Corona (toda la figura) -->
+            <div class="tooth-level-section">
+              <h4 class="subsection-title">Corona</h4>
+              @if (getCoronaStatus(selectedTooth()!.toothId)) {
+                <div class="status-display tooth-level-current">
+                  <strong>Marca actual:</strong>
+                  <span
+                    class="status-badge"
+                    [style.background-color]="getCoronaStatus(selectedTooth()!.toothId)!.color"
+                  >
+                    {{ getCoronaStateLabel(getCoronaStatus(selectedTooth()!.toothId)!.estado) }}
+                  </span>
+                </div>
+              } @else {
+                <p class="no-status">Sin corona marcada</p>
+              }
+
+              <div class="state-options tooth-level-options">
+                @for (item of coronaStateOptions; track item[0]) {
+                  <label class="state-option">
+                    <input
+                      type="radio"
+                      name="coronaState"
+                      [value]="item[0]"
+                      [(ngModel)]="selectedCoronaState"
+                    />
+                    <span class="state-label" [style.border-color]="item[1].color">
+                      <span class="color-dot" [style.background-color]="item[1].color"></span>
+                      {{ item[1].label }}
+                    </span>
+                  </label>
+                }
+              </div>
+
+              <div class="apply-actions">
+                <button
+                  type="button"
+                  class="btn-apply btn-apply--secondary"
+                  (click)="applyCoronaMark()"
+                  [disabled]="saving()"
+                >
+                  {{ saving() ? 'Guardando...' : 'Aplicar' }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-clear-face"
+                  (click)="clearCoronaMark()"
+                  [disabled]="saving() || !hasCoronaMark()"
+                  title="Quitar el relleno de corona"
+                >
+                  Quitar corona
+                </button>
               </div>
             </div>
 
@@ -262,7 +577,7 @@
               <div class="state-group">
                 <h4>🟢 Prevención</h4>
                 <div class="state-options">
-                  @for (item of stateGroups().prevencion; track item[0]) {
+                  @for (item of stateGroups().prevencionVerde; track item[0]) {
                     <label class="state-option">
                       <input
                         type="radio"
@@ -279,15 +594,47 @@
                 </div>
               </div>
 
-              <!-- Botón aplicar -->
-              <button
-                type="button"
-                class="btn-apply"
-                (click)="applyState()"
-                [disabled]="saving()"
-              >
-                {{ saving() ? 'Guardando...' : 'Aplicar estado' }}
-              </button>
+              <!-- Prevención (amarillo) -->
+              <div class="state-group">
+                <h4>🟡 Sellado de fosas y fisuras</h4>
+                <div class="state-options">
+                  @for (item of stateGroups().prevencionAmarilla; track item[0]) {
+                    <label class="state-option">
+                      <input
+                        type="radio"
+                        name="state"
+                        [value]="item[0]"
+                        [(ngModel)]="selectedState"
+                      />
+                      <span class="state-label" [style.border-color]="item[1].color">
+                        <span class="color-dot" [style.background-color]="item[1].color"></span>
+                        {{ item[1].label }}
+                      </span>
+                    </label>
+                  }
+                </div>
+              </div>
+
+              <div class="apply-actions">
+                <button
+                  type="button"
+                  class="btn-apply"
+                  (click)="applyState()"
+                  [disabled]="saving()"
+                >
+                  {{ saving() ? 'Guardando...' : 'Aplicar estado' }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-clear-face"
+                  (click)="clearFace()"
+                  [disabled]="saving() || !hasFaceStatus()"
+                  title="Quitar color y dejar la cara sin marcar"
+                >
+                  Limpiar cara
+                </button>
+              </div>
+              <p class="apply-hint">Puedes cambiar de color aplicando otro estado, o usar «Limpiar cara» para dejarla en blanco.</p>
             </div>
           } @else {
             <div class="instruction">

@@ -472,6 +472,33 @@
     background: #f8fafc;
   }
 
+  &--risk-biosecurity {
+    background: #fef2f2;
+    border-left: 3px solid #dc2626;
+
+    &:hover {
+      background: #fee2e2;
+    }
+  }
+
+  &--risk-allergy {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+
+    &:hover {
+      background: #fef3c7;
+    }
+  }
+
+  &--risk-systemic {
+    background: #eff6ff;
+    border-left: 3px solid #2563eb;
+
+    &:hover {
+      background: #dbeafe;
+    }
+  }
+
   &--cancelled {
     opacity: 0.72;
 
@@ -520,9 +547,43 @@
 }
 
 .day-row__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   font-size: 0.9375rem;
   font-weight: 700;
   color: var(--agenda-text);
+}
+
+.day-row__risk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.day-row__risk--red {
+  background: #dc2626;
+  box-shadow: 0 0 0 2px #fecaca;
+  font-size: 0.58rem;
+}
+
+.day-row__risk--amber {
+  background: #f59e0b;
+  color: #1c1917;
+  box-shadow: 0 0 0 2px #fde68a;
+}
+
+.day-row__risk--blue {
+  background: #2563eb;
+  box-shadow: 0 0 0 2px #bfdbfe;
 }
 
 .day-row__treatment {
@@ -769,6 +830,54 @@
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
+:host ::ng-deep .fc .fc-event-main-custom {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 0.1rem 0.15rem;
+  overflow: hidden;
+  line-height: 1.25;
+}
+
+:host ::ng-deep .fc .fc-event-title-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+:host ::ng-deep .fc .fc-event-risk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+:host ::ng-deep .fc .fc-event-risk--biosecurity {
+  background: #dc2626;
+}
+
+:host ::ng-deep .fc .fc-event-risk--allergy {
+  background: #f59e0b;
+  color: #1c1917;
+}
+
+:host ::ng-deep .fc .fc-event-risk--systemic {
+  background: #2563eb;
+}
+
+:host ::ng-deep .fc .fc-event.fc-event--risk-biosecurity {
+  border-width: 2px;
+}
+
 :host ::ng-deep .fc .fc-daygrid-day.fc-day-today,
 :host ::ng-deep .fc .fc-timegrid-col.fc-day-today {
   background-color: var(--agenda-primary-soft);
@@ -830,6 +939,32 @@
 }
 .legend-swatch--noshow {
   background: var(--legend-noshow);
+}
+
+.legend-risk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.legend-risk--red {
+  background: #dc2626;
+}
+
+.legend-risk--amber {
+  background: #f59e0b;
+  color: #1c1917;
+}
+
+.legend-risk--blue {
+  background: #2563eb;
 }
 
 .help-text {

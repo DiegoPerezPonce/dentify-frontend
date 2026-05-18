@@ -59,6 +59,12 @@ export const routes: Routes = [
             pathMatch: 'full',
             data: { pageTitle: 'Ficha paciente' },
             loadComponent: () =>
+              import('./modules/patients/patient-record/patient-record').then((m) => m.PatientRecordComponent)
+          },
+          {
+            path: 'editar',
+            data: { pageTitle: 'Editar paciente' },
+            loadComponent: () =>
               import('./modules/patients/patient-form/patient-form').then((m) => m.PatientFormComponent)
           },
           {
@@ -143,15 +149,20 @@ export const routes: Routes = [
           import('./modules/billing/billing-payments/billing-payments').then((m) => m.BillingPaymentsComponent)
       },
       {
-        path: 'admin/odontologos',
+        path: 'odontologos',
         canActivate: [roleGuard],
         data: {
-          ...adminOnly,
-          pageTitle: 'Gestión de odontólogos',
-          hint: 'Issue #16: CRUD personal clínico (solo ROLE_ADMIN).'
+          ...clinicalOrAdmin,
+          pageTitle: 'Odontólogos',
+          hint: 'Ficha profesional y consulta de horario asignado.'
         },
         loadComponent: () =>
           import('./modules/dentists/dentist-list/dentist-list').then((m) => m.DentistListComponent)
+      },
+      {
+        path: 'admin/odontologos',
+        redirectTo: 'odontologos',
+        pathMatch: 'full'
       },
       {
         path: 'admin/boxes',
@@ -185,7 +196,7 @@ export const routes: Routes = [
       {
         path: 'admin/disponibilidad-odontologos',
         canActivate: [roleGuard],
-        data: { ...adminOnly, pageTitle: 'Disponibilidad de odontólogos', hint: 'Issue #22: horario semanal y solapes.' },
+        data: { ...adminOnly, pageTitle: 'Gestión de turnos y horarios', hint: 'Turnos mañana/tarde por odontólogo (lunes a sábado).' },
         loadComponent: () =>
           import('./modules/dentist-availability/dentist-availability-management/dentist-availability-management').then(
             (m) => m.DentistAvailabilityManagementComponent

@@ -40,7 +40,25 @@ import {
   getAppointmentKindTreatmentHint,
   TreatmentCategoryGroup
 } from '../models/clinical-catalog.models';
-import { Subscription } from 'rxjs';
+import { Subscription, catchError, of } from 'rxjs';
+import { DentistScheduleService } from '../../dentist-availability/dentist-schedule.service';
+import { ClinicScheduleSettings } from '../../dentist-availability/models/dentist-schedule.models';
+import {
+  clinicHoursErrorMessageForSlot,
+  clinicHoursRangeLabel,
+  isAppointmentWithinClinicHours,
+  lastAppointmentStartOnDay
+} from '../../dentist-availability/clinic-hours.utils';
+import {
+  appointmentMedicalTitle,
+  appointmentPatientMedicalSeverity,
+  medicalRiskIconChar
+} from '../appointment-patient-risk.utils';
+import {
+  medicalFlagLabels,
+  patientMedicalSeverity,
+  type MedicalAlertSeverity
+} from '../../patients/medical-flags.constants';
 
 export type AppointmentModalViewMode = 'create' | 'detail' | 'edit';
 
@@ -63,6 +81,7 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   private patientService = inject(PatientService);
   private treatmentCategoryService = inject(TreatmentCategoryService);
   private treatmentService = inject(TreatmentService);
+  private scheduleService = inject(DentistScheduleService);
 
   @Input() isOpen = false;
   @Input() appointment: Appointment | null = null;
@@ -87,6 +106,16 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   readonly treatmentGroups = signal<TreatmentCategoryGroup[]>([]);
 
   readonly showCustomTreatmentForm = signal(false);
+  readonly clinicSettings = signal<ClinicScheduleSettings | null>(null);
+  readonly clinicHoursAlert = signal<string | null>(null);
+  readonly infectiousPatientAlert = signal<string | null>(null);
+  readonly availableDentistIds = signal<number[]>([]);
+  readonly loadingAvailableDentists = signal(false);
+
+  readonly clinicHoursHint = computed(() => {
+    const c = this.clinicSettings();
+    return c ? clinicHoursRangeLabel(c) : null;
+  });
   readonly customTreatmentName = signal('');
   readonly customTreatmentDuration = signal(30);
   readonly customCategoryId = signal<number | null>(null);
@@ -95,12 +124,28 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   private formSubs: Subscription[] = [];
   private catalogLoadSeq = 0;
 
+  readonly hasScheduleSlotSelected = computed(() => {
+    this.formTick();
+    const startRaw = this.form.get('startDateTime')?.value as string | undefined;
+    if (!startRaw) return false;
+    return this.validateClinicHoursFromForm() === null;
+  });
+
   readonly filteredDentists = computed(() => {
     this.formTick();
+    this.availableDentistIds();
     const treatment = this.selectedCatalogTreatment();
     const specialtyName = treatment?.dentistSpecialtyName ?? null;
     const all = this.dentists();
     let list = filterDentistsBySpecialtyName(all, specialtyName);
+
+    if (this.hasScheduleSlotSelected()) {
+      const allowed = new Set(this.availableDentistIds());
+      list = list.filter((d) => allowed.has(d.id));
+    } else {
+      list = [];
+    }
+
     const currentId = Number(this.form.get('dentistId')?.value);
     if (currentId && !list.some((d) => d.id === currentId)) {
       const current = all.find((d) => d.id === currentId);
@@ -113,6 +158,13 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     this.formTick();
     const id = Number(this.form.get('catalogTreatmentId')?.value);
     return findCatalogTreatmentInGroups(this.treatmentGroups(), id);
+  });
+
+  readonly selectedPatient = computed(() => {
+    this.formTick();
+    const id = Number(this.form.get('patientId')?.value);
+    if (!id) return null;
+    return this.patients().find((p) => Number(p.id) === id) ?? null;
   });
 
   viewMode: AppointmentModalViewMode = 'create';
@@ -141,11 +193,20 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   }
 
   ngOnInit(): void {
+    this.loadClinicSettings();
     this.loadResources();
     this.formSubs = [
       this.form.get('appointmentKind')?.valueChanges.subscribe(() => this.onAppointmentKindChange()) ??
         new Subscription(),
       this.form.get('catalogTreatmentId')?.valueChanges.subscribe(() => this.onCatalogTreatmentChange()) ??
+        new Subscription(),
+      this.form.get('startDateTime')?.valueChanges.subscribe(() => this.onScheduleFieldsChange()) ??
+        new Subscription(),
+      this.form.get('duration')?.valueChanges.subscribe(() => this.onDurationChange()) ??
+        new Subscription(),
+      this.form.get('patientId')?.valueChanges.subscribe(() => this.onPatientChange()) ??
+        new Subscription(),
+      this.form.get('isInfectiousPatient')?.valueChanges.subscribe(() => this.onInfectiousPatientToggle()) ??
         new Subscription()
     ];
   }
@@ -171,6 +232,9 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
       return;
     }
     this.error.set(null);
+    this.clinicHoursAlert.set(null);
+    this.infectiousPatientAlert.set(null);
+    this.loadClinicSettings();
     if (this.appointment) {
       this.viewMode = 'detail';
       void this.populateForm(this.appointment);
@@ -186,6 +250,7 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
         const durationMinutes = (end.getTime() - start.getTime()) / 60000;
         this.form.patchValue({ duration: Math.max(15, Math.round(durationMinutes)) });
       }
+      void this.loadAvailableDentists();
     }
   }
 
@@ -203,8 +268,77 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
       isInfectiousPatient: false
     });
     this.treatmentGroups.set([]);
+    this.availableDentistIds.set([]);
     this.showCustomTreatmentForm.set(false);
     this.customCategoryId.set(null);
+    this.infectiousPatientAlert.set(null);
+    this.formTick.update((n) => n + 1);
+  }
+
+  onPatientChange(): void {
+    const patient = this.selectedPatient();
+    if (!patient || patientMedicalSeverity(patient.medical_flags) !== 'biosecurity') {
+      this.infectiousPatientAlert.set(null);
+      this.formTick.update((n) => n + 1);
+      return;
+    }
+
+    const flags = patient.medical_flags ?? [];
+    const labels = medicalFlagLabels(flags).join(', ');
+    this.infectiousPatientAlert.set(
+      labels
+        ? `Este paciente tiene alertas de bioseguridad (${labels}). Debe ser la última cita del día.`
+        : 'Este paciente está marcado como infeccioso. Debe ser la última cita del día.'
+    );
+
+    if (this.viewMode === 'create') {
+      this.form.patchValue({ isInfectiousPatient: true }, { emitEvent: false });
+      this.applyLastSlotOfDay();
+    }
+
+    this.formTick.update((n) => n + 1);
+  }
+
+  onInfectiousPatientToggle(): void {
+    const checked = Boolean(this.form.get('isInfectiousPatient')?.value);
+    if (checked && this.viewMode === 'create') {
+      this.applyLastSlotOfDay();
+    }
+    this.formTick.update((n) => n + 1);
+  }
+
+  private applyLastSlotOfDay(): void {
+    const clinic = this.clinicSettings();
+    if (!clinic) return;
+
+    const duration = Number(this.form.get('duration')?.value) || 30;
+    const startRaw = this.form.get('startDateTime')?.value as string | undefined;
+
+    let day: Date;
+    if (startRaw) {
+      day = new Date(startRaw);
+    } else if (this.preselectedStart) {
+      day = new Date(this.preselectedStart);
+    } else {
+      day = new Date();
+    }
+
+    const lastStart = lastAppointmentStartOnDay(day, duration, clinic);
+    if (!lastStart) {
+      this.clinicHoursAlert.set(
+        `No cabe una cita de ${duration} min al final del día (${clinicHoursRangeLabel(clinic)}).`
+      );
+      return;
+    }
+
+    this.form.patchValue({ startDateTime: toDatetimeLocalInput(lastStart.toISOString()) });
+    const msg = this.validateClinicHoursFromForm();
+    this.clinicHoursAlert.set(msg);
+    if (!msg) {
+      this.error.set(null);
+    }
+    this.form.patchValue({ dentistId: null });
+    void this.loadAvailableDentists();
     this.formTick.update((n) => n + 1);
   }
 
@@ -262,6 +396,7 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
       isInfectiousPatient: appointment.isInfectiousPatient || false
     });
     await this.reloadCatalog();
+    void this.loadAvailableDentists();
     if (!appointment.catalogTreatmentId && appointment.treatment) {
       const flat = flattenCatalogTreatments(this.treatmentGroups());
       const match = flat.find(
@@ -271,11 +406,13 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
         this.form.patchValue({ catalogTreatmentId: match.id });
       }
     }
+    this.onPatientChange();
     this.formTick.update((n) => n + 1);
   }
 
   private onAppointmentKindChange(): void {
     this.form.patchValue({ catalogTreatmentId: null, dentistId: null });
+    this.availableDentistIds.set([]);
     void this.reloadCatalog();
     this.formTick.update((n) => n + 1);
   }
@@ -284,12 +421,9 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     const treatment = this.selectedCatalogTreatment();
     if (treatment) {
       this.form.patchValue({ duration: treatment.defaultDurationMinutes });
-      const allowed = filterDentistsBySpecialtyName(this.dentists(), treatment.dentistSpecialtyName);
-      const dentistId = Number(this.form.get('dentistId')?.value);
-      if (dentistId && !allowed.some((d) => d.id === dentistId)) {
-        this.form.patchValue({ dentistId: null });
-      }
     }
+    this.form.patchValue({ dentistId: null });
+    void this.loadAvailableDentists();
     this.formTick.update((n) => n + 1);
   }
 
@@ -381,11 +515,99 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
       });
   }
 
+  private loadClinicSettings(): void {
+    this.scheduleService
+      .getClinicSettings()
+      .pipe(catchError(() => of(null)))
+      .subscribe((clinic) => this.clinicSettings.set(clinic));
+  }
+
+  onDurationChange(): void {
+    if (this.viewMode === 'create' && this.form.get('isInfectiousPatient')?.value) {
+      this.applyLastSlotOfDay();
+      return;
+    }
+    this.onScheduleFieldsChange();
+  }
+
+  onScheduleFieldsChange(): void {
+    const msg = this.validateClinicHoursFromForm();
+    this.clinicHoursAlert.set(msg);
+    if (!msg) {
+      this.error.set(null);
+    }
+    this.form.patchValue({ dentistId: null });
+    void this.loadAvailableDentists();
+    this.formTick.update((n) => n + 1);
+  }
+
+  private loadAvailableDentists(): void {
+    const startRaw = this.form.get('startDateTime')?.value as string | undefined;
+    const duration = Number(this.form.get('duration')?.value) || 0;
+
+    if (!startRaw || this.validateClinicHoursFromForm() !== null || duration < 1) {
+      this.availableDentistIds.set([]);
+      this.loadingAvailableDentists.set(false);
+      return;
+    }
+
+    const excludeId =
+      this.appointment && this.viewMode === 'edit' ? this.appointment.id : null;
+
+    this.loadingAvailableDentists.set(true);
+    this.scheduleService.getAvailableDentistIds(startRaw, duration, excludeId).subscribe({
+      next: (ids) => {
+        this.availableDentistIds.set(ids);
+        this.loadingAvailableDentists.set(false);
+        const dentistId = Number(this.form.get('dentistId')?.value);
+        if (dentistId && !ids.includes(dentistId)) {
+          this.form.patchValue({ dentistId: null });
+        }
+        this.formTick.update((n) => n + 1);
+      },
+      error: () => {
+        this.availableDentistIds.set([]);
+        this.loadingAvailableDentists.set(false);
+        this.formTick.update((n) => n + 1);
+      }
+    });
+  }
+
+  private validateClinicHoursFromForm(): string | null {
+    const clinic = this.clinicSettings();
+    const startRaw = this.form.get('startDateTime')?.value as string | undefined;
+    if (!clinic || !startRaw) return null;
+
+    const start = new Date(startRaw);
+    const duration = Number(this.form.get('duration')?.value) || 0;
+    if (Number.isNaN(start.getTime()) || duration < 1) return null;
+
+    if (!isAppointmentWithinClinicHours(start, duration, clinic)) {
+      return clinicHoursErrorMessageForSlot(start, duration, clinic);
+    }
+    return null;
+  }
+
+  private showClinicHoursAlert(message: string): void {
+    this.clinicHoursAlert.set(message);
+    this.error.set(message);
+    window.alert(message);
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+
+    const hoursError = this.validateClinicHoursFromForm();
+    if (hoursError) {
+      this.form.get('startDateTime')?.markAsTouched();
+      this.form.get('duration')?.markAsTouched();
+      this.showClinicHoursAlert(hoursError);
+      return;
+    }
+
     const formValue = this.form.value;
     const catalog = this.selectedCatalogTreatment();
     const payloadBase = {
@@ -427,6 +649,8 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     this.viewMode = 'create';
     this.resetFormForCreate();
     this.error.set(null);
+    this.clinicHoursAlert.set(null);
+    this.infectiousPatientAlert.set(null);
     this.close.emit();
   }
 
@@ -476,6 +700,9 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
         if (message.includes('infectious')) {
           return 'Conflicto: Los pacientes infecciosos deben ser la última cita del día.';
         }
+        if (message.includes('horario de la clínica') || message.includes('No se puede agendar')) {
+          return message;
+        }
         return message || 'Conflicto en la programación de la cita.';
       }
       if (err.status === 422) {
@@ -519,5 +746,19 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
 
   requiredDentistSpecialtyLabel(): string | null {
     return this.selectedCatalogTreatment()?.dentistSpecialtyName ?? null;
+  }
+
+  detailAppointmentRisk(): MedicalAlertSeverity | null {
+    if (!this.appointment) return null;
+    return appointmentPatientMedicalSeverity(this.appointment);
+  }
+
+  detailAppointmentRiskTitle(): string {
+    if (!this.appointment) return '';
+    return appointmentMedicalTitle(this.appointment);
+  }
+
+  detailRiskIcon(sev: MedicalAlertSeverity): string {
+    return medicalRiskIconChar(sev);
   }
 }

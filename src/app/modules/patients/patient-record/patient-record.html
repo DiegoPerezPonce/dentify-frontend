@@ -1,0 +1,113 @@
+<div class="patient-record">
+  <header class="record-head">
+    <button type="button" class="btn-back" (click)="goBackToList()">← Volver al listado</button>
+  </header>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="muted">Cargando ficha…</p>
+  } @else if (patient(); as p) {
+    <section class="patient-hero">
+      <div class="hero-main">
+        @if (medicalSeverity(); as sev) {
+          <span
+            class="risk-badge"
+            [class.risk-badge--red]="sev === 'biosecurity'"
+            [class.risk-badge--amber]="sev === 'allergy'"
+            [class.risk-badge--blue]="sev === 'systemic'"
+            [attr.title]="medicalTitle()"
+          >
+            {{ sev === 'biosecurity' ? '☣' : '!' }}
+          </span>
+        }
+        <div>
+          <h1>{{ displayName() }}</h1>
+          <div class="hero-meta">
+            <span class="badge">DNI: {{ p.dni }}</span>
+            @if (p.nss) {
+              <span class="badge">NSS: {{ p.nss }}</span>
+            }
+            @if (p.telefono) {
+              <span class="badge">{{ p.telefono }}</span>
+            }
+            @if (p.email) {
+              <span class="badge badge--muted">{{ p.email }}</span>
+            }
+          </div>
+          @if (medicalTitle()) {
+            <p class="medical-flags-hint">{{ medicalTitle() }}</p>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="actions-section" aria-label="Acciones del paciente">
+      <h2 class="actions-title">Acciones</h2>
+      <div class="actions-grid">
+        <button type="button" class="action-card action-card--radio" (click)="goToRadiografias()">
+          <span class="action-card__icon" aria-hidden="true">📸</span>
+          <span class="action-card__label">Radiografías</span>
+          <span class="action-card__desc">Galería de imágenes</span>
+        </button>
+        <button type="button" class="action-card action-card--odonto" (click)="goToOdontograma()">
+          <span class="action-card__icon" aria-hidden="true">🦷</span>
+          <span class="action-card__label">Odontograma</span>
+          <span class="action-card__desc">Mapa dental interactivo</span>
+        </button>
+        <button type="button" class="action-card action-card--visit" (click)="goToFirstVisit()">
+          <span class="action-card__icon" aria-hidden="true">🏥</span>
+          <span class="action-card__label">Primera visita</span>
+          <span class="action-card__desc">Registro inicial</span>
+        </button>
+        <button type="button" class="action-card action-card--history" (click)="goToHistory()">
+          <span class="action-card__icon" aria-hidden="true">📋</span>
+          <span class="action-card__label">Historial</span>
+          <span class="action-card__desc">Historial clínico</span>
+        </button>
+        <button type="button" class="action-card action-card--edit" (click)="goToEdit()">
+          <span class="action-card__icon" aria-hidden="true">✏️</span>
+          <span class="action-card__label">Editar</span>
+          <span class="action-card__desc">Datos del paciente</span>
+        </button>
+        <button type="button" class="action-card action-card--delete" (click)="confirmDelete()">
+          <span class="action-card__icon" aria-hidden="true">🗑️</span>
+          <span class="action-card__label">Eliminar</span>
+          <span class="action-card__desc">Borrar paciente</span>
+        </button>
+      </div>
+    </section>
+  }
+</div>
+
+@if (showDeleteModal()) {
+  <div class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Confirmar eliminación</h2>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar este paciente?</p>
+        @if (patient(); as p) {
+          <div class="patient-info">
+            <strong>{{ displayName() }}</strong>
+            <span class="dni-badge">DNI: {{ p.dni }}</span>
+          </div>
+        }
+        <p class="warning-text">
+          Esta acción no se puede deshacer. Se eliminarán todos los datos asociados al paciente.
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="cancelDelete()" [disabled]="deleting()">
+          Cancelar
+        </button>
+        <button type="button" class="btn-delete" (click)="deletePatient()" [disabled]="deleting()">
+          {{ deleting() ? 'Eliminando...' : 'Eliminar paciente' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

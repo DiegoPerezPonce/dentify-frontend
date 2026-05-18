@@ -204,6 +204,15 @@
     cursor: pointer;
     transition: all 0.2s;
 
+    &.btn-schedule {
+      background-color: #e0f2fe;
+      color: #0369a1;
+
+      &:hover {
+        background-color: #bae6fd;
+      }
+    }
+
     &.btn-edit {
       background-color: #dbeafe;
       color: #1e40af;

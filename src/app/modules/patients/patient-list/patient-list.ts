@@ -33,10 +33,6 @@ export class PatientListComponent implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   
-  readonly showDeleteModal = signal(false);
-  readonly patientToDelete = signal<PatientRow | null>(null);
-  readonly deleting = signal(false);
-
   readonly totalPages = computed(() => {
     const t = this.total();
     const ps = this.pageSize();
@@ -130,80 +126,11 @@ export class PatientListComponent implements OnInit {
     this.router.navigate(['/app/pacientes', 'nuevo']);
   }
 
-  goToEditPatient(p: PatientRow): void {
+  goToRecord(p: PatientRow): void {
     const id = p.id ?? (p['@id'] ? extractIdFromIri(p['@id']) : null);
     if (id) {
       this.router.navigate(['/app/pacientes', id]);
     }
-  }
-
-  goToHistory(p: PatientRow): void {
-    const id = p.id ?? (p['@id'] ? extractIdFromIri(p['@id']) : null);
-    if (id) {
-      this.router.navigate(['/app/pacientes', id, 'historial']);
-    }
-  }
-
-  goToFirstVisit(p: PatientRow): void {
-    const id = p.id ?? (p['@id'] ? extractIdFromIri(p['@id']) : null);
-    if (id) {
-      this.router.navigate(['/app/pacientes', id, 'primera-visita']);
-    }
-  }
-
-  goToOdontograma(p: PatientRow): void {
-    const id = p.id ?? (p['@id'] ? extractIdFromIri(p['@id']) : null);
-    if (id) {
-      this.router.navigate(['/app/pacientes', id, 'odontograma']);
-    }
-  }
-
-  goToRadiografias(p: PatientRow): void {
-    const id = p.id ?? (p['@id'] ? extractIdFromIri(p['@id']) : null);
-    if (id) {
-      this.router.navigate(['/app/pacientes', id, 'radiografias']);
-    }
-  }
-
-  confirmDelete(p: PatientRow): void {
-    this.patientToDelete.set(p);
-    this.showDeleteModal.set(true);
-  }
-
-  cancelDelete(): void {
-    this.showDeleteModal.set(false);
-    this.patientToDelete.set(null);
-    this.deleting.set(false);
-  }
-
-  deletePatient(): void {
-    const patient = this.patientToDelete();
-    if (!patient) return;
-
-    const id = patient.id ?? (patient['@id'] ? extractIdFromIri(patient['@id']) : null);
-    if (!id) {
-      this.error.set('No se pudo identificar el paciente a eliminar.');
-      this.cancelDelete();
-      return;
-    }
-
-    this.deleting.set(true);
-    this.error.set(null);
-
-    this.patientService.delete(Number(id)).subscribe({
-      next: () => {
-        this.deleting.set(false);
-        this.cancelDelete();
-        // Recargar la lista
-        this.load();
-      },
-      error: (err) => {
-        this.deleting.set(false);
-        this.cancelDelete();
-        this.error.set('Error al eliminar el paciente. Es posible que tenga datos relacionados.');
-        console.error('Error deleting patient:', err);
-      }
-    });
   }
 }
 

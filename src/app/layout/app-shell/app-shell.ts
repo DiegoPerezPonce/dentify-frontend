@@ -29,6 +29,8 @@ export class AppShellComponent implements OnInit {
 
   readonly ROLE_ADMIN = ROLE_ADMIN;
 
+  readonly hasDentistProfile = computed(() => this.auth.getDentistId() != null);
+
   readonly sessionParts = computed((): SessionRemainingParts | null => {
     this.sessionTick();
     this.langRefresh();

@@ -1,0 +1,277 @@
+.patient-record {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.record-head {
+  margin-bottom: 1rem;
+}
+
+.btn-back {
+  border: 0;
+  background: transparent;
+  color: #0369a1;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  font-size: 0.9rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.muted {
+  color: #64748b;
+}
+
+.alert.error {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #9f1239;
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.patient-hero {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.hero-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.hero-main h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  color: #0f172a;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.badge {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #334155;
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.82rem;
+}
+
+.badge--muted {
+  color: #64748b;
+}
+
+.medical-flags-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: #b45309;
+}
+
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.risk-badge--red {
+  background: #dc2626;
+  box-shadow: 0 0 0 3px #fecaca;
+  font-size: 0.75rem;
+}
+
+.risk-badge--amber {
+  background: #f59e0b;
+  color: #1c1917;
+  box-shadow: 0 0 0 3px #fde68a;
+}
+
+.risk-badge--blue {
+  background: #2563eb;
+  box-shadow: 0 0 0 3px #bfdbfe;
+}
+
+.actions-title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.65rem;
+}
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 0.85rem 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  }
+}
+
+.action-card__icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.action-card__label {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.action-card__desc {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.action-card--radio {
+  background: #ffe4ef;
+  color: #9d174d;
+  border-color: #fbcfe8;
+}
+
+.action-card--odonto {
+  background: #e6fffa;
+  color: #0f766e;
+  border-color: #99f6e4;
+}
+
+.action-card--visit {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
+.action-card--history {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border-color: #e9d5ff;
+}
+
+.action-card--edit {
+  background: #f8fafc;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+.action-card--delete {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: min(500px, 100%);
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal-header,
+.modal-body,
+.modal-actions {
+  padding: 0.8rem;
+}
+
+.modal-header {
+  border-bottom: 1px solid #e2e8f0;
+
+  h2 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+}
+
+.patient-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.35rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 0.45rem 0.55rem;
+  margin: 0.5rem 0;
+}
+
+.dni-badge {
+  display: inline-block;
+  background: #e2e8f0;
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.82rem;
+}
+
+.warning-text {
+  color: #b91c1c;
+  font-size: 0.88rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-cancel,
+.btn-delete {
+  border: 0;
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: #e2e8f0;
+}
+
+.btn-delete {
+  background: #dc2626;
+  color: #fff;
+}
+
+.btn-cancel:disabled,
+.btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

@@ -30,6 +30,11 @@
       <a routerLink="/app/pacientes" routerLinkActive="active">
         <span class="nav-ico" aria-hidden="true">◎</span>{{ 'NAV.PATIENTS' | translate }}
       </a>
+      @if (hasDentistProfile()) {
+        <a routerLink="/app/odontologos" routerLinkActive="active">
+          <span class="nav-ico" aria-hidden="true">🦷</span>{{ 'NAV.MY_DENTIST_PROFILE' | translate }}
+        </a>
+      }
     </nav>
 
     <nav class="nav-block">
@@ -63,7 +68,7 @@
           </button>
         </div>
         @if (!adminNavCollapsed()) {
-          <a routerLink="/app/admin/odontologos" routerLinkActive="active">
+          <a routerLink="/app/odontologos" routerLinkActive="active">
             <span class="nav-ico" aria-hidden="true">🦷</span>{{ 'NAV.ADM_MANAGE_DENTISTS' | translate }}
           </a>
           <a routerLink="/app/admin/boxes" routerLinkActive="active">

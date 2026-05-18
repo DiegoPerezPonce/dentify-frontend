@@ -15,6 +15,15 @@
       } @else {
         <p class="dash-scope">{{ 'HOME_DASH.APPTS_SCOPE_ALL' | translate }}</p>
       }
+      @if (hasDentistScope() && myTodayScheduleDay(); as day) {
+        <div class="dash-my-schedule">
+          <p class="dash-my-schedule__title">Tu horario de hoy</p>
+          <div class="dash-my-schedule__today" [class.dash-my-schedule__off]="day.shift === 'off'">
+            <strong>{{ myTodayDayName() }}</strong>
+            <span>{{ scheduleRowHint(day) }}</span>
+          </div>
+        </div>
+      }
     </div>
     <div class="dash-top__search">
       <span class="dash-search-ico" aria-hidden="true">⌕</span>

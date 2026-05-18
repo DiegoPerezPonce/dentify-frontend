@@ -21,6 +21,8 @@ export interface Appointment {
   notes?: string;
   status: AppointmentStatus;
   isInfectiousPatient?: boolean;
+  /** Flags médicos del paciente (desde ficha clínica). */
+  patientMedicalFlags?: string[] | null;
   createdAt?: string;
   updatedAt?: string;
 }

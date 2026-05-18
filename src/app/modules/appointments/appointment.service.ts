@@ -319,6 +319,10 @@ export function normalizeAppointmentFromApi(raw: unknown): Appointment {
   const treatment = (o['treatment'] as string | undefined) ?? undefined;
   const notes = (o['notes'] as string | undefined) ?? undefined;
   const isInfectiousPatient = Boolean(o['isInfectiousPatient'] ?? o['isInfectious'] ?? false);
+  const patientMedicalFlagsRaw = o['patientMedicalFlags'] ?? o['patient_medical_flags'];
+  const patientMedicalFlags = Array.isArray(patientMedicalFlagsRaw)
+    ? (patientMedicalFlagsRaw as unknown[]).filter((x): x is string => typeof x === 'string')
+    : undefined;
 
   return {
     id,
@@ -338,6 +342,7 @@ export function normalizeAppointmentFromApi(raw: unknown): Appointment {
     notes,
     status,
     isInfectiousPatient,
+    patientMedicalFlags: patientMedicalFlags?.length ? patientMedicalFlags : undefined,
     createdAt: (o['createdAt'] as string | undefined) ?? undefined,
     updatedAt: (o['updatedAt'] as string | undefined) ?? undefined
   };

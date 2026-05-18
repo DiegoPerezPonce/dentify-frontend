@@ -1,0 +1,71 @@
+.tooth-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.15rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+  color: #0e7490;
+
+  &:hover {
+    background: #f0fdfa;
+  }
+
+  &--selected {
+    outline: 2px solid #0ea5e9;
+    outline-offset: 2px;
+    background: #ecfeff;
+  }
+
+  &--corona .tooth-face {
+    stroke: rgba(15, 23, 42, 0.55);
+  }
+}
+
+.tooth-chart__svg {
+  width: 46px;
+  height: 46px;
+  display: block;
+}
+
+.tooth-face {
+  stroke: #0e7490;
+  stroke-width: 0.5;
+  cursor: pointer;
+  transition: filter 0.12s ease;
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+
+  &--active {
+    stroke: #0284c7;
+    stroke-width: 1.5;
+    filter: brightness(0.88);
+  }
+}
+
+.tooth-mark {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.85));
+}
+
+.bridge-ring {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.85));
+}
+
+.endo-mark {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  paint-order: stroke fill;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 2px;
+}
+
+.tooth-chart__number {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #334155;
+  line-height: 1;
+}
