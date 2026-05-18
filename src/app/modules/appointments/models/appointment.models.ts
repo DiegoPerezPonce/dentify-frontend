@@ -13,7 +13,9 @@ export interface Appointment {
   boxName?: string;
   startDateTime: string; // ISO 8601
   endDateTime: string; // ISO 8601
-  duration: number; // minutes
+  duration: number; // total minutes (tratamiento + limpieza)
+  cleaningTimeMinutes?: number;
+  treatmentDurationMinutes?: number;
   appointmentKind?: AppointmentKind | string;
   catalogTreatmentId?: number;
   specialtyName?: string;
@@ -44,6 +46,7 @@ export interface AppointmentCreateDTO {
   boxId?: number;
   startDateTime: string;
   duration: number;
+  cleaningTimeMinutes?: number;
   appointmentKind?: AppointmentKind | string;
   catalogTreatmentId?: number;
   treatment?: string;
@@ -62,6 +65,7 @@ export interface AppointmentUpdateDTO {
   boxId?: number;
   startDateTime?: string;
   duration?: number;
+  cleaningTimeMinutes?: number;
   appointmentKind?: AppointmentKind | string;
   catalogTreatmentId?: number;
   treatment?: string;

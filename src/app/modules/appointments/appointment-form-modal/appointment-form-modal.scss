@@ -289,6 +289,20 @@ form {
       flex: 1 1 10rem;
     }
 
+    .duration-total {
+      margin: 0;
+      padding: 0.5rem 0.65rem;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+    }
+
+    .duration-total__label {
+      margin: 0;
+      font-size: 0.88rem;
+      color: #0c4a6e;
+    }
+
     .duration-input {
       flex: 0 0 5.5rem;
     }

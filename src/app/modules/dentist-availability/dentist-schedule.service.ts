@@ -59,6 +59,27 @@ export class DentistScheduleService {
       })
     );
   }
+
+  getAvailableBoxIds(
+    startDateTime: string,
+    durationMinutes: number,
+    excludeAppointmentId?: number | null
+  ): Observable<number[]> {
+    let params = new HttpParams()
+      .set('startDateTime', startDateTime)
+      .set('duration', String(durationMinutes));
+    if (excludeAppointmentId != null) {
+      params = params.set('excludeAppointmentId', String(excludeAppointmentId));
+    }
+    return this.http.get<unknown>(`${this.base}/boxes-available`, { params }).pipe(
+      map((raw) => {
+        const o = raw as Record<string, unknown>;
+        const ids = o['boxIds'];
+        if (!Array.isArray(ids)) return [];
+        return ids.map((id) => Number(id)).filter((id) => Number.isFinite(id));
+      })
+    );
+  }
 }
 
 function normalizeClinic(raw: unknown): ClinicScheduleSettings {
