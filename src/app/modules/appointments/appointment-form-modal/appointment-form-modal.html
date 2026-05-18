@@ -63,8 +63,14 @@
           <dt>Fin</dt>
           <dd>{{ formatDateTimeDisplay(appointment.endDateTime) }}</dd>
 
-          <dt>Duración</dt>
+          <dt>Duración total</dt>
           <dd>{{ appointment.duration }} minutos</dd>
+
+          <dt>Tratamiento</dt>
+          <dd>{{ detailTreatmentDurationMinutes() }} min</dd>
+
+          <dt>Limpieza del box</dt>
+          <dd>{{ detailCleaningTimeMinutes() }} min (final de la cita)</dd>
 
           <dt>Estado</dt>
           <dd>{{ getStatusLabel(appointment.status) }}</dd>
@@ -213,19 +219,47 @@
           </div>
 
           <div class="form-group">
-            <label for="duration">Duración (minutos) *</label>
+            <label for="treatmentDuration">Duración del tratamiento (min) *</label>
             <input
               type="number"
-              id="duration"
-              formControlName="duration"
+              id="treatmentDuration"
+              formControlName="treatmentDuration"
               class="form-control"
               min="15"
-              step="15"
+              step="5"
               (change)="onScheduleFieldsChange()"
             />
-            @if (form.get('duration')?.invalid && form.get('duration')?.touched) {
-              <span class="error-message">Ingresa duración válida (mínimo 15 min)</span>
+            @if (form.get('treatmentDuration')?.invalid && form.get('treatmentDuration')?.touched) {
+              <span class="error-message">Mínimo 15 minutos de tratamiento</span>
             }
+          </div>
+
+          <div class="form-group">
+            <label for="cleaningTimeMinutes">Tiempo de limpieza del box (min) *</label>
+            <input
+              type="number"
+              id="cleaningTimeMinutes"
+              formControlName="cleaningTimeMinutes"
+              class="form-control"
+              min="0"
+              max="60"
+              step="5"
+              (change)="onScheduleFieldsChange()"
+            />
+            <p class="field-hint">
+              Reservado al final de la cita para limpiar el box (por defecto {{ defaultCleaningMinutes }} min).
+            </p>
+            @if (form.get('cleaningTimeMinutes')?.invalid && form.get('cleaningTimeMinutes')?.touched) {
+              <span class="error-message">Entre 0 y 60 minutos</span>
+            }
+          </div>
+
+          <div class="form-group full-width duration-total">
+            <p class="duration-total__label">
+              Duración total de la cita:
+              <strong>{{ getTotalDurationMinutes() }} min</strong>
+              ({{ getTreatmentDurationMinutes() }} tratamiento + {{ getCleaningTimeMinutes() }} limpieza)
+            </p>
           </div>
 
           <div class="form-group full-width">
@@ -271,12 +305,30 @@
 
           <div class="form-group">
             <label for="boxId">Box *</label>
-            <select id="boxId" formControlName="boxId" class="form-control">
-              <option [ngValue]="null">Seleccionar box</option>
-              @for (box of boxes(); track box.id) {
+            <select
+              id="boxId"
+              formControlName="boxId"
+              class="form-control"
+              [disabled]="!hasScheduleSlotSelected() || loadingAvailableBoxes()"
+            >
+              <option [ngValue]="null">
+                @if (!hasScheduleSlotSelected()) {
+                  Elige fecha, hora y duración válidas
+                } @else if (loadingAvailableBoxes()) {
+                  Buscando boxes disponibles...
+                } @else if (filteredBoxes().length === 0) {
+                  No hay boxes libres a esa hora
+                } @else {
+                  Seleccionar box
+                }
+              </option>
+              @for (box of filteredBoxes(); track box.id) {
                 <option [ngValue]="box.id">{{ box.nombre }}</option>
               }
             </select>
+            @if (hasScheduleSlotSelected() && !loadingAvailableBoxes() && filteredBoxes().length === 0) {
+              <p class="field-hint">Todos los boxes tienen una cita en ese horario.</p>
+            }
             @if (form.get('boxId')?.invalid && form.get('boxId')?.touched) {
               <span class="error-message">Selecciona un box</span>
             }

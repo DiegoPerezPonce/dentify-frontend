@@ -160,6 +160,7 @@ interface ApiAppointmentCreateBody {
   fecha: string;
   hora_inicio: string;
   duracion: number;
+  tiempo_limpieza: number;
   prioridad: string;
   estado: string;
   appointment_kind: string;
@@ -177,6 +178,7 @@ interface ApiAppointmentUpdateBody {
   fecha?: string;
   hora_inicio?: string;
   duracion?: number;
+  tiempo_limpieza?: number;
   prioridad?: string;
   estado?: string;
   appointment_kind?: string;
@@ -199,6 +201,7 @@ function toApiCreateBody(dto: AppointmentCreateDTO): ApiAppointmentCreateBody {
     fecha,
     hora_inicio,
     duracion: dto.duration,
+    tiempo_limpieza: dto.cleaningTimeMinutes ?? 5,
     prioridad: dto.appointmentKind === 'urgencia' ? 'alta' : 'media',
     estado: mapStatusToEstado(dto.status),
     appointment_kind: dto.appointmentKind ?? 'tratamiento',
@@ -220,6 +223,7 @@ function toApiUpdateBody(dto: AppointmentUpdateDTO): ApiAppointmentUpdateBody {
     body.hora_inicio = hora_inicio;
   }
   if (dto.duration != null) body.duracion = dto.duration;
+  if (dto.cleaningTimeMinutes != null) body.tiempo_limpieza = dto.cleaningTimeMinutes;
   if (dto.appointmentKind != null) body.appointment_kind = String(dto.appointmentKind);
   if (dto.catalogTreatmentId !== undefined) {
     body.catalog_treatment_id = dto.catalogTreatmentId ?? null;
@@ -281,6 +285,16 @@ export function normalizeAppointmentFromApi(raw: unknown): Appointment {
   const boxRaw = o['boxId'];
   const boxId = boxRaw != null && boxRaw !== '' ? Number(boxRaw) : undefined;
   const duration = Number(o['duration'] ?? o['duracion'] ?? 30) || 30;
+  const cleaningRaw = o['cleaningTimeMinutes'] ?? o['tiempo_limpieza'];
+  const cleaningTimeMinutes =
+    cleaningRaw != null && cleaningRaw !== '' ? Number(cleaningRaw) : undefined;
+  const treatmentRaw = o['treatmentDurationMinutes'] ?? o['duracion_tratamiento'];
+  const treatmentDurationMinutes =
+    treatmentRaw != null && treatmentRaw !== ''
+      ? Number(treatmentRaw)
+      : cleaningTimeMinutes != null
+        ? Math.max(0, duration - cleaningTimeMinutes)
+        : undefined;
 
   let startDateTime = String(o['startDateTime'] ?? '');
   if (!startDateTime && o['fecha'] && o['hora_inicio']) {
@@ -335,6 +349,10 @@ export function normalizeAppointmentFromApi(raw: unknown): Appointment {
     startDateTime,
     endDateTime,
     duration,
+    cleaningTimeMinutes: Number.isFinite(cleaningTimeMinutes) ? cleaningTimeMinutes : undefined,
+    treatmentDurationMinutes: Number.isFinite(treatmentDurationMinutes)
+      ? treatmentDurationMinutes
+      : undefined,
     appointmentKind: appointmentKind || undefined,
     catalogTreatmentId: Number.isFinite(catalogTreatmentId) ? catalogTreatmentId : undefined,
     specialtyName: specialtyName?.trim() || undefined,

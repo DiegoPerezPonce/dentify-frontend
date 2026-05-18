@@ -59,6 +59,7 @@ import {
   patientMedicalSeverity,
   type MedicalAlertSeverity
 } from '../../patients/medical-flags.constants';
+import { DEFAULT_APPOINTMENT_CLEANING_MINUTES } from '../appointment-duration.constants';
 
 export type AppointmentModalViewMode = 'create' | 'detail' | 'edit';
 
@@ -71,6 +72,7 @@ export type AppointmentModalViewMode = 'create' | 'detail' | 'edit';
 })
 export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestroy {
   readonly AppointmentStatus = AppointmentStatus;
+  readonly defaultCleaningMinutes = DEFAULT_APPOINTMENT_CLEANING_MINUTES;
   readonly appointmentKindOptions = APPOINTMENT_KIND_OPTIONS;
   readonly AppointmentKind = AppointmentKind;
 
@@ -110,7 +112,9 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   readonly clinicHoursAlert = signal<string | null>(null);
   readonly infectiousPatientAlert = signal<string | null>(null);
   readonly availableDentistIds = signal<number[]>([]);
+  readonly availableBoxIds = signal<number[]>([]);
   readonly loadingAvailableDentists = signal(false);
+  readonly loadingAvailableBoxes = signal(false);
 
   readonly clinicHoursHint = computed(() => {
     const c = this.clinicSettings();
@@ -129,6 +133,30 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     const startRaw = this.form.get('startDateTime')?.value as string | undefined;
     if (!startRaw) return false;
     return this.validateClinicHoursFromForm() === null;
+  });
+
+  readonly filteredBoxes = computed(() => {
+    this.formTick();
+    this.availableBoxIds();
+    const all = this.boxes();
+    let list = all.filter((b) => {
+      const estado = (b.estado ?? 'disponible').toLowerCase();
+      return estado === 'disponible';
+    });
+
+    if (this.hasScheduleSlotSelected()) {
+      const allowed = new Set(this.availableBoxIds());
+      list = list.filter((b) => allowed.has(b.id));
+    } else {
+      list = [];
+    }
+
+    const currentId = Number(this.form.get('boxId')?.value);
+    if (currentId && !list.some((b) => b.id === currentId)) {
+      const current = all.find((b) => b.id === currentId);
+      if (current) list = [current, ...list];
+    }
+    return list;
   });
 
   readonly filteredDentists = computed(() => {
@@ -185,7 +213,11 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
       dentistId: [null, Validators.required],
       boxId: [null, Validators.required],
       startDateTime: ['', Validators.required],
-      duration: [30, [Validators.required, Validators.min(15)]],
+      treatmentDuration: [30, [Validators.required, Validators.min(15)]],
+      cleaningTimeMinutes: [
+        DEFAULT_APPOINTMENT_CLEANING_MINUTES,
+        [Validators.required, Validators.min(0), Validators.max(60)]
+      ],
       notes: [''],
       status: [AppointmentStatus.SCHEDULED],
       isInfectiousPatient: [false]
@@ -202,7 +234,9 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
         new Subscription(),
       this.form.get('startDateTime')?.valueChanges.subscribe(() => this.onScheduleFieldsChange()) ??
         new Subscription(),
-      this.form.get('duration')?.valueChanges.subscribe(() => this.onDurationChange()) ??
+      this.form.get('treatmentDuration')?.valueChanges.subscribe(() => this.onDurationChange()) ??
+        new Subscription(),
+      this.form.get('cleaningTimeMinutes')?.valueChanges.subscribe(() => this.onDurationChange()) ??
         new Subscription(),
       this.form.get('patientId')?.valueChanges.subscribe(() => this.onPatientChange()) ??
         new Subscription(),
@@ -247,8 +281,12 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
       if (this.preselectedEnd && this.preselectedStart) {
         const start = new Date(this.preselectedStart);
         const end = new Date(this.preselectedEnd);
-        const durationMinutes = (end.getTime() - start.getTime()) / 60000;
-        this.form.patchValue({ duration: Math.max(15, Math.round(durationMinutes)) });
+        const totalMinutes = Math.max(15, Math.round((end.getTime() - start.getTime()) / 60000));
+        const cleaning = DEFAULT_APPOINTMENT_CLEANING_MINUTES;
+        this.form.patchValue({
+          cleaningTimeMinutes: cleaning,
+          treatmentDuration: Math.max(15, totalMinutes - cleaning)
+        });
       }
       void this.loadAvailableDentists();
     }
@@ -262,7 +300,8 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
       dentistId: null,
       boxId: null,
       startDateTime: '',
-      duration: 30,
+      treatmentDuration: 30,
+      cleaningTimeMinutes: DEFAULT_APPOINTMENT_CLEANING_MINUTES,
       notes: '',
       status: AppointmentStatus.SCHEDULED,
       isInfectiousPatient: false
@@ -311,7 +350,7 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     const clinic = this.clinicSettings();
     if (!clinic) return;
 
-    const duration = Number(this.form.get('duration')?.value) || 30;
+    const duration = this.getTotalDurationMinutes();
     const startRaw = this.form.get('startDateTime')?.value as string | undefined;
 
     let day: Date;
@@ -337,8 +376,9 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     if (!msg) {
       this.error.set(null);
     }
-    this.form.patchValue({ dentistId: null });
+    this.form.patchValue({ dentistId: null, boxId: null });
     void this.loadAvailableDentists();
+    void this.loadAvailableBoxes();
     this.formTick.update((n) => n + 1);
   }
 
@@ -383,6 +423,12 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
 
   private async populateForm(appointment: Appointment): Promise<void> {
     const kind = this.normalizeAppointmentKind(appointment.appointmentKind);
+    const cleaning =
+      appointment.cleaningTimeMinutes ?? DEFAULT_APPOINTMENT_CLEANING_MINUTES;
+    const treatment =
+      appointment.treatmentDurationMinutes ??
+      Math.max(15, appointment.duration - cleaning);
+
     this.form.patchValue({
       patientId: appointment.patientId,
       appointmentKind: kind,
@@ -390,13 +436,15 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
       dentistId: appointment.dentistId,
       boxId: appointment.boxId ?? null,
       startDateTime: toDatetimeLocalInput(appointment.startDateTime),
-      duration: appointment.duration,
+      treatmentDuration: treatment,
+      cleaningTimeMinutes: cleaning,
       notes: appointment.notes || '',
       status: appointment.status,
       isInfectiousPatient: appointment.isInfectiousPatient || false
     });
     await this.reloadCatalog();
     void this.loadAvailableDentists();
+    void this.loadAvailableBoxes();
     if (!appointment.catalogTreatmentId && appointment.treatment) {
       const flat = flattenCatalogTreatments(this.treatmentGroups());
       const match = flat.find(
@@ -411,8 +459,9 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   }
 
   private onAppointmentKindChange(): void {
-    this.form.patchValue({ catalogTreatmentId: null, dentistId: null });
+    this.form.patchValue({ catalogTreatmentId: null, dentistId: null, boxId: null });
     this.availableDentistIds.set([]);
+    this.availableBoxIds.set([]);
     void this.reloadCatalog();
     this.formTick.update((n) => n + 1);
   }
@@ -420,10 +469,11 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   private onCatalogTreatmentChange(): void {
     const treatment = this.selectedCatalogTreatment();
     if (treatment) {
-      this.form.patchValue({ duration: treatment.defaultDurationMinutes });
+      this.form.patchValue({ treatmentDuration: treatment.defaultDurationMinutes });
     }
-    this.form.patchValue({ dentistId: null });
+    this.form.patchValue({ dentistId: null, boxId: null });
     void this.loadAvailableDentists();
+    void this.loadAvailableBoxes();
     this.formTick.update((n) => n + 1);
   }
 
@@ -536,14 +586,15 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     if (!msg) {
       this.error.set(null);
     }
-    this.form.patchValue({ dentistId: null });
+    this.form.patchValue({ dentistId: null, boxId: null });
     void this.loadAvailableDentists();
+    void this.loadAvailableBoxes();
     this.formTick.update((n) => n + 1);
   }
 
   private loadAvailableDentists(): void {
     const startRaw = this.form.get('startDateTime')?.value as string | undefined;
-    const duration = Number(this.form.get('duration')?.value) || 0;
+    const duration = this.getTotalDurationMinutes();
 
     if (!startRaw || this.validateClinicHoursFromForm() !== null || duration < 1) {
       this.availableDentistIds.set([]);
@@ -570,6 +621,38 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
         this.loadingAvailableDentists.set(false);
         this.formTick.update((n) => n + 1);
       }
+      });
+  }
+
+  private loadAvailableBoxes(): void {
+    const startRaw = this.form.get('startDateTime')?.value as string | undefined;
+    const duration = this.getTotalDurationMinutes();
+
+    if (!startRaw || this.validateClinicHoursFromForm() !== null || duration < 1) {
+      this.availableBoxIds.set([]);
+      this.loadingAvailableBoxes.set(false);
+      return;
+    }
+
+    const excludeId =
+      this.appointment && this.viewMode === 'edit' ? this.appointment.id : null;
+
+    this.loadingAvailableBoxes.set(true);
+    this.scheduleService.getAvailableBoxIds(startRaw, duration, excludeId).subscribe({
+      next: (ids) => {
+        this.availableBoxIds.set(ids);
+        this.loadingAvailableBoxes.set(false);
+        const boxId = Number(this.form.get('boxId')?.value);
+        if (boxId && !ids.includes(boxId)) {
+          this.form.patchValue({ boxId: null });
+        }
+        this.formTick.update((n) => n + 1);
+      },
+      error: () => {
+        this.availableBoxIds.set([]);
+        this.loadingAvailableBoxes.set(false);
+        this.formTick.update((n) => n + 1);
+      }
     });
   }
 
@@ -579,7 +662,7 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     if (!clinic || !startRaw) return null;
 
     const start = new Date(startRaw);
-    const duration = Number(this.form.get('duration')?.value) || 0;
+    const duration = this.getTotalDurationMinutes();
     if (Number.isNaN(start.getTime()) || duration < 1) return null;
 
     if (!isAppointmentWithinClinicHours(start, duration, clinic)) {
@@ -603,7 +686,8 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     const hoursError = this.validateClinicHoursFromForm();
     if (hoursError) {
       this.form.get('startDateTime')?.markAsTouched();
-      this.form.get('duration')?.markAsTouched();
+      this.form.get('treatmentDuration')?.markAsTouched();
+      this.form.get('cleaningTimeMinutes')?.markAsTouched();
       this.showClinicHoursAlert(hoursError);
       return;
     }
@@ -615,7 +699,8 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
       dentistId: Number(formValue.dentistId),
       boxId: Number(formValue.boxId),
       startDateTime: formValue.startDateTime,
-      duration: Number(formValue.duration),
+      duration: this.getTotalDurationMinutes(),
+      cleaningTimeMinutes: Number(formValue.cleaningTimeMinutes),
       appointmentKind: formValue.appointmentKind,
       catalogTreatmentId: Number(formValue.catalogTreatmentId),
       treatment: catalog?.name,
@@ -691,11 +776,20 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     if (err instanceof HttpErrorResponse) {
       if (err.status === 409) {
         const message = err.error?.message || '';
-        if (message.includes('5-minute gap')) {
-          return 'Conflicto: El dentista debe tener al menos 5 minutos de separación entre citas.';
+        if (
+          message.includes('5-minute gap') ||
+          message.includes('5 minutos entre citas') ||
+          message.includes('odontólogo ya tiene')
+        ) {
+          return message.includes('odontólogo')
+            ? message
+            : 'El odontólogo ya tiene otra cita en ese horario (mínimo 5 min entre citas).';
         }
-        if (message.includes('occupied')) {
-          return 'Conflicto: El box o dentista ya está ocupado en ese horario.';
+        if (message.includes('box ya está ocupado') || message.includes('box is already')) {
+          return 'El box ya está ocupado en ese horario.';
+        }
+        if (message.includes('occupied') || message.includes('ocupado')) {
+          return message || 'El odontólogo o el box ya están ocupados en ese horario.';
         }
         if (message.includes('infectious')) {
           return 'Conflicto: Los pacientes infecciosos deben ser la última cita del día.';
@@ -734,6 +828,32 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
 
   hasCatalogTreatmentSelected(): boolean {
     return !!this.selectedCatalogTreatment();
+  }
+
+  getTotalDurationMinutes(): number {
+    const treatment = Number(this.form.get('treatmentDuration')?.value) || 0;
+    const cleaning = Number(this.form.get('cleaningTimeMinutes')?.value) || 0;
+    return treatment + cleaning;
+  }
+
+  getTreatmentDurationMinutes(): number {
+    return Number(this.form.get('treatmentDuration')?.value) || 0;
+  }
+
+  getCleaningTimeMinutes(): number {
+    return Number(this.form.get('cleaningTimeMinutes')?.value) || 0;
+  }
+
+  detailTreatmentDurationMinutes(): number {
+    if (!this.appointment) return 0;
+    return (
+      this.appointment.treatmentDurationMinutes ??
+      Math.max(0, this.appointment.duration - (this.appointment.cleaningTimeMinutes ?? 5))
+    );
+  }
+
+  detailCleaningTimeMinutes(): number {
+    return this.appointment?.cleaningTimeMinutes ?? DEFAULT_APPOINTMENT_CLEANING_MINUTES;
   }
 
   getPatientName(patient: PatientRow): string {
