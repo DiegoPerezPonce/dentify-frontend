@@ -6,7 +6,8 @@
 .table-wrap{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:auto}.data-table{width:100%;border-collapse:collapse}
 .data-table th,.data-table td{padding:.55rem .65rem;border-bottom:1px solid #f1f5f9;text-align:left;vertical-align:middle}.data-table th{font-size:.72rem;text-transform:uppercase;color:#64748b;background:#f8fafc}
 .data-table tr:last-child td{border-bottom:0}.cell-strong{font-weight:600;color:#1f2937}.cell-muted{color:#64748b}.col-actions{text-align:right}
-.radio-btn{background:#ffe4ef;color:#be185d}.odonto-btn{background:#e6fffa;color:#0f766e}.visit-btn{background:#e0f2fe;color:#0369a1}.history-btn{background:#f3e8ff;color:#7e22ce}.edit-btn{background:#e2e8f0;color:#334155}.delete-btn{background:#fee2e2;color:#b91c1c}
+.btn-ficha{background:#06b6d4;color:#fff;font-weight:600;padding:.4rem .85rem;border:0;border-radius:8px;cursor:pointer;white-space:nowrap}
+.btn-ficha:hover{background:#0891b2}
 .empty{text-align:center;color:#64748b}.pager{justify-content:space-between;align-items:center;margin-top:.7rem}.pager-btns{display:flex;gap:.35rem;align-items:center}
 .pager button{border:1px solid #cbd5e1;background:#fff}
 .modal-overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);display:grid;place-items:center;padding:1rem;z-index:1000}

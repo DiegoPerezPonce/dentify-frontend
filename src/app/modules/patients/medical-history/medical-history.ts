@@ -111,13 +111,18 @@ export class MedicalHistoryComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/app/pacientes']);
+    const id = this.patient()?.id;
+    if (id) {
+      this.router.navigate(['/app/pacientes', id]);
+    } else {
+      this.router.navigate(['/app/pacientes']);
+    }
   }
 
   goToPatientEdit(): void {
     const id = this.patient()?.id;
     if (id) {
-      this.router.navigate(['/app/pacientes', id]);
+      this.router.navigate(['/app/pacientes', id, 'editar']);
     }
   }
 

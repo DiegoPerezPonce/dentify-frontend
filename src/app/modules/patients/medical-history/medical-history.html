@@ -2,7 +2,7 @@
   <!-- Header con info del paciente -->
   <div class="page-header">
     <button type="button" class="btn-back" (click)="goBack()">
-      ← Volver a pacientes
+      ← Volver a ficha
     </button>
     
     @if (patient()) {
@@ -15,20 +15,6 @@
               <span class="badge">NSS: {{ patient()!.nss }}</span>
             }
           </div>
-        </div>
-        <div class="action-buttons">
-          <button type="button" class="btn-action btn-radio" (click)="goToRadiografias()">
-            📸 Radiografías
-          </button>
-          <button type="button" class="btn-action btn-odonto" (click)="goToOdontograma()">
-            🦷 Odontograma
-          </button>
-          <button type="button" class="btn-action btn-first-visit" (click)="goToFirstVisit()">
-            🏥 Primera visita
-          </button>
-          <button type="button" class="btn-action btn-edit" (click)="goToPatientEdit()">
-            Editar paciente
-          </button>
         </div>
       </div>
     }

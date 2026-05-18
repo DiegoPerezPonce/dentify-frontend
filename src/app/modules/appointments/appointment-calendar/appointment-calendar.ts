@@ -10,7 +10,9 @@ import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular
 import {
   CalendarOptions,
   DateSelectArg,
+  DateSpanApi,
   EventClickArg,
+  EventContentArg,
   EventInput,
   EventApi
 } from '@fullcalendar/core';
@@ -29,6 +31,20 @@ import { Dentist } from '../models/dentist.models';
 import { Box } from '../../boxes/models/box.models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppointmentFormModalComponent } from '../appointment-form-modal/appointment-form-modal';
+import { DentistScheduleService } from '../../dentist-availability/dentist-schedule.service';
+import { ClinicScheduleSettings } from '../../dentist-availability/models/dentist-schedule.models';
+import {
+  clinicHoursErrorMessageForSlot,
+  isAppointmentWithinClinicHours,
+  toFullCalendarTime
+} from '../../dentist-availability/clinic-hours.utils';
+import { catchError, of } from 'rxjs';
+import {
+  appointmentMedicalTitle,
+  appointmentPatientMedicalSeverity,
+  medicalRiskIconChar
+} from '../appointment-patient-risk.utils';
+import type { MedicalAlertSeverity } from '../../patients/medical-flags.constants';
 
 export type AgendaLayoutView = 'day' | 'week';
 
@@ -45,6 +61,7 @@ export class AppointmentCalendarComponent implements OnInit {
   private appointmentService = inject(AppointmentService);
   private dentistService = inject(DentistService);
   private boxService = inject(BoxService);
+  private scheduleService = inject(DentistScheduleService);
 
   @ViewChild('fullCalendar') fullCalendar?: FullCalendarComponent;
 
@@ -69,6 +86,8 @@ export class AppointmentCalendarComponent implements OnInit {
   readonly selectedDate = signal(this.toYmd(new Date()));
   /** Vista día (mini + lista) o semana (FullCalendar). */
   readonly agendaView = signal<AgendaLayoutView>('day');
+
+  readonly clinicSettings = signal<ClinicScheduleSettings | null>(null);
 
   readonly weekdayLabels = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'] as const;
 
@@ -136,11 +155,12 @@ export class AppointmentCalendarComponent implements OnInit {
       list: 'Lista'
     },
     slotMinTime: '08:00:00',
-    slotMaxTime: '20:00:00',
+    slotMaxTime: '21:00:00',
     allDaySlot: false,
     editable: true,
     selectable: true,
     selectMirror: true,
+    selectAllow: (span) => this.isCalendarSpanAllowed(span),
     dayMaxEvents: true,
     weekends: true,
     select: this.handleDateSelect.bind(this),
@@ -148,13 +168,43 @@ export class AppointmentCalendarComponent implements OnInit {
     eventsSet: this.handleEvents.bind(this),
     eventDrop: this.handleEventDrop.bind(this),
     eventResize: this.handleEventResize.bind(this),
+    eventContent: (arg) => this.renderEventContent(arg),
     height: 'auto',
     contentHeight: 'auto'
   };
 
   ngOnInit(): void {
+    this.loadClinicHours();
     this.loadFilters();
     this.loadAppointments();
+  }
+
+  private loadClinicHours(): void {
+    this.scheduleService
+      .getClinicSettings()
+      .pipe(catchError(() => of(null)))
+      .subscribe((clinic) => {
+        if (!clinic) return;
+        this.clinicSettings.set(clinic);
+        this.calendarOptions = {
+          ...this.calendarOptions,
+          slotMinTime: toFullCalendarTime(clinic.openTime),
+          slotMaxTime: toFullCalendarTime(clinic.closeTime),
+          selectAllow: (span) => this.isCalendarSpanAllowed(span)
+        };
+      });
+  }
+
+  private isCalendarSpanAllowed(span: DateSpanApi): boolean {
+    const clinic = this.clinicSettings();
+    if (!clinic) return true;
+
+    const start = span.start;
+    const end = span.end;
+    const durationMinutes = Math.round((end.getTime() - start.getTime()) / 60_000);
+    if (durationMinutes < 1) return false;
+
+    return isAppointmentWithinClinicHours(start, durationMinutes, clinic);
   }
 
   setAgendaView(view: AgendaLayoutView): void {
@@ -256,8 +306,13 @@ export class AppointmentCalendarComponent implements OnInit {
 
   openInsertAppointment(): void {
     const ymd = this.selectedDate();
-    this.preselectedStart.set(`${ymd}T09:00`);
-    this.preselectedEnd.set(`${ymd}T09:30`);
+    const open = this.clinicSettings()?.openTime ?? '08:00';
+    const endDate = new Date(`${ymd}T${open}`);
+    endDate.setMinutes(endDate.getMinutes() + 30);
+    const endH = String(endDate.getHours()).padStart(2, '0');
+    const endM = String(endDate.getMinutes()).padStart(2, '0');
+    this.preselectedStart.set(`${ymd}T${open}`);
+    this.preselectedEnd.set(`${ymd}T${endH}:${endM}`);
     this.selectedAppointment.set(null);
     this.showModal.set(true);
   }
@@ -327,17 +382,21 @@ export class AppointmentCalendarComponent implements OnInit {
   }
 
   private updateCalendarEvents(appointments: Appointment[]): void {
-    const events: EventInput[] = appointments.map((apt) => ({
-      id: String(apt.id),
-      title: this.getEventTitle(apt),
-      start: apt.startDateTime,
-      end: apt.endDateTime,
-      backgroundColor: this.getEventColor(apt.status),
-      borderColor: this.getEventColor(apt.status),
-      extendedProps: {
-        appointment: apt
-      }
-    }));
+    const events: EventInput[] = appointments.map((apt) => {
+      const risk = appointmentPatientMedicalSeverity(apt);
+      return {
+        id: String(apt.id),
+        title: this.getEventTitle(apt),
+        start: apt.startDateTime,
+        end: apt.endDateTime,
+        backgroundColor: this.getEventBackgroundColor(apt, risk),
+        borderColor: this.getEventBorderColor(apt, risk),
+        classNames: risk ? [`fc-event--risk-${risk}`] : [],
+        extendedProps: {
+          appointment: apt
+        }
+      };
+    });
 
     this.calendarOptions = {
       ...this.calendarOptions,
@@ -373,10 +432,93 @@ export class AppointmentCalendarComponent implements OnInit {
     }
   }
 
+  private getEventBackgroundColor(
+    apt: Appointment,
+    risk: MedicalAlertSeverity | null
+  ): string {
+    if (risk === 'biosecurity' || apt.isInfectiousPatient) {
+      return '#fecaca';
+    }
+    if (risk === 'allergy') {
+      return '#fde68a';
+    }
+    if (risk === 'systemic') {
+      return '#dbeafe';
+    }
+    return this.getEventColor(apt.status);
+  }
+
+  private getEventBorderColor(apt: Appointment, risk: MedicalAlertSeverity | null): string {
+    if (risk === 'biosecurity' || apt.isInfectiousPatient) {
+      return '#dc2626';
+    }
+    if (risk === 'allergy') {
+      return '#d97706';
+    }
+    if (risk === 'systemic') {
+      return '#2563eb';
+    }
+    return this.getEventColor(apt.status);
+  }
+
+  private renderEventContent(arg: EventContentArg): { domNodes: HTMLElement[] } {
+    const apt = arg.event.extendedProps['appointment'] as Appointment | undefined;
+    const wrap = document.createElement('div');
+    wrap.className = 'fc-event-main-custom';
+
+    if (apt) {
+      const risk = appointmentPatientMedicalSeverity(apt);
+      if (risk) {
+        const badge = document.createElement('span');
+        badge.className = `fc-event-risk fc-event-risk--${risk}`;
+        badge.textContent = medicalRiskIconChar(risk);
+        badge.setAttribute('aria-hidden', 'true');
+        const title = appointmentMedicalTitle(apt);
+        if (title) {
+          badge.setAttribute('title', title);
+        }
+        wrap.appendChild(badge);
+      }
+    }
+
+    const text = document.createElement('span');
+    text.className = 'fc-event-title-text';
+    text.textContent = arg.event.title;
+    wrap.appendChild(text);
+
+    return { domNodes: [wrap] };
+  }
+
+  appointmentRisk(apt: Appointment): MedicalAlertSeverity | null {
+    return appointmentPatientMedicalSeverity(apt);
+  }
+
+  appointmentRiskIcon(sev: MedicalAlertSeverity): string {
+    return medicalRiskIconChar(sev);
+  }
+
+  appointmentRiskTitle(apt: Appointment): string {
+    return appointmentMedicalTitle(apt);
+  }
+
   handleDateSelect(selectInfo: DateSelectArg): void {
     const calendarApi = selectInfo.view.calendar;
     calendarApi.unselect();
 
+    const clinic = this.clinicSettings();
+    if (clinic) {
+      const durationMinutes = Math.round(
+        (selectInfo.end.getTime() - selectInfo.start.getTime()) / 60_000
+      );
+      if (!isAppointmentWithinClinicHours(selectInfo.start, durationMinutes, clinic)) {
+        const msg = clinicHoursErrorMessageForSlot(selectInfo.start, durationMinutes, clinic);
+        this.error.set(msg);
+        window.alert(msg);
+        return;
+      }
+    }
+
+    this.error.set(null);
     this.preselectedStart.set(selectInfo.startStr);
     this.preselectedEnd.set(selectInfo.endStr);
     this.selectedAppointment.set(null);

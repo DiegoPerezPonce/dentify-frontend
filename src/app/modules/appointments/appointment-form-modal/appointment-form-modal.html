@@ -9,7 +9,19 @@
       </button>
     </div>
 
-    @if (error()) {
+    @if (infectiousPatientAlert()) {
+      <div class="alert alert-infectious" role="alert">
+        <strong>Paciente infeccioso</strong>
+        <span>{{ infectiousPatientAlert() }}</span>
+      </div>
+    }
+    @if (clinicHoursAlert()) {
+      <div class="alert alert-clinic-hours" role="alert">
+        <strong>Horario no permitido</strong>
+        <span>{{ clinicHoursAlert() }}</span>
+      </div>
+    }
+    @if (!clinicHoursAlert() && error()) {
       <div class="alert alert-error">
         <span>{{ error() }}</span>
       </div>
@@ -19,7 +31,19 @@
       <div class="detail-body">
         <dl class="detail-grid">
           <dt>Paciente</dt>
-          <dd>{{ appointment.patientName || '—' }} (ID {{ appointment.patientId }})</dd>
+          <dd class="detail-patient-name">
+            @if (detailAppointmentRisk(); as sev) {
+              <span
+                class="detail-risk-ico"
+                [class.detail-risk-ico--red]="sev === 'biosecurity'"
+                [class.detail-risk-ico--amber]="sev === 'allergy'"
+                [class.detail-risk-ico--blue]="sev === 'systemic'"
+                [attr.title]="detailAppointmentRiskTitle()"
+                aria-hidden="true"
+              >{{ detailRiskIcon(sev) }}</span>
+            }
+            {{ appointment.patientName || '—' }} (ID {{ appointment.patientId }})
+          </dd>
 
           <dt>Tipo de cita</dt>
           <dd>{{ getAppointmentKindLabel(appointment.appointmentKind) }}</dd>
@@ -75,12 +99,20 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="patientId">Paciente *</label>
-            <select id="patientId" formControlName="patientId" class="form-control">
+            <select
+              id="patientId"
+              formControlName="patientId"
+              class="form-control"
+              [class.form-control--infectious]="infectiousPatientAlert()"
+            >
               <option [ngValue]="null">Seleccionar paciente</option>
               @for (patient of patients(); track patient.id) {
                 <option [ngValue]="patient.id">{{ getPatientName(patient) }}</option>
               }
             </select>
+            @if (infectiousPatientAlert()) {
+              <p class="field-warning infectious-hint" role="alert">{{ infectiousPatientAlert() }}</p>
+            }
             @if (form.get('patientId')?.invalid && form.get('patientId')?.touched) {
               <span class="error-message">Selecciona un paciente</span>
             }
@@ -159,19 +191,60 @@
             </div>
           }
 
+          <div class="form-group">
+            <label for="startDateTime">Fecha y hora de inicio *</label>
+            <input
+              type="datetime-local"
+              id="startDateTime"
+              formControlName="startDateTime"
+              class="form-control"
+              [class.form-control--invalid-hours]="clinicHoursAlert()"
+              (change)="onScheduleFieldsChange()"
+            />
+            @if (clinicHoursHint(); as hours) {
+              <p class="field-hint">Horario de la clínica: {{ hours }}. La cita debe terminar antes del cierre.</p>
+            }
+            @if (clinicHoursAlert()) {
+              <p class="field-error" role="alert">{{ clinicHoursAlert() }}</p>
+            }
+            @if (form.get('startDateTime')?.invalid && form.get('startDateTime')?.touched) {
+              <span class="error-message">Ingresa fecha y hora de inicio</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="duration">Duración (minutos) *</label>
+            <input
+              type="number"
+              id="duration"
+              formControlName="duration"
+              class="form-control"
+              min="15"
+              step="15"
+              (change)="onScheduleFieldsChange()"
+            />
+            @if (form.get('duration')?.invalid && form.get('duration')?.touched) {
+              <span class="error-message">Ingresa duración válida (mínimo 15 min)</span>
+            }
+          </div>
+
           <div class="form-group full-width">
             <label for="dentistId">Odontólogo *</label>
             <select
               id="dentistId"
               formControlName="dentistId"
               class="form-control"
-              [disabled]="!hasCatalogTreatmentSelected()"
+              [disabled]="!hasCatalogTreatmentSelected() || !hasScheduleSlotSelected() || loadingAvailableDentists()"
             >
               <option [ngValue]="null">
                 @if (!hasCatalogTreatmentSelected()) {
                   Primero elige un tratamiento
+                } @else if (!hasScheduleSlotSelected()) {
+                  Elige fecha, hora y duración válidas
+                } @else if (loadingAvailableDentists()) {
+                  Buscando odontólogos disponibles...
                 } @else if (filteredDentists().length === 0) {
-                  No hay odontólogos con esa especialidad
+                  No hay odontólogos disponibles a esa hora
                 } @else {
                   Seleccionar odontólogo
                 }
@@ -188,6 +261,9 @@
                 }
               </p>
             }
+            @if (hasScheduleSlotSelected() && !loadingAvailableDentists() && filteredDentists().length === 0) {
+              <p class="field-hint">Ningún odontólogo con esa especialidad tiene turno libre en ese horario.</p>
+            }
             @if (form.get('dentistId')?.invalid && form.get('dentistId')?.touched) {
               <span class="error-message">Selecciona un odontólogo</span>
             }
@@ -203,22 +279,6 @@
             </select>
             @if (form.get('boxId')?.invalid && form.get('boxId')?.touched) {
               <span class="error-message">Selecciona un box</span>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="startDateTime">Fecha y hora de inicio *</label>
-            <input type="datetime-local" id="startDateTime" formControlName="startDateTime" class="form-control" />
-            @if (form.get('startDateTime')?.invalid && form.get('startDateTime')?.touched) {
-              <span class="error-message">Ingresa fecha y hora de inicio</span>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="duration">Duración (minutos) *</label>
-            <input type="number" id="duration" formControlName="duration" class="form-control" min="15" step="15" />
-            @if (form.get('duration')?.invalid && form.get('duration')?.touched) {
-              <span class="error-message">Ingresa duración válida (mínimo 15 min)</span>
             }
           </div>
 
@@ -244,11 +304,14 @@
             ></textarea>
           </div>
 
-          <div class="form-group full-width">
-            <label class="checkbox-label">
+          <div class="form-group full-width infectious-checkbox-group">
+            <label class="checkbox-label" [class.checkbox-label--infectious]="form.get('isInfectiousPatient')?.value">
               <input type="checkbox" formControlName="isInfectiousPatient" />
               <span>Paciente infeccioso (debe ser la última cita del día)</span>
             </label>
+            @if (form.get('isInfectiousPatient')?.value && viewMode === 'create') {
+              <p class="field-hint">La hora se ajustará al último hueco del día según la duración y el horario de la clínica.</p>
+            }
           </div>
         </div>
 

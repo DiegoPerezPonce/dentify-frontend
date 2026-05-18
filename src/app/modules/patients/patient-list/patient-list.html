@@ -66,23 +66,8 @@
               <td>{{ dniLine(p) }}</td>
               <td class="cell-muted">{{ contactLine(p) }}</td>
               <td class="actions-cell">
-                <button type="button" class="action-btn radio-btn" (click)="goToRadiografias(p)" title="Ver radiografías">
-                  Radiografías
-                </button>
-                <button type="button" class="action-btn odonto-btn" (click)="goToOdontograma(p)" title="Ver odontograma">
-                  Odontograma
-                </button>
-                <button type="button" class="action-btn visit-btn" (click)="goToFirstVisit(p)" title="Registrar primera visita">
-                  Primera visita
-                </button>
-                <button type="button" class="action-btn history-btn" (click)="goToHistory(p)" title="Ver historial clínico">
-                  Historial
-                </button>
-                <button type="button" class="action-btn edit-btn" (click)="goToEditPatient(p)" title="Editar paciente">
-                  Editar
-                </button>
-                <button type="button" class="action-btn delete-btn" (click)="confirmDelete(p)" title="Eliminar paciente">
-                  Eliminar
+                <button type="button" class="btn-ficha" (click)="goToRecord(p)" title="Ver ficha del paciente">
+                  Ver ficha
                 </button>
               </td>
             </tr>
@@ -108,33 +93,3 @@
   }
 </div>
 
-<!-- Modal de confirmación de eliminación -->
-@if (showDeleteModal()) {
-  <div class="modal-overlay" (click)="cancelDelete()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>⚠️ Confirmar eliminación</h2>
-      </div>
-      <div class="modal-body">
-        <p>¿Estás seguro de que deseas eliminar este paciente?</p>
-        @if (patientToDelete()) {
-          <div class="patient-info">
-            <strong>{{ displayName(patientToDelete()!) }}</strong>
-            <span class="dni-badge">{{ dniLine(patientToDelete()!) }}</span>
-          </div>
-        }
-        <p class="warning-text">
-          Esta acción no se puede deshacer. Se eliminarán todos los datos asociados al paciente.
-        </p>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn-cancel" (click)="cancelDelete()" [disabled]="deleting()">
-          Cancelar
-        </button>
-        <button type="button" class="btn-delete" (click)="deletePatient()" [disabled]="deleting()">
-          {{ deleting() ? 'Eliminando...' : 'Eliminar paciente' }}
-        </button>
-      </div>
-    </div>
-  </div>
-}

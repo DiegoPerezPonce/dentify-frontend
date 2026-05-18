@@ -1,25 +1,12 @@
 <div class="patient-form-container">
   <div class="form-header">
+    @if (isEditMode()) {
+      <button type="button" class="btn-back" (click)="goToRecord()">← Volver a ficha</button>
+    }
     <div>
       <h1>{{ isEditMode() ? 'Editar paciente' : 'Nuevo paciente' }}</h1>
       <p class="subtitle">{{ isEditMode() ? 'Actualiza la información del paciente' : 'Completa los datos del nuevo paciente' }}</p>
     </div>
-    @if (isEditMode()) {
-      <div class="header-actions">
-        <button type="button" class="btn-action btn-radio" (click)="goToRadiografias()">
-          📸 Radiografías
-        </button>
-        <button type="button" class="btn-action btn-odonto" (click)="goToOdontograma()">
-          🦷 Odontograma
-        </button>
-        <button type="button" class="btn-action btn-history" (click)="goToHistory()">
-          📋 Historial
-        </button>
-        <button type="button" class="btn-action btn-first-visit" (click)="goToFirstVisit()">
-          🏥 Primera visita
-        </button>
-      </div>
-    }
   </div>
 
   @if (error()) {

@@ -53,6 +53,44 @@
   color: #64748b;
 }
 
+.dash-my-schedule {
+  margin-top: 0.85rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.dash-my-schedule__title {
+  margin: 0 0 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475569;
+}
+
+.dash-my-schedule__today {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.65rem;
+  font-size: 0.88rem;
+}
+
+.dash-my-schedule__today strong {
+  color: #1e293b;
+  text-transform: capitalize;
+}
+
+.dash-my-schedule__today span {
+  color: #64748b;
+}
+
+.dash-my-schedule__today.dash-my-schedule__off span {
+  color: #94a3b8;
+}
+
 .dash-stats--muted {
   opacity: 0.55;
   pointer-events: none;

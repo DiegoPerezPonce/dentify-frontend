@@ -14,6 +14,11 @@ import { BoxService } from '../../modules/boxes/box.service';
 import { Box } from '../../modules/boxes/models/box.models';
 import { StockMaterial } from '../../modules/stock/models/stock-material.models';
 import { StockMaterialService } from '../../modules/stock/stock-material.service';
+import { DentistScheduleService } from '../../modules/dentist-availability/dentist-schedule.service';
+import {
+  DentistWeeklySchedule,
+  WeeklyScheduleDay
+} from '../../modules/dentist-availability/models/dentist-schedule.models';
 
 export type AppointmentStatusUi = 'registered' | 'confirmed' | 'tentative' | 'locked';
 
@@ -56,6 +61,7 @@ export class HomeDashboardComponent implements OnInit {
   private appointmentService = inject(AppointmentService);
   private boxService = inject(BoxService);
   private stockService = inject(StockMaterialService);
+  private scheduleService = inject(DentistScheduleService);
 
   readonly ROLE_ADMIN = ROLE_ADMIN;
 
@@ -141,6 +147,46 @@ export class HomeDashboardComponent implements OnInit {
 
   readonly hasDentistScope = computed(() => this.auth.getDentistId() != null);
 
+  readonly myWeeklySchedule = signal<DentistWeeklySchedule | null>(null);
+
+  /** Día de la semana actual (1 = lunes … 6 = sábado) según horario de clínica. */
+  readonly myTodayScheduleDay = computed((): WeeklyScheduleDay | null => {
+    this.dashNow();
+    const sched = this.myWeeklySchedule();
+    if (!sched) return null;
+
+    const weekday = scheduleWeekdayFromDate(this.dashNow());
+    if (weekday === null) {
+      return {
+        weekday: 0,
+        shift: 'off',
+        shiftLabel: 'Libre',
+        startTime: null,
+        endTime: null
+      };
+    }
+
+    return (
+      sched.days.find((d) => d.weekday === weekday) ?? {
+        weekday,
+        shift: 'off',
+        shiftLabel: 'Libre',
+        startTime: null,
+        endTime: null
+      }
+    );
+  });
+
+  readonly myTodayDayName = computed(() => {
+    this.dashNow();
+    const lang = this.translate.currentLang || 'es';
+    try {
+      return new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(this.dashNow());
+    } catch {
+      return new Intl.DateTimeFormat('es', { weekday: 'long' }).format(this.dashNow());
+    }
+  });
+
   ngOnInit(): void {
     this.loadDashboard();
   }
@@ -167,6 +213,11 @@ export class HomeDashboardComponent implements OnInit {
       apptQuery.dentistId = dentistId;
     }
 
+    const schedule$ =
+      dentistId != null
+        ? this.scheduleService.getMyWeekly().pipe(catchError(() => of(null)))
+        : of(null);
+
     forkJoin({
       appts: this.appointmentService.list(apptQuery).pipe(
         catchError(() => of({ items: [] as Appointment[], total: 0 }))
@@ -174,11 +225,13 @@ export class HomeDashboardComponent implements OnInit {
       boxes: this.boxService.list().pipe(catchError(() => of({ items: [] as Box[], total: 0 }))),
       stock: this.stockService
         .list({ lowStockOnly: true, page: 1, pageSize: 15 })
-        .pipe(catchError(() => of({ items: [] as StockMaterial[], total: 0 })))
+        .pipe(catchError(() => of({ items: [] as StockMaterial[], total: 0 }))),
+      schedule: schedule$
     })
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: ({ appts, boxes, stock }) => {
+        next: ({ appts, boxes, stock, schedule }) => {
+          this.myWeeklySchedule.set(schedule);
           const raw = (appts.items ?? [])
             .filter((a) => a.status !== AppointmentStatus.CANCELLED)
             .sort((a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime());
@@ -211,6 +264,19 @@ export class HomeDashboardComponent implements OnInit {
   isAdmin(): boolean {
     return this.auth.hasRole(ROLE_ADMIN);
   }
+
+  scheduleRowHint(day: { shiftLabel?: string | null; startTime?: string | null; endTime?: string | null; shift: string }): string {
+    if (day.shift === 'off') return 'Libre';
+    if (day.startTime && day.endTime) return `${day.shiftLabel ?? ''} · ${day.startTime}–${day.endTime}`;
+    return day.shiftLabel ?? day.shift;
+  }
+}
+
+/** 1 = lunes … 6 = sábado; domingo → null (clínica no abre en el modelo actual). */
+function scheduleWeekdayFromDate(d: Date): number | null {
+  const js = d.getDay();
+  if (js === 0) return null;
+  return js;
 }
 
 function formatApiDate(d: Date): string {

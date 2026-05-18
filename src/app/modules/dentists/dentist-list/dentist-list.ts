@@ -1,31 +1,45 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DentistFormModalComponent } from '../dentist-form-modal/dentist-form-modal';
+import { DentistScheduleViewModalComponent } from '../dentist-schedule-view-modal/dentist-schedule-view-modal';
 import { DentistService } from '../dentist.service';
 import { Dentist } from '../models/dentist.models';
 import { UserService } from '../../users/user.service';
 import { User } from '../../users/models/user.models';
+import { AuthService } from '../../../core/services/auth';
+import { ROLE_ADMIN } from '../../../core/utils/jwt-roles';
 
 @Component({
   selector: 'app-dentist-list',
   standalone: true,
-  imports: [CommonModule, DentistFormModalComponent],
+  imports: [CommonModule, DentistFormModalComponent, DentistScheduleViewModalComponent],
   templateUrl: './dentist-list.html',
   styleUrl: './dentist-list.scss'
 })
 export class DentistListComponent implements OnInit {
   private userService = inject(UserService);
   private dentistService = inject(DentistService);
+  private auth = inject(AuthService);
 
   readonly clinicalUsers = signal<User[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly showModal = signal(false);
   readonly selectedDentist = signal<Dentist | null>(null);
+  readonly showScheduleModal = signal(false);
+  readonly scheduleDentistId = signal<number | null>(null);
+  readonly scheduleDentistName = signal('');
+  readonly scheduleUseOwn = signal(false);
+
+  readonly isAdmin = computed(() => this.auth.hasRole(ROLE_ADMIN));
 
   ngOnInit(): void {
-    this.loadClinicalUsers();
+    if (this.isAdmin()) {
+      this.loadClinicalUsers();
+    } else {
+      this.loadOwnProfile();
+    }
   }
 
   loadClinicalUsers(): void {
@@ -43,6 +57,57 @@ export class DentistListComponent implements OnInit {
         this.error.set(this.getErrorMessage(err));
       }
     });
+  }
+
+  loadOwnProfile(): void {
+    const dentistId = this.auth.getDentistId();
+    if (dentistId == null) {
+      this.error.set('Tu cuenta no tiene una ficha de odontólogo vinculada.');
+      return;
+    }
+
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.dentistService.getById(dentistId).subscribe({
+      next: (d) => {
+        const user: User = {
+          id: 0,
+          email: d.email,
+          nombre_usuario: this.auth.getDisplayName() ?? d.email,
+          roles: ['ROLE_USER'],
+          dentistId: d.id,
+          dentistNombre: d.nombre,
+          dentistApellidos: d.apellidos,
+          dentistEspecialidad: d.especialidad,
+          dentistBoxes: d.boxes ?? []
+        };
+        this.clinicalUsers.set([user]);
+        this.loading.set(false);
+      },
+      error: (err: unknown) => {
+        this.loading.set(false);
+        this.error.set(this.getErrorMessage(err));
+      }
+    });
+  }
+
+  openScheduleModal(user: User): void {
+    const id = user.dentistId;
+    if (id == null) return;
+    const ownId = this.auth.getDentistId();
+    this.scheduleDentistId.set(id);
+    this.scheduleDentistName.set(this.getDentistFullName(user));
+    // Siempre cargar por id de ficha; evita desajustes JWT vs. usuario vinculado.
+    this.scheduleUseOwn.set(false);
+    this.showScheduleModal.set(true);
+  }
+
+  closeScheduleModal(): void {
+    this.showScheduleModal.set(false);
+    this.scheduleDentistId.set(null);
+    this.scheduleDentistName.set('');
+    this.scheduleUseOwn.set(false);
   }
 
   openEditModal(user: User): void {

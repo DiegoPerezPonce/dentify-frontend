@@ -8,13 +8,38 @@
 .odontograma-workspace{display:grid;grid-template-columns:1fr 340px;gap:.8rem}
 .odontograma-visual,.control-panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:.8rem}
 .section-title{margin:0 0 .6rem;font-size:1rem}.color-legend{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.6rem}.legend-item{display:flex;align-items:center;gap:.3rem;font-size:.8rem}.legend-color{width:10px;height:10px;border-radius:3px}
+.legend-item--x .legend-x{font-weight:800;font-size:1rem;line-height:1}
+.legend-x-inline{font-weight:800;margin-right:.25rem}
+.tooth-level-section{margin-top:.65rem;padding-top:.55rem;border-top:1px dashed #cbd5e1}
+.subsection-title{margin:0 0 .45rem;font-size:.88rem;color:#334155}
+.tooth-level-options{flex-direction:column;align-items:stretch}
+.state-label--x{display:flex;align-items:center;gap:.2rem}
+.tooth-level-current{margin-bottom:.45rem}
+.status-badge--x{background:transparent!important;border:1px solid currentColor;font-weight:700}
+.btn-apply--secondary{background:#6366f1}
 .jaw{margin-bottom:.8rem}.quadrant-label{text-align:center;color:#64748b;font-size:.82rem;margin-bottom:.35rem}
-.teeth-row{display:flex;justify-content:center;gap:1.2rem}.quadrant{display:flex;align-items:center;gap:.2rem;flex-wrap:wrap}.quadrant-number{font-size:.7rem;color:#64748b}
-.tooth{width:28px;height:28px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;cursor:pointer;padding:0}
-.tooth.selected{outline:2px solid #0ea5e9}.tooth-number{font-size:.67rem;font-weight:600}
+.teeth-row{display:flex;justify-content:center;gap:1.2rem}.teeth-row--with-bridges{position:relative}.bridge-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}.tooth-slot{display:flex;flex-direction:column;align-items:center;position:relative;z-index:1}.quadrant{display:flex;align-items:flex-end;gap:.15rem;flex-wrap:nowrap}.quadrant-number{font-size:.7rem;color:#64748b;align-self:center;margin-right:.15rem}
+.legend-item--bridge .legend-bridge-sample{font-weight:700;letter-spacing:-.05em}
+.legend-item--endo .legend-endo-sample{font-weight:800;font-size:1.05rem;line-height:1}
+.legend-endo-sample{font-weight:800;margin-right:.25rem}
+.state-label--endo{display:flex;align-items:center;gap:.25rem}
+.status-badge--endo{background:transparent!important;border:1px solid currentColor;font-weight:800;font-size:1rem}
+.bridge-section{margin-bottom:.6rem}.bridge-hint{margin:0 0 .5rem;font-size:.8rem;color:#64748b}.bridge-pillars{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem}.bridge-pillar{display:flex;flex-direction:column;gap:.2rem;padding:.4rem;border:1px solid #e2e8f0;border-radius:8px;background:#fff;font-size:.82rem}.bridge-pillar-label{color:#64748b;font-size:.75rem}.btn-pillar{border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;padding:.25rem .35rem;font-size:.72rem;cursor:pointer}.btn-pillar:disabled{opacity:.45;cursor:not-allowed}.bridge-list{margin:.5rem 0 0;padding:0;list-style:none}.bridge-list-item{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem;padding:.35rem 0;border-top:1px solid #e2e8f0;font-size:.8rem}.bridge-list-label{color:#64748b}.btn-clear-face--compact{padding:.2rem .45rem;font-size:.72rem}
+.chart-hint{margin:0 0 .65rem;font-size:.8rem;color:#64748b}
+.face-selected-label,.instruction-inline{margin:.35rem 0 .5rem;font-size:.85rem;color:#334155}
+.face-selected-label strong{color:#0e7490}
+.odontograma-visual{overflow-x:auto}
 .selection-info,.state-selector,.current-status,.selected-statuses,.history-list{border:1px solid #e2e8f0;border-radius:10px;padding:.6rem;background:#f8fafc;margin-bottom:.6rem}
 .face-buttons,.state-options{display:flex;flex-wrap:wrap;gap:.35rem}.face-btn,.state-label,.action-btn,.btn-clear{border:1px solid #cbd5e1;border-radius:8px;background:#fff;padding:.35rem .5rem;cursor:pointer}
+.apply-actions{display:flex;flex-direction:column;gap:.4rem;margin-top:.25rem}
+.btn-apply{border:0;border-radius:8px;background:#0ea5e9;color:#fff;padding:.5rem .75rem;font-weight:600;cursor:pointer}
+.btn-apply:disabled{opacity:.6;cursor:not-allowed}
+.btn-clear-face{border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#475569;padding:.45rem .75rem;font-weight:600;cursor:pointer}
+.btn-clear-face:hover:not(:disabled){background:#f8fafc;border-color:#94a3b8}
+.btn-clear-face:disabled{opacity:.45;cursor:not-allowed}
+.apply-hint{margin:.35rem 0 0;font-size:.78rem;color:#64748b;line-height:1.35}
 .face-btn.selected,.state-option input:checked + .state-label{border-color:#0ea5e9;background:#eff6ff}
 .state-option input{display:none}.actions{display:flex;gap:.5rem}.action-btn.primary{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
 .status-item{display:flex;justify-content:space-between;gap:.4rem;padding:.3rem 0;border-bottom:1px solid #e2e8f0}.status-item:last-child{border-bottom:0}
-@media(max-width:1024px){.odontograma-workspace{grid-template-columns:1fr}} @media(max-width:768px){.patient-info-card{flex-direction:column;align-items:flex-start}.teeth-row{gap:.6rem}}
+@media(max-width:1024px){.odontograma-workspace{grid-template-columns:1fr}}
+@media(max-width:768px){.patient-info-card{flex-direction:column;align-items:flex-start}.teeth-row{gap:.4rem;overflow-x:auto}.quadrant{flex-wrap:nowrap}}

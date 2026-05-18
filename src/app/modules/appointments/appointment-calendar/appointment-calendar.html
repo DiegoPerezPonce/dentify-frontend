@@ -178,6 +178,9 @@
                       type="button"
                       class="day-row"
                       [class.day-row--cancelled]="apt.status === AppointmentStatus.CANCELLED"
+                      [class.day-row--risk-biosecurity]="appointmentRisk(apt) === 'biosecurity'"
+                      [class.day-row--risk-allergy]="appointmentRisk(apt) === 'allergy'"
+                      [class.day-row--risk-systemic]="appointmentRisk(apt) === 'systemic'"
                       (click)="openAppointmentDetail(apt)"
                     >
                         <div class="day-row__time">
@@ -185,7 +188,19 @@
                           <span class="day-row__time-dur">{{ apt.duration }} min</span>
                         </div>
                         <div class="day-row__body">
-                          <span class="day-row__name">{{ apt.patientName || 'Paciente' }}</span>
+                          <span class="day-row__name">
+                            @if (appointmentRisk(apt); as sev) {
+                              <span
+                                class="day-row__risk"
+                                [class.day-row__risk--red]="sev === 'biosecurity'"
+                                [class.day-row__risk--amber]="sev === 'allergy'"
+                                [class.day-row__risk--blue]="sev === 'systemic'"
+                                [attr.title]="appointmentRiskTitle(apt)"
+                                aria-hidden="true"
+                              >{{ appointmentRiskIcon(sev) }}</span>
+                            }
+                            {{ apt.patientName || 'Paciente' }}
+                          </span>
                           <span class="day-row__treatment">{{ apt.treatment || 'Sin tratamiento indicado' }}</span>
                         </div>
                         <div class="day-row__meta">
@@ -272,6 +287,18 @@
           <div class="legend-item">
             <span class="legend-swatch legend-swatch--noshow"></span>
             <span>No asistió</span>
+          </div>
+          <div class="legend-item legend-item--risk">
+            <span class="legend-risk legend-risk--red" aria-hidden="true">☣</span>
+            <span>Nivel 1 — Bioseguridad (infecciosas)</span>
+          </div>
+          <div class="legend-item legend-item--risk">
+            <span class="legend-risk legend-risk--amber" aria-hidden="true">!</span>
+            <span>Nivel 2 — Alergias</span>
+          </div>
+          <div class="legend-item legend-item--risk">
+            <span class="legend-risk legend-risk--blue" aria-hidden="true">!</span>
+            <span>Nivel 3 — Riesgo sistémico</span>
           </div>
         </div>
       </div>

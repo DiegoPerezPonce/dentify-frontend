@@ -1,0 +1,68 @@
+@if (isOpen) {
+  <div class="modal-overlay" role="presentation" (click)="onClose()">
+    <div
+      class="modal-content"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="schedule-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="modal-header">
+        <div>
+          <h2 id="schedule-modal-title">Horario semanal</h2>
+          @if (dentistName) {
+            <p class="modal-sub">{{ dentistName }}</p>
+          }
+        </div>
+        <button type="button" class="close-btn" (click)="onClose()" aria-label="Cerrar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="modal-body">
+        @if (loading()) {
+          <p class="state-msg">Cargando horario…</p>
+        } @else if (error()) {
+          <div class="alert alert-error" role="alert">{{ error() }}</div>
+        } @else if (schedule(); as sched) {
+          <p class="clinic-hint">
+            Clínica {{ sched.clinic.openTime }} – {{ sched.clinic.closeTime }} · Solape
+            {{ sched.clinic.afternoonStartTime }} – {{ sched.clinic.morningEndTime }}
+          </p>
+
+          <div class="week-grid" role="table" aria-label="Horario semanal">
+            <div class="week-grid__head" role="row">
+              <span role="columnheader">Día</span>
+              <span role="columnheader">Turno</span>
+              <span role="columnheader">Horario</span>
+            </div>
+            @for (day of sched.days; track day.weekday) {
+              <div class="week-grid__row" [class.week-grid__row--off]="day.shift === 'off'" role="row">
+                <span class="week-day" role="cell">{{ dayLabel(day.weekday) }}</span>
+                <span class="shift-label" role="cell">{{ day.shiftLabel ?? (day.shift === 'off' ? 'Libre' : day.shift) }}</span>
+                <span class="time-hint" role="cell">
+                  @if (day.shift === 'off') {
+                    —
+                  } @else if (day.startTime && day.endTime) {
+                    {{ day.startTime }} – {{ day.endTime }}
+                  } @else {
+                    —
+                  }
+                </span>
+              </div>
+            }
+          </div>
+
+          <p class="readonly-note">Horario asignado por administración. Solo lectura.</p>
+        }
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-close" (click)="onClose()">Cerrar</button>
+      </footer>
+    </div>
+  </div>
+}
