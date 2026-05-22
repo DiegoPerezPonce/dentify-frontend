@@ -16,7 +16,6 @@ export type ClinicScheduleSavePayload = Pick<
 export interface WeeklyScheduleDay {
   weekday: number;
   shift: DentistWorkShift;
-  defaultBoxId?: number | null;
   startTime?: string | null;
   endTime?: string | null;
   shiftLabel?: string | null;
@@ -33,7 +32,6 @@ export interface WeeklyScheduleSavePayload {
   days: Array<{
     weekday: number;
     shift: DentistWorkShift;
-    defaultBoxId?: number | null;
   }>;
 }
 

@@ -2,13 +2,14 @@
   <!-- Header -->
   <div class="page-header">
     <button type="button" class="btn-back" (click)="goBack()">
-      ← Volver a ficha
+      <app-icon name="arrow_back" size="sm" />
+      Volver a ficha
     </button>
     
     @if (patient()) {
       <div class="patient-info-card">
         <div class="patient-details">
-          <h1>📸 Galería de Radiografías</h1>
+          <h1><app-icon name="radiology" size="md" /> Galería de Radiografías</h1>
           <p class="patient-name">{{ patient()!.nombre }} {{ patient()!.apellidos }}</p>
           <span class="badge">DNI: {{ patient()!.dni }}</span>
         </div>
@@ -29,7 +30,7 @@
 
   @if (error()) {
     <div class="alert alert-error">
-      <span class="icon">⚠️</span>
+      <app-icon name="warning" size="md" class="icon" />
       <span>{{ error() }}</span>
     </div>
   }
@@ -52,7 +53,7 @@
         </div>
       } @else {
         <div class="upload-content">
-          <div class="upload-icon">📤</div>
+          <app-icon name="upload" size="xl" class="upload-icon" />
           <h3>Arrastra y suelta archivos aquí</h3>
           <p class="upload-description">o haz clic para seleccionar</p>
           <p class="upload-hint">Formatos permitidos: JPEG, PNG, PDF • Máximo 10MB por archivo</p>
@@ -90,12 +91,12 @@
                   />
                 } @else if (isPdfFile(radiografia.tipo_mime)) {
                   <div class="pdf-preview">
-                    <span class="pdf-icon">📄</span>
+                    <app-icon name="description" size="lg" class="pdf-icon" />
                     <span class="pdf-label">PDF</span>
                   </div>
                 }
                 <div class="item-overlay">
-                  <span class="overlay-icon">🔍</span>
+                  <app-icon name="zoom_in" size="md" class="overlay-icon" />
                   <span class="overlay-text">Ver</span>
                 </div>
               </div>
@@ -115,7 +116,7 @@
                 (click)="confirmDelete(radiografia)"
                 title="Eliminar"
               >
-                🗑️
+                <app-icon name="delete" size="sm" />
               </button>
             </div>
           }
@@ -123,7 +124,7 @@
       </div>
     } @else {
       <div class="empty-state">
-        <div class="empty-icon">📷</div>
+        <app-icon name="photo_camera" size="xl" class="empty-icon" />
         <h3>No hay radiografías</h3>
         <p>Arrastra archivos o haz clic en "Seleccionar archivos" para comenzar</p>
       </div>
@@ -134,7 +135,7 @@
   @if (lightboxOpen()) {
     <div class="lightbox-overlay" (click)="closeLightbox()">
       <button type="button" class="lightbox-close" (click)="closeLightbox()">
-        ✕
+        <app-icon name="close" size="md" />
       </button>
       
       @if (radiografias()[lightboxIndex()]) {
@@ -147,7 +148,7 @@
             />
           } @else if (isPdfFile(radiografias()[lightboxIndex()].tipo_mime)) {
             <div class="lightbox-pdf">
-              <div class="pdf-icon-large">📄</div>
+              <app-icon name="description" size="xl" class="pdf-icon-large" />
               <p class="pdf-name">{{ radiografias()[lightboxIndex()].nombre_archivo }}</p>
               <a 
                 [href]="getFileUrl(radiografias()[lightboxIndex()])" 
@@ -167,10 +168,10 @@
         
         @if (radiografias().length > 1) {
           <button type="button" class="lightbox-nav lightbox-prev" (click)="prevImage(); $event.stopPropagation()">
-            ‹
+            <app-icon name="chevron_left" size="lg" />
           </button>
           <button type="button" class="lightbox-nav lightbox-next" (click)="nextImage(); $event.stopPropagation()">
-            ›
+            <app-icon name="chevron_right" size="lg" />
           </button>
         }
       }
@@ -182,7 +183,7 @@
     <div class="modal-overlay" (click)="cancelDelete()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>⚠️ Confirmar eliminación</h2>
+          <h2><app-icon name="warning" size="md" /> Confirmar eliminación</h2>
         </div>
         <div class="modal-body">
           <p>¿Estás seguro de que deseas eliminar esta radiografía?</p>

@@ -49,7 +49,6 @@
               <th>Email</th>
               <th>Nombre profesional</th>
               <th>Especialidad</th>
-              <th>Boxes</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -70,17 +69,6 @@
                 <td>{{ getDentistFullName(u) }}</td>
                 <td>
                   <span class="specialty-badge">{{ u.dentistEspecialidad ?? '—' }}</span>
-                </td>
-                <td>
-                  @if (u.dentistBoxes && u.dentistBoxes.length > 0) {
-                    <div class="boxes-list">
-                      @for (box of u.dentistBoxes; track box) {
-                        <span class="box-badge">{{ box }}</span>
-                      }
-                    </div>
-                  } @else {
-                    <span class="no-boxes">Sin boxes asignados</span>
-                  }
                 </td>
                 <td>
                   <div class="action-buttons">

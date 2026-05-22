@@ -12,6 +12,8 @@ export interface PatientRow {
   email?: string;
   mail?: string;
   medical_flags?: string[] | null;
+  terminos_pendientes?: boolean;
+  terminos_generales_aceptados?: boolean;
 }
 
 export interface PatientListQuery {

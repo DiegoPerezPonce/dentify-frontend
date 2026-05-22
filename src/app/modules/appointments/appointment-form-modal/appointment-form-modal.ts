@@ -2,6 +2,7 @@ import {
   Component,
   computed,
   EventEmitter,
+  HostListener,
   inject,
   Input,
   OnChanges,
@@ -20,6 +21,7 @@ import { PatientService } from '../../patients/patient.service';
 import { TreatmentCategoryService } from '../treatment-category.service';
 import { TreatmentService } from '../treatment.service';
 import { TreatmentCatalogPickerComponent } from '../treatment-catalog-picker/treatment-catalog-picker';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 import {
   Appointment,
   AppointmentCreateDTO,
@@ -52,7 +54,7 @@ import {
 import {
   appointmentMedicalTitle,
   appointmentPatientMedicalSeverity,
-  medicalRiskIconChar
+  medicalRiskIconName
 } from '../appointment-patient-risk.utils';
 import {
   medicalFlagLabels,
@@ -66,7 +68,7 @@ export type AppointmentModalViewMode = 'create' | 'detail' | 'edit';
 @Component({
   selector: 'app-appointment-form-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TreatmentCatalogPickerComponent],
+  imports: [CommonModule, ReactiveFormsModule, TreatmentCatalogPickerComponent, AppIconComponent],
   templateUrl: './appointment-form-modal.html',
   styleUrl: './appointment-form-modal.scss'
 })
@@ -97,6 +99,7 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
 
   readonly form: FormGroup;
   readonly saving = signal(false);
+  readonly statusMenuOpen = signal(false);
   readonly error = signal<string | null>(null);
   readonly loadingResources = signal(true);
   readonly loadingCatalog = signal(false);
@@ -199,7 +202,14 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
 
   readonly statusOptions = [
     { value: AppointmentStatus.SCHEDULED, label: 'Programada' },
-    { value: AppointmentStatus.CONFIRMED, label: 'Confirmada' },
+    { value: AppointmentStatus.COMPLETED, label: 'Completada' },
+    { value: AppointmentStatus.CANCELLED, label: 'Cancelada' },
+    { value: AppointmentStatus.NO_SHOW, label: 'No asistió' }
+  ];
+
+  /** Estados disponibles desde el detalle (sin entrar en editar). */
+  readonly detailStatusOptions = [
+    { value: AppointmentStatus.SCHEDULED, label: 'Programada' },
     { value: AppointmentStatus.COMPLETED, label: 'Completada' },
     { value: AppointmentStatus.CANCELLED, label: 'Cancelada' },
     { value: AppointmentStatus.NO_SHOW, label: 'No asistió' }
@@ -731,6 +741,7 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   }
 
   onClose(): void {
+    this.statusMenuOpen.set(false);
     this.viewMode = 'create';
     this.resetFormForCreate();
     this.error.set(null);
@@ -770,6 +781,56 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
 
   emitDeleteAppointment(): void {
     if (this.appointment) this.deleteAppointment.emit(this.appointment);
+  }
+
+  toggleStatusMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.statusMenuOpen.update((open) => !open);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('.status-change-wrap')) {
+      return;
+    }
+    this.statusMenuOpen.set(false);
+  }
+
+  changeAppointmentStatus(newStatus: AppointmentStatus): void {
+    const apt = this.appointment;
+    if (!apt || apt.status === newStatus || this.saving()) {
+      this.statusMenuOpen.set(false);
+      return;
+    }
+
+    if (newStatus === AppointmentStatus.CANCELLED) {
+      if (!confirm('¿Estás seguro de que deseas cancelar esta cita?')) {
+        this.statusMenuOpen.set(false);
+        return;
+      }
+    }
+
+    this.statusMenuOpen.set(false);
+    this.saving.set(true);
+    this.error.set(null);
+
+    const request$ =
+      newStatus === AppointmentStatus.CANCELLED
+        ? this.appointmentService.cancel(apt.id)
+        : this.appointmentService.update(apt.id, { status: newStatus });
+
+    request$.subscribe({
+      next: (updated) => {
+        this.saving.set(false);
+        Object.assign(apt, updated);
+        this.saved.emit(updated);
+      },
+      error: (err: unknown) => {
+        this.saving.set(false);
+        this.error.set(this.getErrorMessage(err));
+      }
+    });
   }
 
   private getErrorMessage(err: unknown): string {
@@ -879,6 +940,6 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   }
 
   detailRiskIcon(sev: MedicalAlertSeverity): string {
-    return medicalRiskIconChar(sev);
+    return medicalRiskIconName(sev);
   }
 }

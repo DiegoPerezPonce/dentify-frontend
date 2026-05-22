@@ -1,21 +1,39 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter, map, startWith } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth';
 import { documentLangHtml, isAppLang, LANG_STORAGE_KEY } from '../../core/i18n/translate-app.initializer';
 import { PedagogicalNoticeService } from '../../modules/notifications/pedagogical-notice.service';
-import { getSessionRemainingMs, getSessionRemainingParts, ROLE_ADMIN, SessionRemainingParts } from '../../core/utils/jwt-roles';
+import { AppIconComponent } from '../../shared/app-icon/app-icon.component';
+import { ThemeConfiguratorComponent } from '../../shared/theme-configurator/theme-configurator.component';
+import { ThemeService } from '../../core/theme/theme.service';
+import {
+  getJwtThemeUserKey,
+  getSessionRemainingMs,
+  getSessionRemainingParts,
+  ROLE_ADMIN,
+  SessionRemainingParts
+} from '../../core/utils/jwt-roles';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslateModule],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    TranslateModule,
+    AppIconComponent,
+    ThemeConfiguratorComponent
+  ],
   templateUrl: './app-shell.html',
   styleUrl: './app-shell.scss'
 })
 export class AppShellComponent implements OnInit {
   protected auth = inject(AuthService);
+  readonly theme = inject(ThemeService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   private pedagogicalNoticeService = inject(PedagogicalNoticeService);
@@ -87,8 +105,16 @@ export class AppShellComponent implements OnInit {
     void this.translate.use(code);
   }
 
-  /** Aviso pedagógico visible para alumnos (y admins). */
-  readonly showPedagogicalNotice = signal(true);
+  /** Solo en /app/dashboard. */
+  readonly isDashboardRoute = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map(() => this.isDashboardUrl(this.router.url)),
+      startWith(this.isDashboardUrl(this.router.url))
+    ),
+    { initialValue: this.isDashboardUrl(this.router.url) }
+  );
+
   readonly pedagogicalNoticeTitle = signal<string | null>(null);
   readonly pedagogicalNoticeBody = signal<string | null>(null);
 
@@ -102,6 +128,13 @@ export class AppShellComponent implements OnInit {
   ngOnInit(): void {
     this.currentLang.set(this.translate.currentLang || 'es');
 
+    const userKey = getJwtThemeUserKey(this.auth.getToken());
+    if (userKey) {
+      this.theme.setCacheUserKey(userKey);
+      this.theme.bootstrapFromCache(userKey);
+      this.theme.loadFromApi(userKey);
+    }
+
     const id = window.setInterval(() => this.sessionTick.update((n) => n + 1), 30_000);
     this.destroyRef.onDestroy(() => clearInterval(id));
     this.loadPedagogicalBanner();
@@ -110,6 +143,10 @@ export class AppShellComponent implements OnInit {
   logout(): void {
     this.auth.logout();
     void this.router.navigate(['/login']);
+  }
+
+  private isDashboardUrl(url: string): boolean {
+    return url.split('?')[0] === '/app/dashboard';
   }
 
   private loadPedagogicalBanner(): void {

@@ -1,8 +1,11 @@
 import {
   medicalFlagLabels,
+  medicalRiskIconName,
   patientMedicalSeverity,
   type MedicalAlertSeverity
 } from '../patients/medical-flags.constants';
+
+export { medicalRiskIconName };
 import { Appointment } from './models/appointment.models';
 
 export function appointmentPatientMedicalSeverity(
@@ -14,8 +17,9 @@ export function appointmentPatientMedicalSeverity(
   return null;
 }
 
+/** @deprecated Usar `medicalRiskIconName` (ligature Material). */
 export function medicalRiskIconChar(sev: MedicalAlertSeverity): string {
-  return sev === 'biosecurity' ? '☣' : '!';
+  return medicalRiskIconName(sev);
 }
 
 export function appointmentMedicalTitle(

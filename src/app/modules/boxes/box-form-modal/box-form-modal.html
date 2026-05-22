@@ -69,15 +69,6 @@
               }
             </div>
 
-            <div class="form-group">
-              <label for="box-dentist">Odontólogo asignado</label>
-              <select id="box-dentist" formControlName="dentistSelect">
-                <option value="">Sin odontólogo asignado</option>
-                @for (d of dentists(); track d.id) {
-                  <option [value]="d.id">{{ d.nombre }} {{ d.apellidos }}</option>
-                }
-              </select>
-            </div>
           </div>
         </div>
 

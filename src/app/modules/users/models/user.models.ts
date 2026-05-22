@@ -10,7 +10,6 @@ export interface User {
   dentistNombre?: string | null;
   dentistApellidos?: string | null;
   dentistEspecialidad?: string | null;
-  dentistBoxes?: string[];
 }
 
 export interface UserCreateDTO {

@@ -4,7 +4,6 @@ export interface Dentist {
   apellidos: string;
   especialidad: string;
   email: string;
-  boxes?: string[];
 }
 
 export interface DentistCreateDTO {

@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 import {
   Component,
   HostListener,
@@ -21,7 +22,7 @@ import {
 @Component({
   selector: 'app-treatment-catalog-picker',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AppIconComponent],
   templateUrl: './treatment-catalog-picker.html',
   styleUrl: './treatment-catalog-picker.scss',
   providers: [

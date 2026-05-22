@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 import { RadiografiaService } from '../radiografia.service';
 import { PatientService } from '../patient.service';
 import {
@@ -18,7 +19,7 @@ import { getPacienteIdFromRoute } from '../patient-route-id.util';
 @Component({
   selector: 'app-xray-gallery',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AppIconComponent],
   templateUrl: './xray-gallery.html',
   styleUrl: './xray-gallery.scss'
 })

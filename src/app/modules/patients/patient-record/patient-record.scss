@@ -34,6 +34,36 @@
   margin-bottom: 0.75rem;
 }
 
+.terms-pending-banner {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+  margin-bottom: 0.85rem;
+  color: #92400e;
+
+  strong {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 0.95rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+}
+
+.terms-pending-banner__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .patient-hero {
   background: #fff;
   border: 1px solid #e2e8f0;
@@ -140,7 +170,8 @@
   }
 }
 
-.action-card__icon {
+.action-card__icon,
+.action-card app-icon {
   font-size: 1.35rem;
   line-height: 1;
 }

@@ -2,23 +2,15 @@
   <div class="med-alert med-alert--loading" role="status">Cargando alertas médicas…</div>
 } @else if (error()) {
   <div class="med-alert med-alert--error" role="alert">{{ error() }}</div>
-} @else if (severity()) {
+} @else if (severity(); as sev) {
   <div
     class="med-alert"
-    [class.med-alert--biosecurity]="severity() === 'biosecurity'"
-    [class.med-alert--allergy]="severity() === 'allergy'"
-    [class.med-alert--systemic]="severity() === 'systemic'"
+    [class.med-alert--biosecurity]="sev === 'biosecurity'"
+    [class.med-alert--allergy]="sev === 'allergy'"
+    [class.med-alert--systemic]="sev === 'systemic'"
     role="alert"
   >
-    <span class="med-alert__icon" aria-hidden="true">
-      @if (severity() === 'biosecurity') {
-        ☣
-      } @else if (severity() === 'allergy') {
-        ⚠
-      } @else {
-        ⓘ
-      }
-    </span>
+    <app-icon [name]="medicalRiskIcon(sev)" size="md" class="med-alert__icon" />
     <div class="med-alert__body">
       <strong class="med-alert__title">Información médica crítica</strong>
       <p class="med-alert__flags">{{ labels().join(' · ') }}</p>

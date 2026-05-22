@@ -80,7 +80,6 @@ export class DentistListComponent implements OnInit {
           dentistNombre: d.nombre,
           dentistApellidos: d.apellidos,
           dentistEspecialidad: d.especialidad,
-          dentistBoxes: d.boxes ?? []
         };
         this.clinicalUsers.set([user]);
         this.loading.set(false);

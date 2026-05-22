@@ -1,8 +1,26 @@
-<div class="shell">
-  <aside class="sidebar">
+<div
+  class="shell"
+  [class.shell--menu-overlay]="theme.config().menu_mode === 'overlay'"
+  [class.shell--menu-open]="theme.overlayMenuOpen()"
+>
+  @if (theme.config().menu_mode === 'overlay' && theme.overlayMenuOpen()) {
+    <button
+      type="button"
+      class="sidebar-backdrop"
+      [attr.aria-label]="'THEME.CLOSE_MENU' | translate"
+      (click)="theme.closeOverlayMenu()"
+    ></button>
+  }
+
+  <aside class="sidebar" [class.sidebar--overlay-open]="theme.overlayMenuOpen()">
     <div class="brand">
-      <span class="brand-mark"><span class="brand-d">D</span></span>
-      <span class="brand-text">DENTIFY</span>
+      <img
+        src="img/dentify_logo.png"
+        [attr.alt]="'AUTH.LOGO_ALT' | translate"
+        class="brand-logo"
+        width="220"
+        height="36"
+      />
     </div>
 
     <div class="lang-switch">
@@ -22,35 +40,24 @@
     <nav class="nav-block">
       <p class="nav-label">{{ 'NAV.GENERAL' | translate }}</p>
       <a routerLink="/app/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        <span class="nav-ico" aria-hidden="true">⌂</span>{{ 'NAV.HOME' | translate }}
+        <span class="nav-ico"><app-icon name="home" size="sm" /></span>{{ 'NAV.HOME' | translate }}
       </a>
       <a routerLink="/app/agenda" routerLinkActive="active">
-        <span class="nav-ico" aria-hidden="true">▦</span>{{ 'NAV.CALENDAR' | translate }}
+        <span class="nav-ico"><app-icon name="calendar_month" size="sm" /></span>{{ 'NAV.CALENDAR' | translate }}
       </a>
       <a routerLink="/app/pacientes" routerLinkActive="active">
-        <span class="nav-ico" aria-hidden="true">◎</span>{{ 'NAV.PATIENTS' | translate }}
+        <span class="nav-ico"><app-icon name="groups" size="sm" /></span>{{ 'NAV.PATIENTS' | translate }}
       </a>
       @if (hasDentistProfile()) {
         <a routerLink="/app/odontologos" routerLinkActive="active">
-          <span class="nav-ico" aria-hidden="true">🦷</span>{{ 'NAV.MY_DENTIST_PROFILE' | translate }}
+          <span class="nav-ico"><app-icon name="dentistry" size="sm" /></span>{{ 'NAV.MY_DENTIST_PROFILE' | translate }}
         </a>
       }
-    </nav>
-
-    <nav class="nav-block">
-      <p class="nav-label">{{ 'NAV.TOOLS_SECTION' | translate }}</p>
       <a routerLink="/app/notificaciones" routerLinkActive="active">
-        <span class="nav-ico" aria-hidden="true">🔔</span>{{ 'NAV.NOTIFICATIONS' | translate }}
-      </a>
-      <a routerLink="/app/radiografias" routerLinkActive="active">
-        <span class="nav-ico" aria-hidden="true">📷</span>{{ 'NAV.XRAYS' | translate }}
-      </a>
-      <a routerLink="/app/asistente" routerLinkActive="active">
-        <span class="nav-ico" aria-hidden="true">✦</span>{{ 'NAV.ASSISTANT' | translate }}
-        <span class="badge">{{ 'NAV.AI_BADGE' | translate }}</span>
+        <span class="nav-ico"><app-icon name="notifications" size="sm" /></span>{{ 'NAV.NOTIFICATIONS' | translate }}
       </a>
       <a routerLink="/app/pagos" routerLinkActive="active">
-        <span class="nav-ico" aria-hidden="true">€</span>{{ 'NAV.PAYMENTS' | translate }}
+        <span class="nav-ico"><app-icon name="payments" size="sm" /></span>{{ 'NAV.PAYMENTS' | translate }}
       </a>
     </nav>
 
@@ -69,24 +76,30 @@
         </div>
         @if (!adminNavCollapsed()) {
           <a routerLink="/app/odontologos" routerLinkActive="active">
-            <span class="nav-ico" aria-hidden="true">🦷</span>{{ 'NAV.ADM_MANAGE_DENTISTS' | translate }}
+            <span class="nav-ico"><app-icon name="dentistry" size="sm" /></span>{{ 'NAV.ADM_MANAGE_DENTISTS' | translate }}
           </a>
           <a routerLink="/app/admin/boxes" routerLinkActive="active">
-            <span class="nav-ico" aria-hidden="true">▣</span>{{ 'NAV.ADM_MANAGE_BOXES' | translate }}
+            <span class="nav-ico"><app-icon name="chair_alt" size="sm" /></span>{{ 'NAV.ADM_MANAGE_BOXES' | translate }}
           </a>
           <a routerLink="/app/admin/stock" routerLinkActive="active">
-            <span class="nav-ico" aria-hidden="true">📦</span>{{ 'NAV.ADM_MANAGE_STOCK' | translate }}
+            <span class="nav-ico"><app-icon name="inventory_2" size="sm" /></span>{{ 'NAV.ADM_MANAGE_STOCK' | translate }}
           </a>
           <a routerLink="/app/admin/protocolos" routerLinkActive="active">
-            <span class="nav-ico" aria-hidden="true">📖</span>{{ 'NAV.ADM_MANAGE_PROTOCOLS' | translate }}
+            <span class="nav-ico"><app-icon name="menu_book" size="sm" /></span>{{ 'NAV.ADM_MANAGE_PROTOCOLS' | translate }}
           </a>
           <p class="nav-sub-label">{{ 'NAV.ADM_MORE_GROUP' | translate }}</p>
-          <a routerLink="/app/admin/stock/recepciones" routerLinkActive="active">{{ 'NAV.ADM_RESTOCK' | translate }}</a>
-          <a routerLink="/app/admin/disponibilidad-odontologos" routerLinkActive="active">{{
-            'NAV.ADM_AVAILABILITY' | translate
-          }}</a>
-          <a routerLink="/app/admin/usuarios" routerLinkActive="active">{{ 'NAV.ADM_USERS' | translate }}</a>
-          <a routerLink="/app/admin/avisos" routerLinkActive="active">{{ 'NAV.ADM_NOTICES' | translate }}</a>
+          <a routerLink="/app/admin/stock/recepciones" routerLinkActive="active">
+            <span class="nav-ico"><app-icon name="local_shipping" size="sm" /></span>{{ 'NAV.ADM_RESTOCK' | translate }}
+          </a>
+          <a routerLink="/app/admin/disponibilidad-odontologos" routerLinkActive="active">
+            <span class="nav-ico"><app-icon name="schedule" size="sm" /></span>{{ 'NAV.ADM_AVAILABILITY' | translate }}
+          </a>
+          <a routerLink="/app/admin/usuarios" routerLinkActive="active">
+            <span class="nav-ico"><app-icon name="manage_accounts" size="sm" /></span>{{ 'NAV.ADM_USERS' | translate }}
+          </a>
+          <a routerLink="/app/admin/avisos" routerLinkActive="active">
+            <span class="nav-ico"><app-icon name="campaign" size="sm" /></span>{{ 'NAV.ADM_NOTICES' | translate }}
+          </a>
         }
       </nav>
     }
@@ -103,11 +116,7 @@
           }
         </div>
         <button type="button" class="sidebar-logout-ico" (click)="logout()" [attr.aria-label]="'NAV.LOGOUT' | translate">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
+          <app-icon name="logout" size="sm" />
         </button>
       </div>
       <div class="user-line">
@@ -141,13 +150,50 @@
   </aside>
 
   <main class="main">
-    @if (showPedagogicalNotice() && pedagogicalNoticeTitle()) {
-      <div class="notice-banner" role="status">
-        <strong>{{ pedagogicalNoticeTitle() }}</strong>
-        {{ pedagogicalNoticeBody() }}
+    <div class="theme-toolbar" aria-label="Controles de tema">
+      @if (theme.config().menu_mode === 'overlay') {
+        <button
+          type="button"
+          class="theme-fab"
+          [attr.aria-label]="'THEME.OPEN_MENU' | translate"
+          (click)="theme.toggleOverlayMenu()"
+        >
+          <app-icon name="menu" size="md" />
+        </button>
+      }
+      <button
+        type="button"
+        class="theme-fab"
+        [attr.aria-label]="
+          (theme.config().scheme === 'dark' ? 'THEME.LIGHT_MODE' : 'THEME.DARK_MODE') | translate
+        "
+        (click)="theme.toggleScheme()"
+      >
+        <app-icon [name]="theme.config().scheme === 'dark' ? 'light_mode' : 'dark_mode'" size="md" />
+      </button>
+      <div class="theme-toolbar__palette">
+        <button
+          type="button"
+          class="theme-fab theme-fab--accent"
+          [attr.aria-expanded]="theme.panelOpen()"
+          [attr.aria-label]="'THEME.OPEN_PANEL' | translate"
+          (click)="theme.togglePanel()"
+        >
+          <app-icon name="palette" size="md" />
+        </button>
+        @if (theme.panelOpen()) {
+          <app-theme-configurator />
+        }
       </div>
-    }
+    </div>
+
     <div class="outlet-wrap">
+      @if (isDashboardRoute() && pedagogicalNoticeTitle()) {
+        <div class="notice-banner" role="status">
+          <strong>{{ pedagogicalNoticeTitle() }}</strong>
+          {{ pedagogicalNoticeBody() }}
+        </div>
+      }
       <router-outlet />
     </div>
   </main>

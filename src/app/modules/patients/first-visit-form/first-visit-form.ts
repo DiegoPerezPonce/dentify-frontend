@@ -7,11 +7,12 @@ import { PatientService } from '../patient.service';
 import { PrimeraVisitaCreateDTO, PAIN_LEVELS } from '../models/primera-visita.models';
 import { Patient } from '../models/patient.models';
 import { getPacienteIdFromRoute } from '../patient-route-id.util';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 
 @Component({
   selector: 'app-first-visit-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AppIconComponent],
   templateUrl: './first-visit-form.html',
   styleUrl: './first-visit-form.scss'
 })

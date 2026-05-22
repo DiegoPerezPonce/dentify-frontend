@@ -98,11 +98,11 @@
         <div class="mini-calendar-card">
           <div class="mini-calendar-toolbar">
             <button type="button" class="mini-cal-nav" (click)="prevMiniMonth()" aria-label="Mes anterior">
-              <span class="mini-cal-nav-icon">‹</span>
+              <app-icon name="chevron_left" size="sm" class="mini-cal-nav-icon" />
             </button>
             <h3 class="mini-calendar-title">{{ monthTitle() }}</h3>
             <button type="button" class="mini-cal-nav" (click)="nextMiniMonth()" aria-label="Mes siguiente">
-              <span class="mini-cal-nav-icon">›</span>
+              <app-icon name="chevron_right" size="sm" class="mini-cal-nav-icon" />
             </button>
           </div>
           <button type="button" class="mini-cal-today-link" (click)="goToToday()">Ir a hoy</button>
@@ -197,7 +197,7 @@
                                 [class.day-row__risk--blue]="sev === 'systemic'"
                                 [attr.title]="appointmentRiskTitle(apt)"
                                 aria-hidden="true"
-                              >{{ appointmentRiskIcon(sev) }}</span>
+                              ><app-icon [name]="appointmentRiskIcon(sev)" size="xs" /></span>
                             }
                             {{ apt.patientName || 'Paciente' }}
                           </span>
@@ -273,10 +273,6 @@
             <span>Programada</span>
           </div>
           <div class="legend-item">
-            <span class="legend-swatch legend-swatch--confirmed"></span>
-            <span>Confirmada</span>
-          </div>
-          <div class="legend-item">
             <span class="legend-swatch legend-swatch--completed"></span>
             <span>Completada</span>
           </div>
@@ -289,15 +285,15 @@
             <span>No asistió</span>
           </div>
           <div class="legend-item legend-item--risk">
-            <span class="legend-risk legend-risk--red" aria-hidden="true">☣</span>
+            <span class="legend-risk legend-risk--red"><app-icon name="coronavirus" size="xs" /></span>
             <span>Nivel 1 — Bioseguridad (infecciosas)</span>
           </div>
           <div class="legend-item legend-item--risk">
-            <span class="legend-risk legend-risk--amber" aria-hidden="true">!</span>
+            <span class="legend-risk legend-risk--amber"><app-icon name="warning" size="xs" /></span>
             <span>Nivel 2 — Alergias</span>
           </div>
           <div class="legend-item legend-item--risk">
-            <span class="legend-risk legend-risk--blue" aria-hidden="true">!</span>
+            <span class="legend-risk legend-risk--blue"><app-icon name="info" size="xs" /></span>
             <span>Nivel 3 — Riesgo sistémico</span>
           </div>
         </div>

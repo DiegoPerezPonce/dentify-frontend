@@ -127,7 +127,6 @@ export class AppointmentService {
 /** Symfony `AppointmentCreateDTO` / `AppointmentUpdateDTO` usan snake_case y fecha+hora separadas. */
 const STATUS_TO_ESTADO: Record<AppointmentStatus, string> = {
   [AppointmentStatus.SCHEDULED]: 'programada',
-  [AppointmentStatus.CONFIRMED]: 'confirmada',
   [AppointmentStatus.COMPLETED]: 'completada',
   [AppointmentStatus.CANCELLED]: 'cancelada',
   [AppointmentStatus.NO_SHOW]: 'no_show'
@@ -267,7 +266,7 @@ function normalizeListResponse(res: unknown): AppointmentListResult {
 /** Valores `estado` del API (Symfony) → enum del front. */
 const API_ESTADO_TO_STATUS: Record<string, AppointmentStatus> = {
   programada: AppointmentStatus.SCHEDULED,
-  confirmada: AppointmentStatus.CONFIRMED,
+  confirmada: AppointmentStatus.SCHEDULED,
   completada: AppointmentStatus.COMPLETED,
   cancelada: AppointmentStatus.CANCELLED,
   no_show: AppointmentStatus.NO_SHOW
@@ -282,8 +281,11 @@ export function normalizeAppointmentFromApi(raw: unknown): Appointment {
   const id = Number(o['id']);
   const patientId = Number(o['patientId'] ?? o['pacienteId'] ?? 0);
   const dentistId = Number(o['dentistId'] ?? o['odontologoId'] ?? 0);
-  const boxRaw = o['boxId'];
-  const boxId = boxRaw != null && boxRaw !== '' ? Number(boxRaw) : undefined;
+  const boxRaw = o['boxId'] ?? o['box_id'];
+  const boxId =
+    boxRaw != null && boxRaw !== ''
+      ? Number(boxRaw)
+      : undefined;
   const duration = Number(o['duration'] ?? o['duracion'] ?? 30) || 30;
   const cleaningRaw = o['cleaningTimeMinutes'] ?? o['tiempo_limpieza'];
   const cleaningTimeMinutes =
@@ -316,6 +318,8 @@ export function normalizeAppointmentFromApi(raw: unknown): Appointment {
   let status: AppointmentStatus = AppointmentStatus.SCHEDULED;
   if (API_ESTADO_TO_STATUS[estadoRaw]) {
     status = API_ESTADO_TO_STATUS[estadoRaw];
+  } else if (estadoRaw === 'confirmed') {
+    status = AppointmentStatus.SCHEDULED;
   } else if (Object.values(AppointmentStatus).includes(estadoRaw as AppointmentStatus)) {
     status = estadoRaw as AppointmentStatus;
   }

@@ -2,12 +2,13 @@
   <!-- Header con info del paciente -->
   <div class="page-header">
     <button type="button" class="btn-back" (click)="goBack()">
-      ← Volver a ficha
+      <app-icon name="arrow_back" size="sm" />
+      Volver a ficha
     </button>
     
     @if (patient()) {
       <div class="patient-info-card">
-        <div class="patient-icon">🏥</div>
+        <app-icon name="local_hospital" size="xl" class="patient-icon" />
         <div class="patient-details">
           <h1>Primera Visita</h1>
           <p class="patient-name">{{ patient()!.nombre }} {{ patient()!.apellidos }}</p>
@@ -17,7 +18,7 @@
     }
 
     <div class="section-header">
-      <h2>📋 Registro de Primera Visita</h2>
+      <h2><app-icon name="assignment" size="md" /> Registro de Primera Visita</h2>
       <p class="subtitle">Captura datos iniciales y evalúa el estado del paciente</p>
     </div>
   </div>
@@ -32,7 +33,7 @@
 
   @if (error()) {
     <div class="alert alert-error">
-      <span class="icon">⚠️</span>
+      <app-icon name="warning" size="md" class="icon" />
       <span>{{ error() }}</span>
     </div>
   }

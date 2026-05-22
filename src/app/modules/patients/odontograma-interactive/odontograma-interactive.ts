@@ -42,6 +42,7 @@ import {
 import { Patient } from '../models/patient.models';
 import { getPacienteIdFromRoute } from '../patient-route-id.util';
 import { OdontogramaToothChartComponent } from '../odontograma-tooth-chart/odontograma-tooth-chart';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 
 interface ToothSelection {
   toothId: string;
@@ -60,7 +61,7 @@ interface BridgeLineCoords {
 @Component({
   selector: 'app-odontograma-interactive',
   standalone: true,
-  imports: [CommonModule, FormsModule, OdontogramaToothChartComponent],
+  imports: [CommonModule, FormsModule, OdontogramaToothChartComponent, AppIconComponent],
   templateUrl: './odontograma-interactive.html',
   styleUrl: './odontograma-interactive.scss'
 })

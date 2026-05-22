@@ -117,6 +117,15 @@ export function getJwtEmail(token: string | null): string | null {
 }
 
 /** Id de odontólogo vinculado al usuario (JWT emitido tras login; requiere email coincidente con `Dentist`). */
+/** Clave estable para cache de tema (email o sub del JWT). */
+export function getJwtThemeUserKey(token: string | null): string | null {
+  const email = getJwtEmail(token);
+  if (email) return email.toLowerCase();
+  const p = getJwtPayload(token);
+  const sub = p?.['sub'];
+  return typeof sub === 'string' && sub.trim() ? sub.trim() : null;
+}
+
 export function getJwtDentistId(token: string | null): number | null {
   const p = getJwtPayload(token);
   if (!p) return null;

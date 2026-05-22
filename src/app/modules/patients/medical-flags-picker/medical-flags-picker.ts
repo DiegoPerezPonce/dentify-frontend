@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 import {
   Component,
   forwardRef,
@@ -30,7 +31,7 @@ const ADD_OTHER_LABEL: Record<MedicalFlagLevel, string> = {
 @Component({
   selector: 'app-medical-flags-picker',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AppIconComponent],
   templateUrl: './medical-flags-picker.html',
   styleUrl: './medical-flags-picker.scss',
   providers: [

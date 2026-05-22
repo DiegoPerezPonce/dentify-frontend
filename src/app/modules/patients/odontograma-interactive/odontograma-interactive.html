@@ -2,13 +2,14 @@
   <!-- Header -->
   <div class="page-header">
     <button type="button" class="btn-back" (click)="goBack()">
-      ← Volver a ficha
+      <app-icon name="arrow_back" size="sm" />
+      Volver a ficha
     </button>
     
     @if (patient()) {
       <div class="patient-info-card">
         <div class="patient-details">
-          <h1>🦷 Odontograma Interactivo</h1>
+          <h1><app-icon name="dentistry" size="md" /> Odontograma Interactivo</h1>
           <p class="patient-name">{{ patient()!.nombre }} {{ patient()!.apellidos }}</p>
           <span class="badge">DNI: {{ patient()!.dni }}</span>
         </div>
@@ -29,7 +30,7 @@
 
   @if (error()) {
     <div class="alert alert-error">
-      <span class="icon">⚠️</span>
+      <app-icon name="warning" size="md" class="icon" />
       <span>{{ error() }}</span>
     </div>
   }
@@ -40,7 +41,7 @@
       
       <!-- Odontograma visual -->
       <div class="odontograma-visual">
-        <h2 class="section-title">🦷 Dentadura (Sistema FDI)</h2>
+        <h2 class="section-title"><app-icon name="dentistry" size="sm" /> Dentadura (Sistema FDI)</h2>
         
         <!-- Leyenda de colores -->
         <div class="color-legend">
@@ -65,15 +66,15 @@
             <span>Negro: Estado base</span>
           </div>
           <div class="legend-item legend-item--x">
-            <span class="legend-x" style="color: #e53e3e;">✕</span>
+            <app-icon name="close" size="xs" class="legend-x" iconClass="legend-x--red" />
             <span>Rojo: Extracción futura</span>
           </div>
           <div class="legend-item legend-item--x">
-            <span class="legend-x" style="color: #3182ce;">✕</span>
+            <app-icon name="close" size="xs" class="legend-x" iconClass="legend-x--blue" />
             <span>Azul: Extracción realizada</span>
           </div>
           <div class="legend-item legend-item--x">
-            <span class="legend-x" style="color: #2d3748;">✕</span>
+            <app-icon name="close" size="xs" class="legend-x" iconClass="legend-x--dark" />
             <span>Negro: Ausencia natural</span>
           </div>
           <div class="legend-item legend-item--bridge">
@@ -232,7 +233,7 @@
 
       <!-- Panel de control -->
       <div class="control-panel">
-        <h2 class="section-title">⚙️ Panel de control</h2>
+        <h2 class="section-title"><app-icon name="tune" size="sm" /> Panel de control</h2>
 
         @if (odontograma()) {
           <div class="bridge-section selection-info">
@@ -333,7 +334,8 @@
                     class="status-badge status-badge--x"
                     [style.color]="getToothLevelStatus(selectedTooth()!.toothId)!.color"
                   >
-                    ✕ {{ getToothLevelStateLabel(getToothLevelStatus(selectedTooth()!.toothId)!.estado) }}
+                    <app-icon name="close" size="xs" />
+                    {{ getToothLevelStateLabel(getToothLevelStatus(selectedTooth()!.toothId)!.estado) }}
                   </span>
                 </div>
               } @else {
@@ -350,7 +352,9 @@
                       [(ngModel)]="selectedToothLevelState"
                     />
                     <span class="state-label state-label--x" [style.border-color]="item[1].color">
-                      <span class="legend-x-inline" [style.color]="item[1].color">✕</span>
+                      <span class="legend-x-inline" [style.color]="item[1].color">
+                        <app-icon name="close" size="xs" />
+                      </span>
                       {{ item[1].label }}
                     </span>
                   </label>
@@ -643,7 +647,7 @@
           }
         } @else {
           <div class="empty-selection">
-            <div class="empty-icon">🦷</div>
+            <app-icon name="dentistry" size="xl" class="empty-icon" />
             <h3>Selecciona un diente</h3>
             <p>Haz clic en cualquier diente del odontograma para comenzar</p>
           </div>
