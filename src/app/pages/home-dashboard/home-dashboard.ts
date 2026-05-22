@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { forkJoin, of } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, filter, finalize } from 'rxjs/operators';
 import { interval, map, startWith } from 'rxjs';
+import { AppIconComponent } from '../../shared/app-icon/app-icon.component';
 import { AuthService } from '../../core/services/auth';
 import { ROLE_ADMIN } from '../../core/utils/jwt-roles';
 import { AppointmentService } from '../../modules/appointments/appointment.service';
@@ -20,7 +21,7 @@ import {
   WeeklyScheduleDay
 } from '../../modules/dentist-availability/models/dentist-schedule.models';
 
-export type AppointmentStatusUi = 'registered' | 'confirmed' | 'tentative' | 'locked';
+export type AppointmentStatusUi = 'registered' | 'tentative' | 'locked';
 
 export interface DashboardAppointment {
   id: number;
@@ -34,11 +35,17 @@ export interface DashboardAppointment {
   active: boolean;
 }
 
+export interface DashboardBoxSchedule {
+  heading: string;
+  slots: string[];
+}
+
 export interface DashboardBox {
   id: number;
   label: string;
   state: 'busy' | 'free' | 'maint' | 'student';
-  detail: string;
+  statusLine: string;
+  schedule?: DashboardBoxSchedule;
 }
 
 export interface DashboardCalendarEvent {
@@ -51,7 +58,7 @@ export interface DashboardCalendarEvent {
 @Component({
   selector: 'app-home-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule],
+  imports: [CommonModule, RouterLink, TranslateModule, AppIconComponent],
   templateUrl: './home-dashboard.html',
   styleUrl: './home-dashboard.scss'
 })
@@ -62,6 +69,7 @@ export class HomeDashboardComponent implements OnInit {
   private boxService = inject(BoxService);
   private stockService = inject(StockMaterialService);
   private scheduleService = inject(DentistScheduleService);
+  private router = inject(Router);
 
   readonly ROLE_ADMIN = ROLE_ADMIN;
 
@@ -69,12 +77,56 @@ export class HomeDashboardComponent implements OnInit {
   readonly error = signal<string | null>(null);
 
   readonly appointments = signal<DashboardAppointment[]>([]);
+  /** Citas de hoy (sin canceladas) para calcular ocupación de boxes. */
+  readonly todayAppointments = signal<Appointment[]>([]);
   readonly boxes = signal<Box[]>([]);
   readonly stockItems = signal<StockMaterial[]>([]);
   readonly stockAlertTotal = signal(0);
 
   readonly dashNow = toSignal(interval(60_000).pipe(map(() => new Date()), startWith(new Date())), {
     initialValue: new Date()
+  });
+
+  readonly currentTimeIso = computed(() => this.dashNow().toISOString());
+
+  readonly currentClock = computed(() => {
+    const d = this.dashNow();
+    const lang = this.translate.currentLang || 'es';
+    try {
+      return new Intl.DateTimeFormat(lang, {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(d);
+    } catch {
+      return new Intl.DateTimeFormat('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(d);
+    }
+  });
+
+  readonly currentDateLabel = computed(() => {
+    const d = this.dashNow();
+    const lang = this.translate.currentLang || 'es';
+    try {
+      const raw = new Intl.DateTimeFormat(lang, {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }).format(d);
+      return raw.charAt(0).toUpperCase() + raw.slice(1);
+    } catch {
+      const raw = new Intl.DateTimeFormat('es-ES', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }).format(d);
+      return raw.charAt(0).toUpperCase() + raw.slice(1);
+    }
   });
 
   readonly doctorName = computed(() => {
@@ -117,9 +169,8 @@ export class HomeDashboardComponent implements OnInit {
   });
 
   readonly boxesOccupiedCount = computed(() => {
-    const items = this.boxes();
-    if (!items.length) return 0;
-    return items.filter((b) => (b.estado || '').toLowerCase() !== 'disponible').length;
+    this.dashNow();
+    return this.boxCards().filter((b) => b.state === 'busy').length;
   });
 
   readonly boxesTotal = computed(() => this.boxes().length);
@@ -143,7 +194,15 @@ export class HomeDashboardComponent implements OnInit {
     });
   });
 
-  readonly boxCards = computed((): DashboardBox[] => this.boxes().map(mapBoxToDashboard));
+  readonly boxCards = computed((): DashboardBox[] => {
+    this.dashNow();
+    const nowMs = this.dashNow().getTime();
+    const todayKey = formatApiDate(this.dashNow());
+    const todayAppts = this.todayAppointments().filter(
+      (a) => localDayKey(a.startDateTime) === todayKey
+    );
+    return this.boxes().map((box) => buildBoxDashboardCard(box, todayAppts, nowMs));
+  });
 
   readonly hasDentistScope = computed(() => this.auth.getDentistId() != null);
 
@@ -189,6 +248,14 @@ export class HomeDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDashboard();
+    this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe((e) => {
+        const url = e.urlAfterRedirects;
+        if (url.includes('/dashboard')) {
+          this.loadDashboard();
+        }
+      });
   }
 
   loadDashboard(): void {
@@ -197,21 +264,15 @@ export class HomeDashboardComponent implements OnInit {
     const today = formatApiDate(new Date());
     const dentistId = this.auth.getDentistId();
 
-    const apptQuery: {
-      startDate: string;
-      endDate: string;
-      pageSize: number;
-      page: number;
-      dentistId?: number;
-    } = {
+    const apptQueryBase = {
       startDate: today,
       endDate: today,
       pageSize: 200,
       page: 1
     };
-    if (dentistId != null) {
-      apptQuery.dentistId = dentistId;
-    }
+
+    const apptQueryForList =
+      dentistId != null ? { ...apptQueryBase, dentistId } : { ...apptQueryBase };
 
     const schedule$ =
       dentistId != null
@@ -219,7 +280,10 @@ export class HomeDashboardComponent implements OnInit {
         : of(null);
 
     forkJoin({
-      appts: this.appointmentService.list(apptQuery).pipe(
+      appts: this.appointmentService.list(apptQueryForList).pipe(
+        catchError(() => of({ items: [] as Appointment[], total: 0 }))
+      ),
+      boxAppts: this.appointmentService.list(apptQueryBase).pipe(
         catchError(() => of({ items: [] as Appointment[], total: 0 }))
       ),
       boxes: this.boxService.list().pipe(catchError(() => of({ items: [] as Box[], total: 0 }))),
@@ -230,15 +294,20 @@ export class HomeDashboardComponent implements OnInit {
     })
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: ({ appts, boxes, stock, schedule }) => {
+        next: ({ appts, boxAppts, boxes, stock, schedule }) => {
           this.myWeeklySchedule.set(schedule);
-          const raw = (appts.items ?? [])
+          const listRaw = (appts.items ?? [])
             .filter((a) => a.status !== AppointmentStatus.CANCELLED)
             .sort((a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime());
 
+          const boxDayRaw = (boxAppts.items ?? []).filter(
+            (a) => a.status !== AppointmentStatus.CANCELLED
+          );
+
           const now = Date.now();
-          const mapped = raw.map((a) => mapAppointmentToDashboard(a, now));
+          const mapped = listRaw.map((a) => mapAppointmentToDashboard(a, now));
           this.appointments.set(mapped);
+          this.todayAppointments.set(boxDayRaw);
 
           this.boxes.set(boxes.items ?? []);
           this.stockItems.set(stock.items ?? []);
@@ -296,8 +365,7 @@ function mapAppointmentToDashboard(a: Appointment, nowMs: number): DashboardAppo
   const treatmentLine = (a.treatment || '').trim() || '—';
 
   let ui: AppointmentStatusUi = 'tentative';
-  if (a.status === AppointmentStatus.CONFIRMED) ui = 'confirmed';
-  else if (a.status === AppointmentStatus.COMPLETED) ui = 'registered';
+  if (a.status === AppointmentStatus.COMPLETED) ui = 'registered';
   else if (a.status === AppointmentStatus.NO_SHOW) ui = 'locked';
   else if (a.status === AppointmentStatus.SCHEDULED) ui = 'tentative';
 
@@ -322,22 +390,133 @@ function formatTimeLabel(iso: string): string {
   return `${h}:${min}`;
 }
 
-function mapBoxToDashboard(box: Box): DashboardBox {
-  const est = (box.estado || '').toLowerCase();
-  let state: DashboardBox['state'] = 'student';
-  if (est === 'disponible') state = 'free';
-  else if (est === 'ocupado') state = 'busy';
-  else if (est === 'mantenimiento' || est.includes('manten') || est.includes('fuera')) state = 'maint';
+function appointmentBlocksBox(a: Appointment): boolean {
+  return (
+    a.status !== AppointmentStatus.CANCELLED &&
+    a.status !== AppointmentStatus.COMPLETED &&
+    a.status !== AppointmentStatus.NO_SHOW
+  );
+}
 
-  const parts = [box.dentistNombre?.trim(), (box.descripcion || '').trim(), box.estado].filter(Boolean);
-  const detail = parts.length ? parts.join(' · ') : '—';
+function localDayKey(iso: string): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return formatApiDate(d);
+}
+
+function appointmentMatchesBox(a: Appointment, box: Box): boolean {
+  const boxId = Number(a.boxId);
+  if (Number.isFinite(boxId) && boxId === box.id) {
+    return true;
+  }
+  const an = (a.boxName ?? '').trim().toLowerCase();
+  const bn = (box.nombre ?? '').trim().toLowerCase();
+  return an.length > 0 && bn.length > 0 && an === bn;
+}
+
+function buildBoxDashboardCard(box: Box, appointments: Appointment[], nowMs: number): DashboardBox {
+  const label = box.nombre?.trim() || `Box ${box.id}`;
+  const est = (box.estado || '').toLowerCase();
+
+  if (est === 'mantenimiento' || est.includes('manten') || est.includes('fuera')) {
+    return {
+      id: box.id,
+      label,
+      state: 'maint',
+      statusLine: 'En mantenimiento'
+    };
+  }
+
+  const boxAppts = appointments
+    .filter((a) => appointmentMatchesBox(a, box) && appointmentBlocksBox(a))
+    .sort((a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime());
+
+  const slotLines = boxAppts.map((a) =>
+    formatOccupancySlot(a.startDateTime, a.endDateTime)
+  );
+
+  const current = boxAppts.find((a) => {
+    const start = new Date(a.startDateTime).getTime();
+    const end = new Date(a.endDateTime || a.startDateTime).getTime();
+    return nowMs >= start && nowMs < end;
+  });
+
+  if (current) {
+    return {
+      id: box.id,
+      label,
+      state: 'busy',
+      statusLine: 'Ocupado ahora',
+      schedule: {
+        heading: 'Cita en curso:',
+        slots: [formatOccupancySlot(current.startDateTime, current.endDateTime)]
+      }
+    };
+  }
+
+  const next = boxAppts.find((a) => new Date(a.startDateTime).getTime() > nowMs);
+  if (next) {
+    return {
+      id: box.id,
+      label,
+      state: 'free',
+      statusLine: 'Disponible',
+      schedule: {
+        heading: 'Próxima cita:',
+        slots: [formatOccupancySlot(next.startDateTime, next.endDateTime)]
+      }
+    };
+  }
+
+  if (boxAppts.length > 0) {
+    return {
+      id: box.id,
+      label,
+      state: 'free',
+      statusLine: 'Disponible',
+      schedule: {
+        heading: 'Citas hoy:',
+        slots: slotLines
+      }
+    };
+  }
+
+  if (est === 'ocupado') {
+    return {
+      id: box.id,
+      label,
+      state: 'busy',
+      statusLine: 'Ocupado'
+    };
+  }
 
   return {
     id: box.id,
-    label: box.nombre || `Box ${box.id}`,
-    state,
-    detail
+    label,
+    state: 'free',
+    statusLine: 'Disponible'
   };
+}
+
+/** Ej.: "8:00 a.m. - 8:35 a.m." */
+function formatOccupancySlot(startIso: string, endIso: string): string {
+  return `${formatTimeAmPm(startIso)} - ${formatTimeAmPm(endIso || startIso)}`;
+}
+
+function formatTimeAmPm(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  const raw = d.toLocaleTimeString('es-ES', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+  return raw
+    .replace(/\s*a\.?\s*m\.?/gi, ' a.m.')
+    .replace(/\s*p\.?\s*m\.?/gi, ' p.m.')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 export type CalendarCell = { day: number; isToday: boolean } | null;

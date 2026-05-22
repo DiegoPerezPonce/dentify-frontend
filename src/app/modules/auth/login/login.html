@@ -51,7 +51,7 @@
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
         <div class="form-group" [class.has-error]="showError('identifier')">
           <label for="identifier">
-            <span class="label-icon">✉</span>
+            <app-icon name="mail" size="sm" class="label-icon" />
             {{ 'AUTH.IDENTIFIER' | translate }}
             <span class="required-mark">*</span>
           </label>
@@ -65,7 +65,7 @@
               [class.input-error]="showError('identifier')"
               [class.input-valid]="isValid('identifier')"
             />
-            <span class="input-icon" *ngIf="isValid('identifier')">✓</span>
+            <app-icon name="check_circle" size="sm" class="input-icon" *ngIf="isValid('identifier')" />
           </div>
           <div class="error-message" *ngIf="showError('identifier')">
             <ng-container *ngIf="loginForm.get('identifier')?.errors?.['required']">
@@ -79,7 +79,7 @@
 
         <div class="form-group" [class.has-error]="showError('password')">
           <label for="password">
-            <span class="label-icon">🔒</span>
+            <app-icon name="lock" size="sm" class="label-icon" />
             {{ 'AUTH.PASSWORD' | translate }}
             <span class="required-mark">*</span>
           </label>
@@ -108,7 +108,7 @@
         </div>
 
         <div class="server-error" *ngIf="serverError">
-          <span>⚠️</span> {{ serverError }}
+          <app-icon name="warning" size="sm" /> {{ serverError }}
         </div>
 
         <button type="submit" class="btn-login" [class.loading]="isLoading" [disabled]="isLoading">

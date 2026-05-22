@@ -1,3 +1,26 @@
+@use '@angular/material' as mat;
+@use './styles/theme-variables';
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$cyan-palette,
+        tertiary: mat.$azure-palette
+      ),
+      typography: (
+        brand-family: 'Exo',
+        plain-family: 'Noto Sans',
+        bold-weight: 700,
+        medium-weight: 600,
+        regular-weight: 400
+      ),
+      density: 0
+    )
+  );
+}
+
 @font-face {
   font-family: 'Exo';
   src: url('/fonts/exo/Exo-Regular.woff2') format('woff2');
@@ -68,11 +91,11 @@
   /* Layout tokens (Issue #24) */
   --layout-max-width: 1280px;
   --layout-gap: 1rem;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --radius-sm: var(--radius-ui-sm, 8px);
+  --radius-md: var(--radius-ui, 12px);
+  --radius-lg: var(--radius-ui-lg, 16px);
   --border-soft: 1px solid #e2e8f0;
-  --shadow-soft: 0 2px 10px rgba(15, 23, 42, 0.06);
+  --shadow-soft: var(--shadow-ui-card, 0 2px 10px rgba(15, 23, 42, 0.06));
 }
 
 /* --- ESTILOS GLOBALES BASE --- */
@@ -84,8 +107,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: var(--font-body);
-  background-color: var(--dentify-light);
-  color: var(--dentify-dark);
+  background-color: var(--shell-bg, var(--dentify-light));
+  color: var(--text-main, var(--dentify-dark));
   -webkit-font-smoothing: antialiased;
 }
 
@@ -97,7 +120,7 @@ html, body {
 h1, h2, h3, .dentify-title {
   font-family: var(--font-titles);
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: var(--ui-heading-tracking, -0.5px);
 }
 
 h4, h5, h6, .dentify-subtitle {
@@ -119,13 +142,167 @@ button, input, select, textarea {
 
 /* Reusable global surface utility for consistent cards/panels */
 .dentify-surface {
-  border: var(--border-soft);
-  border-radius: var(--radius-md);
-  background: #fff;
-  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-color, var(--border-soft));
+  border-radius: var(--radius-ui-lg, var(--radius-md));
+  background: var(--surface-card, #fff);
+  box-shadow: var(--shadow-ui-card, var(--shadow-ui, var(--shadow-soft)));
+  color: var(--text-main, var(--dentify-dark));
+}
+
+.muted,
+.sub,
+.page-indicator {
+  color: var(--text-muted, #64748b);
+}
+
+h1,
+h2,
+h3,
+h4,
+.dentify-title {
+  color: var(--text-main, var(--dentify-dark));
+}
+
+input,
+select,
+textarea {
+  background-color: var(--input-bg, #fff);
+  color: var(--input-text, inherit);
+  border-color: var(--input-border, #cbd5e1);
+}
+
+/* Placeholders legibles en toda la app */
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in srgb, var(--text-muted, #64748b) 55%, var(--text-main, #1e293b));
+  opacity: 1;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: color-mix(in srgb, var(--text-muted, #64748b) 55%, var(--text-main, #1e293b));
+  opacity: 1;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: color-mix(in srgb, var(--text-muted, #64748b) 55%, var(--text-main, #1e293b));
+  opacity: 1;
+}
+
+html[data-theme='dark'] {
+  /* Solo el texto del placeholder: gris claro legible sobre fondo oscuro */
+  --placeholder-color: #b8c5d6;
+}
+
+html[data-theme='dark'] input::placeholder,
+html[data-theme='dark'] textarea::placeholder,
+html[data-theme='dark'] input::-webkit-input-placeholder,
+html[data-theme='dark'] textarea::-webkit-input-placeholder,
+html[data-theme='dark'] input::-moz-placeholder,
+html[data-theme='dark'] textarea::-moz-placeholder {
+  color: var(--placeholder-color) !important;
+  opacity: 1 !important;
+}
+
+html[data-theme='dark'] .data-table th {
+  background: var(--surface-elevated, #273549);
+  color: var(--text-muted, #94a3b8);
+}
+
+html[data-theme='dark'] .data-table td {
+  color: var(--text-main, #f1f5f9);
+  border-bottom-color: var(--border-color, #334155);
+}
+
+html[data-theme='dark'] .data-table {
+  background: var(--surface-card, #1e293b);
 }
 
 /* Utilidad para botones o fondos con el degradado de marca */
 .bg-dentify {
   background: var(--dentify-gradient);
+}
+
+/* --- Iconos Material (app-icon) --- */
+.app-icon--xs mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.app-icon--sm mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.app-icon--md mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.app-icon--lg mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.app-icon--xl mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+.app-icon__glyph {
+  color: inherit;
+}
+
+/* Botones y títulos con icono inline */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+h1 app-icon,
+h2 app-icon,
+h3 app-icon,
+.section-title app-icon,
+.field-hint app-icon,
+.dash-appt__lock-msg app-icon {
+  vertical-align: middle;
+  margin-right: 0.25rem;
+}
+
+.field-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.server-error {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* FullCalendar / DOM dinámico sin Angular */
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded', sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 }

@@ -7,14 +7,16 @@ import { getPacienteIdFromRoute } from '../patient-route-id.util';
 import { ActivatedRoute } from '@angular/router';
 import {
   medicalFlagLabels,
+  medicalRiskIconName,
   patientMedicalSeverity,
   type MedicalAlertSeverity
 } from '../medical-flags.constants';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 
 @Component({
   selector: 'app-patient-record',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AppIconComponent],
   templateUrl: './patient-record.html',
   styleUrl: './patient-record.scss'
 })
@@ -43,10 +45,20 @@ export class PatientRecordComponent implements OnInit {
     return patientMedicalSeverity(p.medical_flags) || null;
   });
 
+  readonly medicalRiskIcon = medicalRiskIconName;
+
   readonly medicalTitle = computed(() => {
     const p = this.patient();
     if (!p?.medical_flags?.length) return '';
     return medicalFlagLabels(p.medical_flags).join(', ');
+  });
+
+  readonly terminosPendientes = computed(() => {
+    const p = this.patient();
+    if (!p) return false;
+    if (p.terminos_pendientes === true) return true;
+    if (p.terminos_pendientes === false) return false;
+    return p.terminos_generales_aceptados !== true;
   });
 
   ngOnInit(): void {

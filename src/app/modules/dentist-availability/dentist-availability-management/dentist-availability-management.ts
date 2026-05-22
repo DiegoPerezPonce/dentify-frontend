@@ -243,8 +243,7 @@ export class DentistAvailabilityManagementComponent implements OnInit {
       .saveDentistWeekly(dentistId, {
         days: this.weekDraft().map((d) => ({
           weekday: d.weekday,
-          shift: d.shift,
-          defaultBoxId: d.defaultBoxId ?? null
+          shift: d.shift
         }))
       })
       .subscribe({

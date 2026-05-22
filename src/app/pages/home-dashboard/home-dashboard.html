@@ -26,7 +26,7 @@
       }
     </div>
     <div class="dash-top__search">
-      <span class="dash-search-ico" aria-hidden="true">⌕</span>
+      <span class="dash-search-ico"><app-icon name="search" size="sm" /></span>
       <input
         type="search"
         class="dash-search-input"
@@ -35,14 +35,15 @@
       />
     </div>
     <div class="dash-top__actions">
+      <div class="dash-clock" aria-live="polite">
+        <span class="dash-clock__label">{{ 'HOME_DASH.CURRENT_TIME' | translate }}</span>
+        <time class="dash-clock__time" [attr.datetime]="currentTimeIso()">{{ currentClock() }}</time>
+        <span class="dash-clock__date">{{ currentDateLabel() }}</span>
+      </div>
       <a routerLink="/app/notificaciones" class="dash-icon-btn" [attr.aria-label]="'HOME_DASH.NOTIF_ARIA' | translate">
-        <span class="dash-bell" aria-hidden="true">🔔</span>
+        <app-icon name="notifications" size="md" class="dash-bell" />
         <span class="dash-dot"></span>
       </a>
-      <a routerLink="/app/agenda" class="dash-icon-btn" [attr.aria-label]="'HOME_DASH.SETTINGS_ARIA' | translate">
-        <span aria-hidden="true">⚙</span>
-      </a>
-      <a routerLink="/app/agenda" class="dash-btn dash-btn--ghost">{{ 'HOME_DASH.REPORT' | translate }}</a>
       <a routerLink="/app/agenda" class="dash-btn dash-btn--primary">{{ 'HOME_DASH.NEW_APPT' | translate }}</a>
     </div>
   </header>
@@ -61,7 +62,7 @@
 
     <div class="dash-stats" [class.dash-stats--muted]="loading()">
       <article class="dash-stat">
-        <div class="dash-stat__ico" aria-hidden="true">🪑</div>
+        <div class="dash-stat__ico"><app-icon name="chair_alt" size="lg" /></div>
         <div>
           <p class="dash-stat__label">{{ 'HOME_DASH.STAT_BOXES' | translate }}</p>
           <p class="dash-stat__value">{{ boxesOccupiedCount() }}/{{ boxesTotal() || '—' }}</p>
@@ -73,7 +74,7 @@
         </div>
       </article>
       <article class="dash-stat" [class.dash-stat--alert]="stockAlertTotal() > 0">
-        <div class="dash-stat__ico" aria-hidden="true">📦</div>
+        <div class="dash-stat__ico"><app-icon name="inventory_2" size="lg" /></div>
         <div>
           <p class="dash-stat__label">{{ 'HOME_DASH.STAT_STOCK' | translate }}</p>
           <p class="dash-stat__value">{{ stockAlertTotal() }}</p>
@@ -85,7 +86,7 @@
         </div>
       </article>
       <article class="dash-stat">
-        <div class="dash-stat__ico" aria-hidden="true">👥</div>
+        <div class="dash-stat__ico"><app-icon name="groups" size="lg" /></div>
         <div>
           <p class="dash-stat__label">{{ 'HOME_DASH.STAT_PATIENTS' | translate }}</p>
           <p class="dash-stat__value">{{ patientsTodayCount() }}</p>
@@ -97,16 +98,16 @@
     <div class="dash-quick">
       @if (isAdmin()) {
         <a routerLink="/app/admin/stock" class="dash-quick__card">
-          <span class="dash-quick__ico" aria-hidden="true">🛒</span>
+          <span class="dash-quick__ico"><app-icon name="shopping_cart" size="md" /></span>
           <span>{{ 'HOME_DASH.QUICK_RESTOCK' | translate }}</span>
         </a>
         <a routerLink="/app/admin/protocolos" class="dash-quick__card">
-          <span class="dash-quick__ico" aria-hidden="true">📋</span>
+          <span class="dash-quick__ico"><app-icon name="menu_book" size="md" /></span>
           <span>{{ 'HOME_DASH.QUICK_PROTO' | translate }}</span>
         </a>
       }
       <a routerLink="/app/agenda" class="dash-quick__card">
-        <span class="dash-quick__ico" aria-hidden="true">▦</span>
+        <span class="dash-quick__ico"><app-icon name="calendar_month" size="md" /></span>
         <span>{{ 'HOME_DASH.QUICK_AGENDA' | translate }}</span>
       </a>
     </div>
@@ -130,14 +131,11 @@
                   <span
                     class="dash-appt__pill"
                     [class.dash-appt__pill--reg]="a.status === 'registered'"
-                    [class.dash-appt__pill--conf]="a.status === 'confirmed'"
                     [class.dash-appt__pill--tent]="a.status === 'tentative'"
                     [class.dash-appt__pill--lock]="a.status === 'locked'"
                   >
                     @if (a.status === 'registered') {
                       {{ 'HOME_DASH.ST_REGISTERED' | translate }}
-                    } @else if (a.status === 'confirmed') {
-                      {{ 'HOME_DASH.ST_CONFIRMED' | translate }}
                     } @else if (a.status === 'tentative') {
                       {{ 'HOME_DASH.ST_TENTATIVE' | translate }}
                     } @else {
@@ -152,7 +150,9 @@
                   </div>
                   <p class="dash-appt__treat">{{ a.treatmentLine }}</p>
                   @if (a.status === 'locked') {
-                    <p class="dash-appt__lock-msg">🔒 {{ 'HOME_DASH.FILE_LOCKED' | translate }}</p>
+                    <p class="dash-appt__lock-msg">
+                      <app-icon name="lock" size="xs" /> {{ 'HOME_DASH.FILE_LOCKED' | translate }}
+                    </p>
                   }
                   <div class="dash-appt__btns">
                     <a routerLink="/app/agenda" class="dash-appt__btn dash-appt__btn--pri">{{
@@ -182,7 +182,15 @@
             @for (b of boxCards(); track b.id) {
               <article class="dash-box" [class]="'dash-box--' + b.state">
                 <span class="dash-box__tag">{{ b.label }}</span>
-                <p class="dash-box__detail">{{ b.detail }}</p>
+                <p class="dash-box__status">{{ b.statusLine }}</p>
+                @if (b.schedule) {
+                  <p class="dash-box__schedule-title">{{ b.schedule.heading }}</p>
+                  <ul class="dash-box__slots">
+                    @for (slot of b.schedule.slots; track slot) {
+                      <li>{{ slot }}</li>
+                    }
+                  </ul>
+                }
               </article>
             }
           </div>

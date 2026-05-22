@@ -1,13 +1,14 @@
 import { Component, effect, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientService } from '../patient.service';
-import { medicalFlagLabels, patientMedicalSeverity } from '../medical-flags.constants';
+import { medicalFlagLabels, medicalRiskIconName, patientMedicalSeverity } from '../medical-flags.constants';
 import type { MedicalAlertSeverity } from '../medical-flags.constants';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 
 @Component({
   selector: 'app-patient-alert-banner',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AppIconComponent],
   templateUrl: './patient-alert-banner.html',
   styleUrl: './patient-alert-banner.scss'
 })
@@ -24,6 +25,7 @@ export class PatientAlertBannerComponent {
 
   readonly severity = signal<MedicalAlertSeverity>(null);
   readonly labels = signal<string[]>([]);
+  readonly medicalRiskIcon = medicalRiskIconName;
 
   constructor() {
     effect(() => {

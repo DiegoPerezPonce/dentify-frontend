@@ -46,7 +46,6 @@
               <th>ID</th>
               <th>Nombre</th>
               <th>Estado</th>
-              <th>Odontólogo</th>
               <th>Descripción</th>
               <th>Acciones</th>
             </tr>
@@ -66,13 +65,6 @@
                 </td>
                 <td>
                   <span class="estado-badge" [class]="estadoClass(box.estado)">{{ box.estado }}</span>
-                </td>
-                <td>
-                  @if (box.dentistNombre) {
-                    <span>{{ box.dentistNombre }}</span>
-                  } @else {
-                    <span class="no-dentist">Sin asignar</span>
-                  }
                 </td>
                 <td class="cell-desc">{{ box.descripcion || '—' }}</td>
                 <td>

@@ -11,9 +11,7 @@ import {
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BoxService } from '../box.service';
-import { DentistService } from '../../dentists/dentist.service';
 import { Box, BoxCreatePayload, BoxUpdatePayload } from '../models/box.models';
-import { Dentist } from '../../dentists/models/dentist.models';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export const BOX_ESTADOS = ['disponible', 'ocupado', 'mantenimiento'] as const;
@@ -28,7 +26,6 @@ export const BOX_ESTADOS = ['disponible', 'ocupado', 'mantenimiento'] as const;
 export class BoxFormModalComponent implements OnChanges {
   private fb = inject(FormBuilder);
   private boxService = inject(BoxService);
-  private dentistService = inject(DentistService);
 
   @Input() isOpen = false;
   @Input() box: Box | null = null;
@@ -39,25 +36,19 @@ export class BoxFormModalComponent implements OnChanges {
   readonly form: FormGroup;
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
-  readonly dentists = signal<Dentist[]>([]);
   readonly estados = BOX_ESTADOS;
 
   constructor() {
     this.form = this.fb.group({
       nombre: ['', Validators.required],
       descripcion: [''],
-      estado: ['disponible', Validators.required],
-      dentistSelect: ['']
+      estado: ['disponible', Validators.required]
     });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['box'] || changes['isOpen']) && this.isOpen) {
       this.error.set(null);
-      this.dentistService.list().subscribe({
-        next: (r) => this.dentists.set(r.items),
-        error: () => this.dentists.set([])
-      });
       this.resetForm();
     }
   }
@@ -69,15 +60,13 @@ export class BoxFormModalComponent implements OnChanges {
       this.form.patchValue({
         nombre: this.box.nombre,
         descripcion: this.box.descripcion ?? '',
-        estado: this.box.estado || 'disponible',
-        dentistSelect: this.box.dentistId != null ? String(this.box.dentistId) : ''
+        estado: this.box.estado || 'disponible'
       });
     } else {
       this.form.reset({
         nombre: '',
         descripcion: '',
-        estado: 'disponible',
-        dentistSelect: ''
+        estado: 'disponible'
       });
     }
   }
@@ -103,57 +92,29 @@ export class BoxFormModalComponent implements OnChanges {
       nombre: string;
       descripcion: string;
       estado: string;
-      dentistSelect: string;
     };
 
-    if (this.isEditMode && this.box) {
-      const payload: BoxUpdatePayload = {
-        nombre: fv.nombre.trim(),
-        descripcion: fv.descripcion?.trim() ? fv.descripcion.trim() : null,
-        estado: fv.estado
-      };
+    const payload: BoxCreatePayload | BoxUpdatePayload = {
+      nombre: fv.nombre.trim(),
+      descripcion: fv.descripcion?.trim() ? fv.descripcion.trim() : null,
+      estado: fv.estado
+    };
 
-      const sel = fv.dentistSelect ?? '';
-      if (sel === '') {
-        if (this.box.dentistId != null) {
-          payload.clear_dentist = true;
-        }
-      } else {
-        payload.dentist_id = Number(sel);
+    const request$ =
+      this.isEditMode && this.box
+        ? this.boxService.update(this.box.id, payload)
+        : this.boxService.create(payload as BoxCreatePayload);
+
+    request$.subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.saved.emit();
+      },
+      error: (err: unknown) => {
+        this.saving.set(false);
+        this.error.set(this.getErrorMessage(err));
       }
-
-      this.boxService.update(this.box.id, payload).subscribe({
-        next: () => {
-          this.saving.set(false);
-          this.saved.emit();
-        },
-        error: (err: unknown) => {
-          this.saving.set(false);
-          this.error.set(this.getErrorMessage(err));
-        }
-      });
-    } else {
-      const payload: BoxCreatePayload = {
-        nombre: fv.nombre.trim(),
-        descripcion: fv.descripcion?.trim() ? fv.descripcion.trim() : null,
-        estado: fv.estado
-      };
-      const sel = fv.dentistSelect ?? '';
-      if (sel !== '') {
-        payload.dentist_id = Number(sel);
-      }
-
-      this.boxService.create(payload).subscribe({
-        next: () => {
-          this.saving.set(false);
-          this.saved.emit();
-        },
-        error: (err: unknown) => {
-          this.saving.set(false);
-          this.error.set(this.getErrorMessage(err));
-        }
-      });
-    }
+    });
   }
 
   onClose(): void {

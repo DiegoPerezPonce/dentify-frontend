@@ -31,6 +31,7 @@ import { Dentist } from '../models/dentist.models';
 import { Box } from '../../boxes/models/box.models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppointmentFormModalComponent } from '../appointment-form-modal/appointment-form-modal';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 import { DentistScheduleService } from '../../dentist-availability/dentist-schedule.service';
 import { ClinicScheduleSettings } from '../../dentist-availability/models/dentist-schedule.models';
 import {
@@ -42,7 +43,7 @@ import { catchError, of } from 'rxjs';
 import {
   appointmentMedicalTitle,
   appointmentPatientMedicalSeverity,
-  medicalRiskIconChar
+  medicalRiskIconName
 } from '../appointment-patient-risk.utils';
 import type { MedicalAlertSeverity } from '../../patients/medical-flags.constants';
 
@@ -51,7 +52,7 @@ export type AgendaLayoutView = 'day' | 'week';
 @Component({
   selector: 'app-appointment-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, FullCalendarModule, AppointmentFormModalComponent],
+  imports: [CommonModule, FormsModule, FullCalendarModule, AppointmentFormModalComponent, AppIconComponent],
   templateUrl: './appointment-calendar.html',
   styleUrl: './appointment-calendar.scss'
 })
@@ -169,6 +170,7 @@ export class AppointmentCalendarComponent implements OnInit {
     eventDrop: this.handleEventDrop.bind(this),
     eventResize: this.handleEventResize.bind(this),
     eventContent: (arg) => this.renderEventContent(arg),
+    displayEventTime: false,
     height: 'auto',
     contentHeight: 'auto'
   };
@@ -275,8 +277,6 @@ export class AppointmentCalendarComponent implements OnInit {
     switch (status) {
       case AppointmentStatus.SCHEDULED:
         return 'Programada';
-      case AppointmentStatus.CONFIRMED:
-        return 'Confirmada';
       case AppointmentStatus.COMPLETED:
         return 'Completada';
       case AppointmentStatus.CANCELLED:
@@ -290,8 +290,6 @@ export class AppointmentCalendarComponent implements OnInit {
 
   statusPillClass(status: AppointmentStatus): string {
     switch (status) {
-      case AppointmentStatus.CONFIRMED:
-        return 'day-row__pill day-row__pill--confirmed';
       case AppointmentStatus.COMPLETED:
         return 'day-row__pill day-row__pill--completed';
       case AppointmentStatus.CANCELLED:
@@ -386,12 +384,16 @@ export class AppointmentCalendarComponent implements OnInit {
       const risk = appointmentPatientMedicalSeverity(apt);
       return {
         id: String(apt.id),
-        title: this.getEventTitle(apt),
+        title: this.getEventCalendarLabel(apt),
         start: apt.startDateTime,
         end: apt.endDateTime,
         backgroundColor: this.getEventBackgroundColor(apt, risk),
         borderColor: this.getEventBorderColor(apt, risk),
-        classNames: risk ? [`fc-event--risk-${risk}`] : [],
+        classNames: [
+          'fc-event--compact',
+          `fc-event--status-${apt.status}`,
+          ...(risk ? [`fc-event--risk-${risk}`] : [])
+        ],
         extendedProps: {
           appointment: apt
         }
@@ -404,22 +406,38 @@ export class AppointmentCalendarComponent implements OnInit {
     };
   }
 
-  private getEventTitle(apt: Appointment): string {
-    const parts: string[] = [];
-    if (apt.patientName) {
-      parts.push(apt.patientName);
+  /** Etiqueta corta en el bloque del calendario (vista semana/día). */
+  private getEventCalendarLabel(apt: Appointment): string {
+    const name = apt.patientName?.trim();
+    if (!name) return 'Cita';
+    if (name.length <= 14) return name;
+    const parts = name.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) {
+      const short = `${parts[0]} ${parts[parts.length - 1].charAt(0)}.`;
+      return short.length <= 14 ? short : parts[0];
     }
-    if (apt.treatment) {
-      parts.push(`- ${apt.treatment}`);
+    return `${name.slice(0, 12)}…`;
+  }
+
+  /** Tooltip al pasar el ratón (detalle completo). */
+  private getEventTooltip(apt: Appointment): string {
+    const lines: string[] = [];
+    if (apt.patientName?.trim()) lines.push(apt.patientName.trim());
+    if (apt.treatment?.trim()) lines.push(apt.treatment.trim());
+    if (apt.dentistName?.trim()) lines.push(`Odontólogo: ${apt.dentistName.trim()}`);
+    if (apt.boxName?.trim()) lines.push(`Box: ${apt.boxName.trim()}`);
+    const start = new Date(apt.startDateTime);
+    if (!Number.isNaN(start.getTime())) {
+      lines.push(
+        start.toLocaleString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+      );
     }
-    return parts.join(' ') || 'Cita sin datos';
+    return lines.join(' · ') || 'Cita';
   }
 
   private getEventColor(status: AppointmentStatus): string {
     switch (status) {
       case AppointmentStatus.SCHEDULED:
-        return '#3788d8';
-      case AppointmentStatus.CONFIRMED:
         return '#28a745';
       case AppointmentStatus.COMPLETED:
         return '#6c757d';
@@ -428,7 +446,7 @@ export class AppointmentCalendarComponent implements OnInit {
       case AppointmentStatus.NO_SHOW:
         return '#ffc107';
       default:
-        return '#3788d8';
+        return '#28a745';
     }
   }
 
@@ -466,24 +484,31 @@ export class AppointmentCalendarComponent implements OnInit {
     const wrap = document.createElement('div');
     wrap.className = 'fc-event-main-custom';
 
+    const tooltip = apt ? this.getEventTooltip(apt) : String(arg.event.title ?? '');
+    if (tooltip) {
+      wrap.setAttribute('title', tooltip);
+    }
+
     if (apt) {
       const risk = appointmentPatientMedicalSeverity(apt);
       if (risk) {
         const badge = document.createElement('span');
-        badge.className = `fc-event-risk fc-event-risk--${risk}`;
-        badge.textContent = medicalRiskIconChar(risk);
+        badge.className = `material-symbols-rounded fc-event-risk fc-event-risk--${risk}`;
+        badge.textContent = medicalRiskIconName(risk);
         badge.setAttribute('aria-hidden', 'true');
-        const title = appointmentMedicalTitle(apt);
-        if (title) {
-          badge.setAttribute('title', title);
+        const riskTitle = appointmentMedicalTitle(apt);
+        if (riskTitle) {
+          badge.setAttribute('title', riskTitle);
         }
         wrap.appendChild(badge);
       }
     }
 
+    const label =
+      apt != null ? this.getEventCalendarLabel(apt) : String(arg.event.title ?? 'Cita');
     const text = document.createElement('span');
     text.className = 'fc-event-title-text';
-    text.textContent = arg.event.title;
+    text.textContent = label;
     wrap.appendChild(text);
 
     return { domNodes: [wrap] };
@@ -494,7 +519,7 @@ export class AppointmentCalendarComponent implements OnInit {
   }
 
   appointmentRiskIcon(sev: MedicalAlertSeverity): string {
-    return medicalRiskIconChar(sev);
+    return medicalRiskIconName(sev);
   }
 
   appointmentRiskTitle(apt: Appointment): string {
@@ -551,7 +576,10 @@ export class AppointmentCalendarComponent implements OnInit {
     this.preselectedEnd.set(null);
   }
 
-  onAppointmentSaved(_appointment: Appointment): void {
+  onAppointmentSaved(appointment: Appointment): void {
+    if (this.selectedAppointment()?.id === appointment.id) {
+      this.selectedAppointment.set(appointment);
+    }
     this.loadAppointments();
   }
 

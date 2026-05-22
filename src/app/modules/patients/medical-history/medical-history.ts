@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 import { PatientService } from '../patient.service';
 import { ClinicalHistory, HISTORY_TYPE_COLORS, HISTORY_TYPE_LABELS } from '../models/clinical-history.models';
 import { Patient } from '../models/patient.models';
@@ -9,7 +10,7 @@ import { getPacienteIdFromRoute } from '../patient-route-id.util';
 @Component({
   selector: 'app-medical-history',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AppIconComponent],
   templateUrl: './medical-history.html',
   styleUrl: './medical-history.scss'
 })

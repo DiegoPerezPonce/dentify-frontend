@@ -8,14 +8,16 @@ import { PatientService } from '../patient.service';
 import { PatientListQuery, PatientRow } from '../models/patient-list.models';
 import {
   medicalFlagLabels,
+  medicalRiskIconName,
   patientMedicalSeverity,
   type MedicalAlertSeverity
 } from '../medical-flags.constants';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 
 @Component({
   selector: 'app-patient-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AppIconComponent],
   templateUrl: './patient-list.html',
   styleUrl: './patient-list.scss'
 })
@@ -98,6 +100,8 @@ export class PatientListComponent implements OnInit {
     return parts.join(' ').trim() || '(Sin nombre)';
   }
 
+  readonly medicalRiskIcon = medicalRiskIconName;
+
   rowMedicalSeverity(p: PatientRow): MedicalAlertSeverity {
     return patientMedicalSeverity(p.medical_flags);
   }
@@ -116,6 +120,12 @@ export class PatientListComponent implements OnInit {
 
   dniLine(p: PatientRow): string {
     return String(p.dni ?? p.nif ?? '—');
+  }
+
+  hasTerminosPendientes(p: PatientRow): boolean {
+    if (p.terminos_pendientes === true) return true;
+    if (p.terminos_pendientes === false) return false;
+    return p.terminos_generales_aceptados !== true;
   }
 
   trackById(_i: number, p: PatientRow): string {

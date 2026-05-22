@@ -102,10 +102,6 @@ function normalizeWeekly(raw: unknown): DentistWeeklySchedule {
         return {
           weekday: Number(day['weekday']),
           shift: String(day['shift'] ?? 'off') as DentistWorkShift,
-          defaultBoxId:
-            day['defaultBoxId'] != null && day['defaultBoxId'] !== ''
-              ? Number(day['defaultBoxId'])
-              : null,
           startTime: (day['startTime'] as string | null) ?? null,
           endTime: (day['endTime'] as string | null) ?? null,
           shiftLabel: (day['shiftLabel'] as string | null) ?? null

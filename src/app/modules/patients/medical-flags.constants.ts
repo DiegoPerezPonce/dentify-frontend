@@ -214,3 +214,11 @@ export function medicalFlagLabels(flags: string[]): string[] {
 export function medicalFlagOptionsByLevel(level: MedicalFlagLevel): MedicalFlagOption[] {
   return MEDICAL_FLAG_OPTIONS.filter((o) => o.level === level);
 }
+
+/** Icono Material para alertas médicas por severidad. */
+export function medicalRiskIconName(sev: MedicalAlertSeverity): string {
+  if (!sev) return 'info';
+  if (sev === 'biosecurity') return 'coronavirus';
+  if (sev === 'allergy') return 'warning';
+  return 'info';
+}

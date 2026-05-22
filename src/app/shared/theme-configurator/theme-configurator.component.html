@@ -1,0 +1,79 @@
+<div class="theme-panel" role="dialog" [attr.aria-label]="'THEME.PANEL_ARIA' | translate">
+  <section class="theme-panel__section">
+    <h3 class="theme-panel__title">{{ 'THEME.PRIMARY' | translate }}</h3>
+    <div class="theme-panel__swatches">
+      @for (key of primaryOptions; track key) {
+        <button
+          type="button"
+          class="theme-swatch"
+          [class.theme-swatch--active]="isPrimaryActive(key)"
+          [style.background]="swatchPrimary(key)"
+          [attr.aria-label]="'THEME.PRIMARY_OPTION' | translate: { color: key }"
+          [attr.aria-pressed]="isPrimaryActive(key)"
+          (click)="theme.setPrimary(key)"
+        ></button>
+      }
+    </div>
+  </section>
+
+  <section class="theme-panel__section">
+    <h3 class="theme-panel__title">{{ 'THEME.SURFACE' | translate }}</h3>
+    <div class="theme-panel__swatches">
+      @for (key of surfaceOptions; track key) {
+        <button
+          type="button"
+          class="theme-swatch theme-swatch--surface"
+          [class.theme-swatch--active]="isSurfaceActive(key)"
+          [style.background]="swatchSurface(key)"
+          [attr.aria-label]="surfaceLabelKey(key) | translate"
+          [attr.aria-pressed]="isSurfaceActive(key)"
+          (click)="theme.setSurface(key)"
+        ></button>
+      }
+    </div>
+  </section>
+
+  <section class="theme-panel__section">
+    <h3 class="theme-panel__title">{{ 'THEME.PRESET' | translate }}</h3>
+    <div class="theme-panel__pills">
+      @for (key of presetOptions; track key) {
+        <button
+          type="button"
+          class="theme-pill"
+          [class.theme-pill--active]="isPresetActive(key)"
+          (click)="theme.setPreset(key)"
+        >
+          @if (key === 'aura') {
+            {{ 'THEME.PRESET_AURA' | translate }}
+          } @else if (key === 'lara') {
+            {{ 'THEME.PRESET_LARA' | translate }}
+          } @else {
+            {{ 'THEME.PRESET_NORA' | translate }}
+          }
+        </button>
+      }
+    </div>
+  </section>
+
+  <section class="theme-panel__section">
+    <h3 class="theme-panel__title">{{ 'THEME.MENU_MODE' | translate }}</h3>
+    <div class="theme-panel__pills">
+      <button
+        type="button"
+        class="theme-pill"
+        [class.theme-pill--active]="isMenuStatic()"
+        (click)="theme.setMenuMode('static')"
+      >
+        {{ 'THEME.MENU_STATIC' | translate }}
+      </button>
+      <button
+        type="button"
+        class="theme-pill"
+        [class.theme-pill--active]="!isMenuStatic()"
+        (click)="theme.setMenuMode('overlay')"
+      >
+        {{ 'THEME.MENU_OVERLAY' | translate }}
+      </button>
+    </div>
+  </section>
+</div>

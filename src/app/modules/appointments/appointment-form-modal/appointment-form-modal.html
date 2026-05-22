@@ -40,7 +40,7 @@
                 [class.detail-risk-ico--blue]="sev === 'systemic'"
                 [attr.title]="detailAppointmentRiskTitle()"
                 aria-hidden="true"
-              >{{ detailRiskIcon(sev) }}</span>
+              ><app-icon [name]="detailRiskIcon(sev)" size="xs" /></span>
             }
             {{ appointment.patientName || '—' }} (ID {{ appointment.patientId }})
           </dd>
@@ -92,6 +92,34 @@
           <button type="button" class="btn btn-danger" (click)="emitDeleteAppointment()" [disabled]="saving()">
             Eliminar
           </button>
+          <div class="status-change-wrap" (click)="$event.stopPropagation()">
+            <button
+              type="button"
+              class="btn btn-secondary status-change-trigger"
+              (click)="toggleStatusMenu($event)"
+              [disabled]="saving()"
+              [attr.aria-expanded]="statusMenuOpen()"
+              aria-haspopup="menu"
+            >
+              Cambiar estado
+            </button>
+            @if (statusMenuOpen()) {
+              <div class="status-menu" role="menu" aria-label="Cambiar estado de la cita">
+                @for (opt of detailStatusOptions; track opt.value) {
+                  <button
+                    type="button"
+                    role="menuitem"
+                    class="status-menu-item"
+                    [class.status-menu-item--active]="appointment.status === opt.value"
+                    [disabled]="saving() || appointment.status === opt.value"
+                    (click)="changeAppointmentStatus(opt.value)"
+                  >
+                    {{ opt.label }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
           <button type="button" class="btn btn-primary" (click)="switchToEdit()" [disabled]="saving()">Editar</button>
         </div>
       </div>
@@ -333,17 +361,6 @@
               <span class="error-message">Selecciona un box</span>
             }
           </div>
-
-          @if (isEditMode) {
-            <div class="form-group">
-              <label for="status">Estado</label>
-              <select id="status" formControlName="status" class="form-control">
-                @for (st of statusOptions; track st.value) {
-                  <option [ngValue]="st.value">{{ st.label }}</option>
-                }
-              </select>
-            </div>
-          }
 
           <div class="form-group full-width">
             <label for="notes">Notas</label>

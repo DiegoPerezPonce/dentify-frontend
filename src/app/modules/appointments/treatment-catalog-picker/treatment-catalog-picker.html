@@ -69,7 +69,7 @@
                     <span class="tcp__opt-label">{{ t.name }}</span>
                     <span class="tcp__opt-meta">{{ t.defaultDurationMinutes }} min</span>
                     @if (isSelected(t)) {
-                      <span class="tcp__check" aria-hidden="true">✓</span>
+                      <app-icon name="check" size="sm" class="tcp__check" />
                     }
                   </button>
                 </li>

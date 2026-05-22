@@ -2,7 +2,8 @@
   <!-- Header con info del paciente -->
   <div class="page-header">
     <button type="button" class="btn-back" (click)="goBack()">
-      ← Volver a ficha
+      <app-icon name="arrow_back" size="sm" />
+      Volver a ficha
     </button>
     
     @if (patient()) {
@@ -20,7 +21,7 @@
     }
 
     <div class="section-header">
-      <h2>📋 Historial Clínico</h2>
+      <h2><app-icon name="history_edu" size="md" /> Historial Clínico</h2>
       <p class="subtitle">Registro cronológico de consultas, tratamientos y observaciones médicas</p>
     </div>
   </div>
@@ -35,7 +36,7 @@
 
   @if (error()) {
     <div class="alert alert-error">
-      <span class="icon">⚠️</span>
+      <app-icon name="warning" size="md" class="icon" />
       <span>{{ error() }}</span>
     </div>
   }
@@ -44,7 +45,7 @@
   @if (!loading() && !error()) {
     @if (history().length === 0) {
       <div class="empty-state">
-        <div class="empty-icon">📄</div>
+        <app-icon name="description" size="xl" class="empty-icon" />
         <h3>Sin historial clínico</h3>
         <p>Este paciente aún no tiene entradas en su historial médico.</p>
       </div>

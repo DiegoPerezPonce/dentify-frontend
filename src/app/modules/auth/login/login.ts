@@ -10,11 +10,12 @@ import {
   LANG_STORAGE_KEY
 } from '../../../core/i18n/translate-app.initializer';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink, TranslateModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink, TranslateModule, AppIconComponent],
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })

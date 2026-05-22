@@ -6,11 +6,12 @@ import { PatientService } from '../patient.service';
 import { PatientCreateDTO, PatientUpdateDTO } from '../models/patient.models';
 import { getPacienteIdFromRoute } from '../patient-route-id.util';
 import { MedicalFlagsPickerComponent } from '../medical-flags-picker/medical-flags-picker';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
 
 @Component({
   selector: 'app-patient-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MedicalFlagsPickerComponent],
+  imports: [CommonModule, ReactiveFormsModule, MedicalFlagsPickerComponent, AppIconComponent],
   templateUrl: './patient-form.html',
   styleUrl: './patient-form.scss'
 })
@@ -37,7 +38,9 @@ export class PatientFormComponent implements OnInit {
     enfermedades: [''],
     alergias: [''],
     historial_clinico: [''],
-    datos_facturacion: ['']
+    datos_facturacion: [''],
+    alta_por_telefono: [false],
+    terminos_generales_aceptados: [false]
   });
 
   ngOnInit(): void {
@@ -47,6 +50,44 @@ export class PatientFormComponent implements OnInit {
       this.patientId.set(Number(idStr));
       this.loadPatient(Number(idStr));
     }
+
+    this.wireTerminosMutualExclusion();
+  }
+
+  /** Solo una opción activa: alta por teléfono (pendiente) o términos aceptados. */
+  private wireTerminosMutualExclusion(): void {
+    const phone = this.patientForm.get('alta_por_telefono');
+    const terms = this.patientForm.get('terminos_generales_aceptados');
+    if (!phone || !terms) return;
+
+    const syncDisabledState = (): void => {
+      if (phone.value) {
+        terms.disable({ emitEvent: false });
+        phone.enable({ emitEvent: false });
+      } else if (terms.value) {
+        phone.disable({ emitEvent: false });
+        terms.enable({ emitEvent: false });
+      } else {
+        phone.enable({ emitEvent: false });
+        terms.enable({ emitEvent: false });
+      }
+    };
+
+    phone.valueChanges.subscribe((byPhone) => {
+      if (byPhone && terms.value) {
+        terms.setValue(false, { emitEvent: false });
+      }
+      syncDisabledState();
+    });
+
+    terms.valueChanges.subscribe((accepted) => {
+      if (accepted && phone.value) {
+        phone.setValue(false, { emitEvent: false });
+      }
+      syncDisabledState();
+    });
+
+    syncDisabledState();
   }
 
   loadPatient(id: number): void {
@@ -69,7 +110,9 @@ export class PatientFormComponent implements OnInit {
           enfermedades: patient.enfermedades ?? '',
           alergias: patient.alergias ?? '',
           historial_clinico: patient.historial_clinico ?? '',
-          datos_facturacion: patient.datos_facturacion ?? ''
+          datos_facturacion: patient.datos_facturacion ?? '',
+          alta_por_telefono: false,
+          terminos_generales_aceptados: patient.terminos_generales_aceptados ?? false
         });
         this.loading.set(false);
       },
@@ -93,6 +136,8 @@ export class PatientFormComponent implements OnInit {
     const formValue = this.patientForm.getRawValue();
     const flags = (formValue.medical_flags as string[]) ?? [];
     const notesTrim = (formValue.medical_notes ?? '').trim();
+    const byPhone = !!formValue.alta_por_telefono;
+    const termsAccepted = byPhone ? false : !!formValue.terminos_generales_aceptados;
 
     if (this.isEditMode()) {
       const dto: PatientUpdateDTO = {
@@ -107,7 +152,8 @@ export class PatientFormComponent implements OnInit {
         enfermedades: formValue.enfermedades || undefined,
         alergias: formValue.alergias || undefined,
         historial_clinico: formValue.historial_clinico || undefined,
-        datos_facturacion: formValue.datos_facturacion || undefined
+        datos_facturacion: formValue.datos_facturacion || undefined,
+        terminos_generales_aceptados: termsAccepted
       };
 
       this.patientService.update(this.patientId()!, dto).subscribe({
@@ -134,7 +180,8 @@ export class PatientFormComponent implements OnInit {
         enfermedades: formValue.enfermedades || undefined,
         alergias: formValue.alergias || undefined,
         historial_clinico: formValue.historial_clinico || undefined,
-        datos_facturacion: formValue.datos_facturacion || undefined
+        datos_facturacion: formValue.datos_facturacion || undefined,
+        terminos_generales_aceptados: termsAccepted
       };
 
       this.patientService.create(dto).subscribe({

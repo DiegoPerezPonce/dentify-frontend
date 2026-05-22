@@ -9,7 +9,10 @@
 .odontograma-visual,.control-panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:.8rem}
 .section-title{margin:0 0 .6rem;font-size:1rem}.color-legend{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.6rem}.legend-item{display:flex;align-items:center;gap:.3rem;font-size:.8rem}.legend-color{width:10px;height:10px;border-radius:3px}
 .legend-item--x .legend-x{font-weight:800;font-size:1rem;line-height:1}
-.legend-x-inline{font-weight:800;margin-right:.25rem}
+.legend-x-inline{font-weight:800;margin-right:.25rem;display:inline-flex;align-items:center}
+.app-icon__glyph.legend-x--red{color:#e53e3e}
+.app-icon__glyph.legend-x--blue{color:#3182ce}
+.app-icon__glyph.legend-x--dark{color:#2d3748}
 .tooth-level-section{margin-top:.65rem;padding-top:.55rem;border-top:1px dashed #cbd5e1}
 .subsection-title{margin:0 0 .45rem;font-size:.88rem;color:#334155}
 .tooth-level-options{flex-direction:column;align-items:stretch}
