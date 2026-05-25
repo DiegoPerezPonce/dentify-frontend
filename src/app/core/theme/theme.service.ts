@@ -25,6 +25,13 @@ export class ThemeService {
   readonly overlayMenuOpen = signal(false);
   readonly loading = signal(false);
 
+  /** Tras login: aplica caché al instante y sincroniza con la API. */
+  restoreUserSession(userKey: string): void {
+    this.setCacheUserKey(userKey);
+    this.bootstrapFromCache(userKey);
+    this.loadFromApi(userKey);
+  }
+
   bootstrapFromCache(userKey: string): void {
     const cached = this.readCache(userKey);
     if (cached) {
@@ -33,17 +40,25 @@ export class ThemeService {
   }
 
   loadFromApi(userKey: string): void {
+    const cached = this.readCache(userKey);
     this.loading.set(true);
     this.mePrefs
       .getTheme()
       .pipe(
         tap((cfg) => {
-          const normalized = this.normalize(cfg);
-          this.writeCache(userKey, normalized);
-          this.apply(normalized);
+          const fromApi = this.normalize(cfg);
+          const merged = this.mergeWithCache(fromApi, cached);
+          this.writeCache(userKey, merged);
+          this.apply(merged);
+          if (cached?.scheme === 'dark' && fromApi.scheme === 'light') {
+            this.mePrefs.patchTheme(merged).subscribe({ error: () => undefined });
+          }
           this.loading.set(false);
         }),
         catchError(() => {
+          if (cached) {
+            this.apply(cached);
+          }
           this.loading.set(false);
           return of(null);
         })
@@ -97,7 +112,16 @@ export class ThemeService {
     this.persist(next);
   }
 
+  /** Login público: documento en tema claro (no persiste preferencias del usuario). */
+  applyLoginAppearance(): void {
+    this.applyDocument(DEFAULT_THEME_CONFIG);
+  }
+
   private apply(cfg: ThemeConfig): void {
+    this.applyDocument(this.normalize(cfg));
+  }
+
+  private applyDocument(cfg: ThemeConfig): void {
     this.config.set(cfg);
     const html = document.documentElement;
     html.setAttribute('data-theme', cfg.scheme);
@@ -127,6 +151,27 @@ export class ThemeService {
     return THEME_SURFACE_OPTIONS.includes(s as ThemeSurface)
       ? (s as ThemeSurface)
       : DEFAULT_THEME_CONFIG.surface;
+  }
+
+  /**
+   * Si el usuario tenía oscuro en localStorage pero la API aún devuelve light (p. ej. PATCH fallido),
+   * conservamos la preferencia local hasta que el servidor la persista.
+   */
+  private mergeWithCache(fromApi: ThemeConfig, cached: ThemeConfig | null): ThemeConfig {
+    if (!cached) {
+      return fromApi;
+    }
+    if (cached.scheme === 'dark' && fromApi.scheme === 'light') {
+      return {
+        ...fromApi,
+        scheme: cached.scheme,
+        primary: cached.primary,
+        surface: cached.surface,
+        preset: cached.preset,
+        menu_mode: cached.menu_mode
+      };
+    }
+    return fromApi;
   }
 
   private normalize(raw: Partial<ThemeConfig> | null | undefined): ThemeConfig {

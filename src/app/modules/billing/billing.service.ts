@@ -102,6 +102,16 @@ export class BillingService {
     return all[idx];
   }
 
+  delete(id: string): boolean {
+    const all = this.read();
+    const next = all.filter((r) => r.id !== id);
+    if (next.length === all.length) {
+      return false;
+    }
+    this.write(next);
+    return true;
+  }
+
   private read(): BillingRecord[] {
     const raw = localStorage.getItem(this.storageKey);
     if (!raw) {

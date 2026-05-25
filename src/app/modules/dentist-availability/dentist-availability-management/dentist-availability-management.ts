@@ -9,16 +9,21 @@ import {
   ClinicScheduleSavePayload,
   ClinicScheduleSettings,
   DentistWorkShift,
-  SHIFT_OPTIONS,
+  SHIFT_ICONS,
   WEEKDAYS_MON_SAT,
+  buildShiftOptions,
+  shiftLabelFor,
   WeeklyScheduleDay,
   defaultWeekDraft
 } from '../models/dentist-schedule.models';
+import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
+import { TimeInputComponent } from '../../../shared/time-input/time-input.component';
+import { normalizeTimeHHmm } from '../../../shared/time-input/time-slot.util';
 
 @Component({
   selector: 'app-dentist-availability-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TimeInputComponent, AppIconComponent],
   templateUrl: './dentist-availability-management.html',
   styleUrl: './dentist-availability-management.scss'
 })
@@ -26,8 +31,9 @@ export class DentistAvailabilityManagementComponent implements OnInit {
   private dentistService = inject(DentistService);
   private scheduleService = inject(DentistScheduleService);
 
-  readonly shiftOptions = SHIFT_OPTIONS;
   readonly weekdays = WEEKDAYS_MON_SAT;
+
+  readonly shiftOptions = computed(() => buildShiftOptions(this.clinicDraft()));
 
   readonly dentists = signal<Dentist[]>([]);
   readonly loading = signal(false);
@@ -103,7 +109,8 @@ export class DentistAvailabilityManagementComponent implements OnInit {
   }
 
   onClinicFieldChange(field: keyof ClinicScheduleSavePayload, value: string): void {
-    const normalized = value.length >= 5 ? value.slice(0, 5) : value;
+    const normalized = normalizeTimeHHmm(value);
+    if (!normalized) return;
     this.clinicDraft.update((c) => ({ ...c, [field]: normalized }));
     this.clinicSuccess.set(null);
     this.refreshWeekDraftTimes();
@@ -153,10 +160,25 @@ export class DentistAvailabilityManagementComponent implements OnInit {
     return this.weekDraft().find((d) => d.weekday === weekday)?.shift ?? 'off';
   }
 
-  timeHintFor(weekday: number): string {
+  scheduleDisplayFor(weekday: number): {
+    shift: DentistWorkShift;
+    label: string;
+    range: string | null;
+    icon: string;
+  } {
     const day = this.weekDraft().find((d) => d.weekday === weekday);
-    if (!day?.startTime || !day?.endTime) return '—';
-    return `${day.startTime} – ${day.endTime}`;
+    if (!day) {
+      return { shift: 'off', label: '—', range: null, icon: SHIFT_ICONS.off };
+    }
+    const shift = day.shift;
+    const label = day.shiftLabel ?? shiftLabelFor(shift);
+    const icon = SHIFT_ICONS[shift] ?? SHIFT_ICONS.off;
+    if (shift === 'off') {
+      return { shift, label, range: null, icon };
+    }
+    const range =
+      day.startTime && day.endTime ? `${day.startTime} – ${day.endTime}` : null;
+    return { shift, label, range, icon };
   }
 
   onShiftChange(weekday: number, shift: string): void {
@@ -167,7 +189,7 @@ export class DentistAvailabilityManagementComponent implements OnInit {
       return {
         ...d,
         shift: typed,
-        shiftLabel: SHIFT_OPTIONS.find((o) => o.value === typed)?.label ?? null,
+        shiftLabel: shiftLabelFor(typed),
         startTime: range?.start ?? null,
         endTime: range?.end ?? null
       };
@@ -191,7 +213,7 @@ export class DentistAvailabilityManagementComponent implements OnInit {
         const range = this.resolveShiftRange(d.shift);
         return {
           ...d,
-          shiftLabel: SHIFT_OPTIONS.find((o) => o.value === d.shift)?.label ?? null,
+          shiftLabel: shiftLabelFor(d.shift),
           startTime: range?.start ?? null,
           endTime: range?.end ?? null
         };

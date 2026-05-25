@@ -1,128 +1,125 @@
-<div class="login-container">
-  <div class="login-panel-left">
-    <div class="panel-content">
-      <img src="img/dentify_logo.png" [attr.alt]="'AUTH.LOGO_ALT' | translate" class="panel-logo" />
-      <h2 class="panel-tagline">{{ 'AUTH.TAGLINE' | translate }}</h2>
-      <p class="panel-description">{{ 'AUTH.PANEL_BLURB' | translate }}</p>
-      <div class="panel-decorations">
-        <div class="deco-circle deco-1"></div>
-        <div class="deco-circle deco-2"></div>
-        <div class="deco-circle deco-3"></div>
-      </div>
+<div class="lp">
+  <aside class="lp-panel" aria-hidden="true">
+    <div class="lp-panel__hline" aria-hidden="true">
+      <span class="lp-panel__hline-beam"></span>
     </div>
-  </div>
+    <div class="lp-panel__content">
+      <img src="img/dentify_logo.png" alt="" class="lp-panel__logo" />
+      <p class="lp-panel__tagline">{{ 'AUTH.TAGLINE' | translate }}</p>
+      <p class="lp-panel__blurb">{{ 'AUTH.PANEL_BLURB' | translate }}</p>
+      <ul class="lp-panel__dots">
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+  </aside>
 
-  <div class="login-panel-right">
-    <div class="login-card">
-      <div class="mobile-logo">
-        <img src="img/dentify_logo.png" [attr.alt]="'AUTH.LOGO_ALT' | translate" />
+  <main class="lp-form-area">
+    <div class="lp-card">
+      <div class="lp-card__lang">
+        <app-lang-switcher />
       </div>
 
-      <div class="login-lang-row">
-        <label class="sr-only" for="login-lang">{{ 'LANG.SELECT_ARIA' | translate }}</label>
-        <select
-          id="login-lang"
-          class="login-lang-select"
-          [value]="currentLang()"
-          (change)="setLang($any($event.target).value)"
-        >
-          <option value="es">{{ 'LANG.ES' | translate }}</option>
-          <option value="ca">{{ 'LANG.CA' | translate }}</option>
-          <option value="en">{{ 'LANG.EN' | translate }}</option>
-        </select>
-      </div>
-
-      <div class="login-header">
+      <header class="lp-card__head">
+        <div class="lp-mobile-logo">
+          <img src="img/dentify_logo.png" [attr.alt]="'AUTH.LOGO_ALT' | translate" />
+        </div>
         <h1>{{ 'AUTH.TITLE_WELCOME' | translate }}</h1>
-        <p class="login-subtitle">{{ 'AUTH.SUBTITLE' | translate }}</p>
-      </div>
+        <p>{{ 'AUTH.SUBTITLE' | translate }}</p>
+      </header>
 
-      <div class="session-active" *ngIf="authService.isLoggedIn()">
+      <div class="lp-notice lp-notice--info" *ngIf="authService.isLoggedIn()">
         <p>{{ 'AUTH.SESSION_ALREADY' | translate }}</p>
-        <a routerLink="/app/dashboard" class="session-active-link">{{ 'AUTH.GO_PANEL' | translate }}</a>
+        <a routerLink="/app/dashboard" class="lp-link">{{ 'AUTH.GO_PANEL' | translate }}</a>
       </div>
 
       @if (sessionExpiredNotice(); as notice) {
-        <div class="session-expired-notice" role="alert">
+        <div class="lp-notice lp-notice--warn" role="alert">
           <p>{{ notice }}</p>
         </div>
       }
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
-        <div class="form-group" [class.has-error]="showError('identifier')">
-          <label for="identifier">
-            <app-icon name="mail" size="sm" class="label-icon" />
+        <div class="lp-field" [class.lp-field--err]="showError('identifier')">
+          <label class="lp-field__label" for="identifier">
             {{ 'AUTH.IDENTIFIER' | translate }}
-            <span class="required-mark">*</span>
           </label>
-          <div class="input-wrapper">
+          <div class="lp-field__wrap">
+            <app-icon name="alternate_email" size="sm" class="lp-field__ico" />
             <input
               type="text"
               id="identifier"
+              class="lp-field__input"
               formControlName="identifier"
               [attr.placeholder]="'AUTH.IDENTIFIER_PH' | translate"
               autocomplete="username"
-              [class.input-error]="showError('identifier')"
-              [class.input-valid]="isValid('identifier')"
+              [class.is-err]="showError('identifier')"
+              [class.is-ok]="isValid('identifier')"
             />
-            <app-icon name="check_circle" size="sm" class="input-icon" *ngIf="isValid('identifier')" />
+            <app-icon name="check_circle" size="sm" class="lp-field__ok" *ngIf="isValid('identifier')" />
           </div>
-          <div class="error-message" *ngIf="showError('identifier')">
-            <ng-container *ngIf="loginForm.get('identifier')?.errors?.['required']">
-              {{ 'AUTH.ERR_IDENTIFIER_REQUIRED' | translate }}
-            </ng-container>
-            <ng-container *ngIf="loginForm.get('identifier')?.errors?.['minlength']">
-              {{ 'AUTH.ERR_IDENTIFIER_MIN' | translate }}
-            </ng-container>
-          </div>
+          <span class="lp-field__msg" *ngIf="showError('identifier')">
+            <ng-container *ngIf="loginForm.get('identifier')?.errors?.['required']">{{ 'AUTH.ERR_IDENTIFIER_REQUIRED' | translate }}</ng-container>
+            <ng-container *ngIf="loginForm.get('identifier')?.errors?.['minlength']">{{ 'AUTH.ERR_IDENTIFIER_MIN' | translate }}</ng-container>
+          </span>
         </div>
 
-        <div class="form-group" [class.has-error]="showError('password')">
-          <label for="password">
-            <app-icon name="lock" size="sm" class="label-icon" />
+        <div class="lp-field" [class.lp-field--err]="showError('password')">
+          <label class="lp-field__label" for="password">
             {{ 'AUTH.PASSWORD' | translate }}
-            <span class="required-mark">*</span>
           </label>
-          <div class="input-wrapper">
+          <div class="lp-field__wrap">
+            <app-icon name="lock" size="sm" class="lp-field__ico" />
             <input
               [type]="showPassword ? 'text' : 'password'"
               id="password"
+              class="lp-field__input"
               formControlName="password"
               [attr.placeholder]="'AUTH.PASSWORD_PH' | translate"
               autocomplete="current-password"
-              [class.input-error]="showError('password')"
-              [class.input-valid]="isValid('password')"
+              [class.is-err]="showError('password')"
+              [class.is-ok]="isValid('password')"
             />
-            <button type="button" class="toggle-password" (click)="togglePassword()" tabindex="-1">
-              {{ showPassword ? ('AUTH.TOGGLE_HIDE' | translate) : ('AUTH.TOGGLE_SHOW' | translate) }}
+            <button
+              type="button"
+              class="lp-field__eye"
+              (click)="togglePassword()"
+              [attr.aria-label]="showPassword ? ('AUTH.TOGGLE_HIDE' | translate) : ('AUTH.TOGGLE_SHOW' | translate)"
+              tabindex="-1"
+            >
+              <app-icon [name]="showPassword ? 'visibility_off' : 'visibility'" size="sm" />
             </button>
           </div>
-          <div class="error-message" *ngIf="showError('password')">
-            <ng-container *ngIf="loginForm.get('password')?.errors?.['required']">
-              {{ 'AUTH.ERR_PASSWORD_REQUIRED' | translate }}
-            </ng-container>
-            <ng-container *ngIf="loginForm.get('password')?.errors?.['minlength']">
-              {{ 'AUTH.ERR_PASSWORD_MIN' | translate }}
-            </ng-container>
-          </div>
+          <span class="lp-field__msg" *ngIf="showError('password')">
+            <ng-container *ngIf="loginForm.get('password')?.errors?.['required']">{{ 'AUTH.ERR_PASSWORD_REQUIRED' | translate }}</ng-container>
+            <ng-container *ngIf="loginForm.get('password')?.errors?.['minlength']">{{ 'AUTH.ERR_PASSWORD_MIN' | translate }}</ng-container>
+          </span>
         </div>
 
-        <div class="server-error" *ngIf="serverError">
-          <app-icon name="warning" size="sm" /> {{ serverError }}
+        <div class="lp-server-err" *ngIf="serverError" role="alert">
+          <app-icon name="error_outline" size="sm" />
+          <span>{{ serverError }}</span>
         </div>
 
-        <button type="submit" class="btn-login" [class.loading]="isLoading" [disabled]="isLoading">
+        <button
+          type="submit"
+          class="lp-btn"
+          [class.lp-btn--loading]="isLoading"
+          [disabled]="isLoading"
+        >
+          <span class="lp-btn__ripple" aria-hidden="true"></span>
           <span *ngIf="!isLoading">{{ 'AUTH.SUBMIT' | translate }}</span>
-          <span *ngIf="isLoading" class="spinner"></span>
+          <span *ngIf="isLoading" class="lp-btn__spinner" aria-hidden="true"></span>
         </button>
       </form>
 
-      <div class="login-footer">
-        <a href="#" class="forgot-link">{{ 'AUTH.FORGOT' | translate }}</a>
-        <p class="contact-info">
-          {{ 'AUTH.NO_ACCOUNT' | translate }} <span class="link">{{ 'AUTH.CONTACT_ADMIN' | translate }}</span>
+      <footer class="lp-card__foot">
+        <p>
+          {{ 'AUTH.NO_ACCOUNT' | translate }}
+          <span class="lp-accent">{{ 'AUTH.CONTACT_ADMIN' | translate }}</span>
         </p>
-      </div>
+      </footer>
     </div>
-  </div>
+  </main>
 </div>

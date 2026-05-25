@@ -133,7 +133,6 @@
     "GREET_EVENING": "Bona nit, {{name}}!",
     "SUBTITLE": "Aquí tens el resum de la clínica avui.",
     "CURRENT_TIME": "Hora actual",
-    "SEARCH_PH": "Cercar pacients, doctors…",
     "NOTIF_ARIA": "Notificacions",
     "NEW_APPT": "+ Nova cita",
     "PANEL_TITLE": "Panell",
@@ -203,7 +202,6 @@
   },
   "BILLING": {
     "TITLE": "Pagaments i facturació",
-    "SUBTITLE": "Mòdul accessible per a ROLE_USER i ROLE_ADMIN. Les regles fines de permisos es consolidaran des del backend.",
     "NEW_CHARGE": "+ Nou cobrament",
     "ADMIN_NOTE": "Vista administrador: inclou resum estès per al seguiment operatiu.",
     "SUMMARY_TOTAL": "Total",
@@ -226,6 +224,8 @@
     "BTN_EDIT": "Edita",
     "BTN_MARK_PAID": "Marca com a pagat",
     "BTN_ANNUL": "Anul·la",
+    "BTN_DELETE": "Elimina",
+    "CONFIRM_DELETE": "Vols eliminar el cobrament de {{patient}} ({{concept}})? Aquesta acció no es pot desfer.",
     "EMPTY_ROWS": "Sense registres amb els filtres actuals.",
     "MODAL_NEW": "Nou cobrament",
     "MODAL_EDIT": "Edita el cobrament",
@@ -248,6 +248,7 @@
     "STATUS_ANNULLED": "Anul·lat",
     "ERR_SAVE": "No s'ha pogut desar el registre. Comprova que segueixi pendent.",
     "ERR_PAY": "No s'ha pogut registrar el pagament. L'estat hauria pogut canviar.",
-    "ERR_ANNUL": "No s'ha pogut anul·lar el registre."
+    "ERR_ANNUL": "No s'ha pogut anul·lar el registre.",
+    "ERR_DELETE": "No s'ha pogut eliminar el registre."
   }
 }

@@ -44,16 +44,49 @@ export const WEEKDAYS_MON_SAT: Array<{ weekday: number; label: string }> = [
   { weekday: 6, label: 'Sábado' }
 ];
 
-export const SHIFT_OPTIONS: Array<{
+export const SHIFT_ICONS: Record<DentistWorkShift, string> = {
+  morning: 'wb_twilight',
+  afternoon: 'wb_sunny',
+  full_day: 'schedule',
+  off: 'event_busy'
+};
+
+export const SHIFT_LABELS: Record<DentistWorkShift, string> = {
+  morning: 'Mañana',
+  afternoon: 'Tarde',
+  full_day: 'Todo el día',
+  off: 'Libre'
+};
+
+export function shiftLabelFor(shift: DentistWorkShift): string {
+  return SHIFT_LABELS[shift] ?? '—';
+}
+
+/** Franjas de turno según el horario actual de la clínica (para desplegables y resúmenes). */
+export function buildShiftOptions(clinic: ClinicScheduleSavePayload): Array<{
   value: DentistWorkShift;
   label: string;
   description: string;
-}> = [
-  { value: 'morning', label: 'Mañana', description: '08:00 – 15:00' },
-  { value: 'afternoon', label: 'Tarde', description: '14:00 – 21:00' },
-  { value: 'full_day', label: 'Todo el día', description: '08:00 – 21:00' },
-  { value: 'off', label: 'Libre', description: 'Sin consulta' }
-];
+}> {
+  return [
+    {
+      value: 'morning',
+      label: SHIFT_LABELS.morning,
+      description: `${clinic.openTime} – ${clinic.morningEndTime}`
+    },
+    {
+      value: 'afternoon',
+      label: SHIFT_LABELS.afternoon,
+      description: `${clinic.afternoonStartTime} – ${clinic.closeTime}`
+    },
+    {
+      value: 'full_day',
+      label: SHIFT_LABELS.full_day,
+      description: `${clinic.openTime} – ${clinic.closeTime}`
+    },
+    { value: 'off', label: SHIFT_LABELS.off, description: 'Sin consulta' }
+  ];
+}
 
 export function defaultWeekDraft(): WeeklyScheduleDay[] {
   return WEEKDAYS_MON_SAT.map((d) => ({

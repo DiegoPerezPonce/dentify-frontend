@@ -1,0 +1,115 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.lang-sw {
+  --lsw-text: var(--text-main, #1e293b);
+  --lsw-muted: var(--text-muted, #64748b);
+  --lsw-surface: var(--input-bg, var(--surface-card, #fff));
+  --lsw-border: var(--input-border, var(--border-color, #e2e8f0));
+  --lsw-accent: var(--theme-primary, #06b6d4);
+
+  position: relative;
+  width: 100%;
+}
+
+.lang-sw__trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  box-sizing: border-box;
+  border: 1px solid var(--lsw-border);
+  border-radius: var(--radius-ui-sm, 8px);
+  padding: 0.4rem 0.5rem 0.4rem 0.65rem;
+  font-family: 'Noto Sans', system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--lsw-text);
+  background: var(--lsw-surface);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--lsw-accent) 55%, var(--lsw-border));
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--lsw-accent);
+    box-shadow: 0 0 0 3px var(--theme-primary-soft, rgba(6, 182, 212, 0.2));
+  }
+}
+
+.lang-sw--open .lang-sw__trigger {
+  border-color: var(--lsw-accent);
+  box-shadow: 0 0 0 3px var(--theme-primary-soft, rgba(6, 182, 212, 0.2));
+}
+
+.lang-sw__value {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lang-sw__chev {
+  flex-shrink: 0;
+  color: var(--lsw-muted);
+  transition: transform 0.2s;
+}
+
+.lang-sw--open .lang-sw__chev {
+  transform: rotate(180deg);
+  color: var(--lsw-accent);
+}
+
+.lang-sw__panel {
+  position: absolute;
+  z-index: 50;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  margin: 0;
+  padding: 0.3rem;
+  list-style: none;
+  border: 1px solid var(--lsw-border);
+  border-radius: var(--radius-ui-sm, 8px);
+  background: var(--surface-card, #fff);
+  box-shadow: var(--shadow-ui-elevated, 0 8px 20px rgba(15, 23, 42, 0.15));
+}
+
+.lang-sw__opt {
+  width: 100%;
+  display: block;
+  text-align: left;
+  border: 0;
+  border-radius: calc(var(--radius-ui-sm, 8px) - 2px);
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--lsw-text);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--lsw-accent) 10%, var(--surface-card, #fff));
+  }
+
+  &:focus-visible {
+    outline: none;
+    background: color-mix(in srgb, var(--lsw-accent) 14%, var(--surface-card, #fff));
+  }
+
+  &--active {
+    background: color-mix(in srgb, var(--lsw-accent) 18%, var(--surface-card, #fff));
+    color: var(--lsw-accent);
+    font-weight: 700;
+  }
+}

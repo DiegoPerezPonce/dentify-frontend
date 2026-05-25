@@ -20,51 +20,64 @@
 
   <section class="card clinic-card" aria-labelledby="clinic-schedule-title">
     <h2 id="clinic-schedule-title" class="card-title">Horario de la clínica</h2>
-    <p class="card-hint">
-      Lunes a viernes. Turno mañana hasta el fin de mañana; turno tarde desde el inicio de tarde.
-      Solape habitual: <strong>{{ overlapHint() }}</strong>.
-    </p>
+    <p class="card-hint">Lunes a viernes. Define la jornada y los límites entre turno de mañana y tarde.</p>
 
     <div class="clinic-form">
-      <label class="field-label" for="clinicOpen">Apertura</label>
-      <input
-        id="clinicOpen"
-        type="time"
-        class="form-control time-input"
-        [value]="clinicDraft().openTime"
-        [disabled]="loading() || savingClinic()"
-        (change)="onClinicFieldChange('openTime', $any($event.target).value)"
-      />
+      <section class="clinic-form__group" aria-labelledby="clinic-day-hours-title">
+        <h3 id="clinic-day-hours-title" class="clinic-form__group-title">Jornada de la clínica</h3>
+        <div class="clinic-form__grid">
+          <div class="clinic-form__cell clinic-form__cell--open">
+            <label class="clinic-form__cell-label" for="clinicOpen">Apertura</label>
+            <app-time-input
+              inputId="clinicOpen"
+              leadingIcon="door_open"
+              [value]="clinicDraft().openTime"
+              [disabled]="loading() || savingClinic()"
+              (valueChange)="onClinicFieldChange('openTime', $event)"
+            />
+          </div>
+          <div class="clinic-form__cell clinic-form__cell--close">
+            <label class="clinic-form__cell-label" for="clinicClose">Cierre</label>
+            <app-time-input
+              inputId="clinicClose"
+              leadingIcon="door_back"
+              [value]="clinicDraft().closeTime"
+              [disabled]="loading() || savingClinic()"
+              (valueChange)="onClinicFieldChange('closeTime', $event)"
+            />
+          </div>
+        </div>
+      </section>
 
-      <label class="field-label" for="clinicClose">Cierre</label>
-      <input
-        id="clinicClose"
-        type="time"
-        class="form-control time-input"
-        [value]="clinicDraft().closeTime"
-        [disabled]="loading() || savingClinic()"
-        (change)="onClinicFieldChange('closeTime', $any($event.target).value)"
-      />
-
-      <label class="field-label" for="clinicMorningEnd">Fin turno mañana</label>
-      <input
-        id="clinicMorningEnd"
-        type="time"
-        class="form-control time-input"
-        [value]="clinicDraft().morningEndTime"
-        [disabled]="loading() || savingClinic()"
-        (change)="onClinicFieldChange('morningEndTime', $any($event.target).value)"
-      />
-
-      <label class="field-label" for="clinicAfternoonStart">Inicio turno tarde</label>
-      <input
-        id="clinicAfternoonStart"
-        type="time"
-        class="form-control time-input"
-        [value]="clinicDraft().afternoonStartTime"
-        [disabled]="loading() || savingClinic()"
-        (change)="onClinicFieldChange('afternoonStartTime', $any($event.target).value)"
-      />
+      <section class="clinic-form__group" aria-labelledby="clinic-shifts-title">
+        <h3 id="clinic-shifts-title" class="clinic-form__group-title">Límites de turnos</h3>
+        <p class="clinic-form__group-hint">
+          Mañana hasta el fin de mañana; tarde desde el inicio de tarde. Solape habitual:
+          <strong>{{ overlapHint() }}</strong>.
+        </p>
+        <div class="clinic-form__grid">
+          <div class="clinic-form__cell clinic-form__cell--morning">
+            <label class="clinic-form__cell-label" for="clinicMorningEnd">Fin turno mañana</label>
+            <app-time-input
+              inputId="clinicMorningEnd"
+              leadingIcon="wb_twilight"
+              [value]="clinicDraft().morningEndTime"
+              [disabled]="loading() || savingClinic()"
+              (valueChange)="onClinicFieldChange('morningEndTime', $event)"
+            />
+          </div>
+          <div class="clinic-form__cell clinic-form__cell--afternoon">
+            <label class="clinic-form__cell-label" for="clinicAfternoonStart">Inicio turno tarde</label>
+            <app-time-input
+              inputId="clinicAfternoonStart"
+              leadingIcon="wb_sunny"
+              [value]="clinicDraft().afternoonStartTime"
+              [disabled]="loading() || savingClinic()"
+              (valueChange)="onClinicFieldChange('afternoonStartTime', $event)"
+            />
+          </div>
+        </div>
+      </section>
     </div>
 
     <div class="actions">
@@ -115,6 +128,7 @@
           <span role="columnheader">Horario</span>
         </div>
         @for (wd of weekdays; track wd.weekday) {
+          @let sched = scheduleDisplayFor(wd.weekday);
           <div class="week-grid__row" role="row">
             <span class="week-day" role="cell">{{ wd.label }}</span>
             <span role="cell">
@@ -125,12 +139,24 @@
                 [ngModelOptions]="{ standalone: true }"
                 [disabled]="saving()"
               >
-                @for (opt of shiftOptions; track opt.value) {
+                @for (opt of shiftOptions(); track opt.value) {
                   <option [value]="opt.value">{{ opt.label }} ({{ opt.description }})</option>
                 }
               </select>
             </span>
-            <span class="time-hint" role="cell">{{ timeHintFor(wd.weekday) }}</span>
+            <span class="schedule-hint schedule-hint--{{ sched.shift }}" role="cell">
+              <span class="schedule-hint__icon" aria-hidden="true">
+                <app-icon [name]="sched.icon" size="sm" />
+              </span>
+              <span class="schedule-hint__text">
+                <strong class="schedule-hint__label">{{ sched.label }}</strong>
+                @if (sched.range) {
+                  <span class="schedule-hint__range">{{ sched.range }}</span>
+                } @else if (sched.shift === 'off') {
+                  <span class="schedule-hint__range schedule-hint__range--muted">Sin consulta</span>
+                }
+              </span>
+            </span>
           </div>
         }
       </div>

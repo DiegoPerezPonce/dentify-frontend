@@ -29,6 +29,7 @@ export class BoxFormModalComponent implements OnChanges {
 
   @Input() isOpen = false;
   @Input() box: Box | null = null;
+  @Input() existingBoxes: Box[] = [];
 
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
@@ -94,8 +95,18 @@ export class BoxFormModalComponent implements OnChanges {
       estado: string;
     };
 
+    const nombre = fv.nombre.trim();
+
+    if (this.isDuplicateNombre(nombre)) {
+      this.saving.set(false);
+      this.error.set('Ya existe un gabinete con ese nombre.');
+      this.form.get('nombre')?.setErrors({ duplicate: true });
+      this.form.get('nombre')?.markAsTouched();
+      return;
+    }
+
     const payload: BoxCreatePayload | BoxUpdatePayload = {
-      nombre: fv.nombre.trim(),
+      nombre,
       descripcion: fv.descripcion?.trim() ? fv.descripcion.trim() : null,
       estado: fv.estado
     };
@@ -135,13 +146,29 @@ export class BoxFormModalComponent implements OnChanges {
       return 'Este campo es obligatorio';
     }
 
+    if (control.errors['duplicate']) {
+      return 'Ya existe un gabinete con ese nombre.';
+    }
+
     return 'Campo inválido';
+  }
+
+  private isDuplicateNombre(nombre: string): boolean {
+    const key = nombre.trim().toLocaleLowerCase();
+    if (!key) {
+      return false;
+    }
+
+    const currentId = this.box?.id;
+    return this.existingBoxes.some(
+      (b) => b.id !== currentId && b.nombre.trim().toLocaleLowerCase() === key
+    );
   }
 
   private getErrorMessage(err: unknown): string {
     if (err instanceof HttpErrorResponse) {
       if (err.status === 400) {
-        const message = err.error?.message;
+        const message = err.error?.message ?? err.error?.detail;
         if (message && typeof message === 'string') {
           return message;
         }

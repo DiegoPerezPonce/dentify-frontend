@@ -1,0 +1,55 @@
+<div
+  class="app-time-inline"
+  [class.app-time-inline--with-icon]="leadingIcon()"
+  [attr.aria-label]="ariaLabel()"
+>
+  @if (leadingIcon(); as iconName) {
+    <span class="app-time-inline__icon-badge" aria-hidden="true">
+      <app-icon [name]="iconName" size="sm" />
+    </span>
+  }
+
+  <div class="app-time-inline__body">
+    @if (!leadingIcon()) {
+      <span class="app-time-inline__label">Hora (24 h)</span>
+    }
+
+    <div class="app-time-inline__time-row" role="group" [attr.aria-label]="ariaLabel() || 'Hora'">
+      <input
+        #hourInput
+        [attr.id]="hourInputId()"
+        type="text"
+        class="app-time-inline__part"
+        inputmode="numeric"
+        autocomplete="off"
+        maxlength="2"
+        placeholder="08"
+        [attr.aria-label]="(ariaLabel() ? ariaLabel() + ' — ' : '') + 'Horas'"
+        [disabled]="disabled()"
+        [value]="hourDisplay()"
+        (focus)="onHourFocus($event)"
+        (keydown)="onHourKeydown($event)"
+        (input)="onHourInput($any($event.target).value)"
+        (blur)="onHourBlur()"
+      />
+      <span class="app-time-inline__sep" aria-hidden="true">:</span>
+      <input
+        #minuteInput
+        [attr.id]="minuteInputId()"
+        type="text"
+        class="app-time-inline__part"
+        inputmode="numeric"
+        autocomplete="off"
+        maxlength="2"
+        placeholder="00"
+        [attr.aria-label]="(ariaLabel() ? ariaLabel() + ' — ' : '') + 'Minutos'"
+        [disabled]="disabled()"
+        [value]="minuteDisplay()"
+        (focus)="onMinuteFocus($event)"
+        (keydown)="onMinuteKeydown($event)"
+        (input)="onMinuteInput($any($event.target).value)"
+        (blur)="onMinuteBlur()"
+      />
+    </div>
+  </div>
+</div>

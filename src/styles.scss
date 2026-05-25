@@ -1,5 +1,9 @@
 @use '@angular/material' as mat;
 @use './styles/theme-variables';
+@use './styles/scrollbar';
+@use './styles/app-pages';
+
+@include scrollbar.dentify-scrollbar-global();
 
 html {
   @include mat.theme(
@@ -161,6 +165,24 @@ h3,
 h4,
 .dentify-title {
   color: var(--text-main, var(--dentify-dark));
+}
+
+/* Login público: no heredar tema oscuro de la app */
+.login-container h1,
+.login-container h2,
+.login-container label,
+.login-container .login-subtitle {
+  color: var(--login-text, #0f172a);
+}
+
+.login-container .login-subtitle {
+  color: var(--login-muted, #64748b);
+}
+
+.login-container input {
+  background-color: var(--login-input-bg, #f8fafc);
+  color: var(--login-text, #0f172a);
+  border-color: var(--login-input-border, #cbd5e1);
 }
 
 input,

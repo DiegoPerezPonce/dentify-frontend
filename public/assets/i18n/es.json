@@ -133,7 +133,6 @@
     "GREET_EVENING": "¡Buenas noches, {{name}}!",
     "SUBTITLE": "Aquí tienes el resumen de la clínica hoy.",
     "CURRENT_TIME": "Hora actual",
-    "SEARCH_PH": "Buscar pacientes, doctores…",
     "NOTIF_ARIA": "Notificaciones",
     "NEW_APPT": "+ Nueva cita",
     "PANEL_TITLE": "Panel",
@@ -203,7 +202,6 @@
   },
   "BILLING": {
     "TITLE": "Pagos y facturación",
-    "SUBTITLE": "Módulo accesible para ROLE_USER y ROLE_ADMIN. Las reglas finas de permisos se consolidarán desde el backend.",
     "NEW_CHARGE": "+ Nuevo cobro",
     "ADMIN_NOTE": "Vista administrador: incluye resumen extendido para seguimiento operativo.",
     "SUMMARY_TOTAL": "Total",
@@ -226,6 +224,8 @@
     "BTN_EDIT": "Editar",
     "BTN_MARK_PAID": "Marcar pagado",
     "BTN_ANNUL": "Anular",
+    "BTN_DELETE": "Eliminar",
+    "CONFIRM_DELETE": "¿Eliminar el cobro de {{patient}} ({{concept}})? Esta acción no se puede deshacer.",
     "EMPTY_ROWS": "Sin registros para los filtros actuales.",
     "MODAL_NEW": "Nuevo cobro",
     "MODAL_EDIT": "Editar cobro",
@@ -248,6 +248,7 @@
     "STATUS_ANNULLED": "Anulado",
     "ERR_SAVE": "No se pudo guardar el registro. Verifica que siga pendiente.",
     "ERR_PAY": "No se pudo registrar el pago. El estado pudo cambiar.",
-    "ERR_ANNUL": "No se pudo anular el registro."
+    "ERR_ANNUL": "No se pudo anular el registro.",
+    "ERR_DELETE": "No se pudo eliminar el registro."
   }
 }

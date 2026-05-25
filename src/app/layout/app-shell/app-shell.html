@@ -24,17 +24,7 @@
     </div>
 
     <div class="lang-switch">
-      <label class="sr-only" for="shell-lang">{{ 'LANG.SELECT_ARIA' | translate }}</label>
-      <select
-        id="shell-lang"
-        class="lang-select"
-        [value]="currentLang()"
-        (change)="setLang($any($event.target).value)"
-      >
-        <option value="es">{{ 'LANG.ES' | translate }}</option>
-        <option value="ca">{{ 'LANG.CA' | translate }}</option>
-        <option value="en">{{ 'LANG.EN' | translate }}</option>
-      </select>
+      <app-lang-switcher />
     </div>
 
     <nav class="nav-block">
@@ -161,30 +151,32 @@
           <app-icon name="menu" size="md" />
         </button>
       }
-      <button
-        type="button"
-        class="theme-fab"
-        [attr.aria-label]="
-          (theme.config().scheme === 'dark' ? 'THEME.LIGHT_MODE' : 'THEME.DARK_MODE') | translate
-        "
-        (click)="theme.toggleScheme()"
-      >
-        <app-icon [name]="theme.config().scheme === 'dark' ? 'light_mode' : 'dark_mode'" size="md" />
-      </button>
-      <div class="theme-toolbar__palette">
+      @if (isDashboardRoute()) {
         <button
           type="button"
-          class="theme-fab theme-fab--accent"
-          [attr.aria-expanded]="theme.panelOpen()"
-          [attr.aria-label]="'THEME.OPEN_PANEL' | translate"
-          (click)="theme.togglePanel()"
+          class="theme-fab"
+          [attr.aria-label]="
+            (theme.config().scheme === 'dark' ? 'THEME.LIGHT_MODE' : 'THEME.DARK_MODE') | translate
+          "
+          (click)="theme.toggleScheme()"
         >
-          <app-icon name="palette" size="md" />
+          <app-icon [name]="theme.config().scheme === 'dark' ? 'light_mode' : 'dark_mode'" size="md" />
         </button>
-        @if (theme.panelOpen()) {
-          <app-theme-configurator />
-        }
-      </div>
+        <div class="theme-toolbar__palette">
+          <button
+            type="button"
+            class="theme-fab theme-fab--accent"
+            [attr.aria-expanded]="theme.panelOpen()"
+            [attr.aria-label]="'THEME.OPEN_PANEL' | translate"
+            (click)="theme.togglePanel()"
+          >
+            <app-icon name="palette" size="md" />
+          </button>
+          @if (theme.panelOpen()) {
+            <app-theme-configurator />
+          }
+        </div>
+      }
     </div>
 
     <div class="outlet-wrap">

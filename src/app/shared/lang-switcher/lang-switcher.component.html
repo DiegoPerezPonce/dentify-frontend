@@ -1,0 +1,32 @@
+<div class="lang-sw" [class.lang-sw--open]="open()">
+  <button
+    type="button"
+    class="lang-sw__trigger"
+    [attr.aria-expanded]="open()"
+    [attr.aria-label]="'LANG.SELECT_ARIA' | translate"
+    aria-haspopup="listbox"
+    (click)="toggle($event)"
+  >
+    <span class="lang-sw__value">{{ currentLabelKey() | translate }}</span>
+    <app-icon name="expand_more" size="sm" class="lang-sw__chev" />
+  </button>
+
+  @if (open()) {
+    <ul class="lang-sw__panel" role="listbox" [attr.aria-label]="'LANG.SELECT_ARIA' | translate">
+      @for (opt of options; track opt.code) {
+        <li role="presentation">
+          <button
+            type="button"
+            class="lang-sw__opt"
+            role="option"
+            [attr.aria-selected]="opt.code === currentLang()"
+            [class.lang-sw__opt--active]="opt.code === currentLang()"
+            (click)="select(opt.code)"
+          >
+            {{ opt.labelKey | translate }}
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

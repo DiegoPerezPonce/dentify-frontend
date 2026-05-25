@@ -1,12 +1,12 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth';
-import { documentLangHtml, isAppLang, LANG_STORAGE_KEY } from '../../core/i18n/translate-app.initializer';
 import { PedagogicalNoticeService } from '../../modules/notifications/pedagogical-notice.service';
 import { AppIconComponent } from '../../shared/app-icon/app-icon.component';
+import { LangSwitcherComponent } from '../../shared/lang-switcher/lang-switcher.component';
 import { ThemeConfiguratorComponent } from '../../shared/theme-configurator/theme-configurator.component';
 import { ThemeService } from '../../core/theme/theme.service';
 import {
@@ -26,7 +26,8 @@ import {
     RouterLinkActive,
     TranslateModule,
     AppIconComponent,
-    ThemeConfiguratorComponent
+    ThemeConfiguratorComponent,
+    LangSwitcherComponent
   ],
   templateUrl: './app-shell.html',
   styleUrl: './app-shell.scss'
@@ -92,17 +93,8 @@ export class AppShellComponent implements OnInit {
   /** Solo UI: oculta el bloque Administración sin cambiar permisos. */
   readonly adminNavCollapsed = signal(false);
 
-  readonly currentLang = signal(this.translate.currentLang || 'es');
-
   toggleAdminNav(): void {
     this.adminNavCollapsed.update((v) => !v);
-  }
-
-  setLang(code: string): void {
-    if (!isAppLang(code)) return;
-    localStorage.setItem(LANG_STORAGE_KEY, code);
-    document.documentElement.lang = documentLangHtml(code);
-    void this.translate.use(code);
   }
 
   /** Solo en /app/dashboard. */
@@ -119,20 +111,31 @@ export class AppShellComponent implements OnInit {
   readonly pedagogicalNoticeBody = signal<string | null>(null);
 
   constructor() {
-    this.translate.onLangChange.pipe(takeUntilDestroyed()).subscribe((ev) => {
-      this.currentLang.set(ev.lang);
+    this.translate.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
       this.langRefresh.update((n) => n + 1);
+    });
+
+    effect(() => {
+      const lockBody =
+        this.theme.config().menu_mode === 'overlay' && this.theme.overlayMenuOpen();
+      document.body.style.overflow = lockBody ? 'hidden' : '';
+    });
+
+    effect(() => {
+      if (!this.isDashboardRoute()) {
+        this.theme.closePanel();
+      }
+    });
+
+    this.destroyRef.onDestroy(() => {
+      document.body.style.overflow = '';
     });
   }
 
   ngOnInit(): void {
-    this.currentLang.set(this.translate.currentLang || 'es');
-
     const userKey = getJwtThemeUserKey(this.auth.getToken());
     if (userKey) {
-      this.theme.setCacheUserKey(userKey);
-      this.theme.bootstrapFromCache(userKey);
-      this.theme.loadFromApi(userKey);
+      this.theme.restoreUserSession(userKey);
     }
 
     const id = window.setInterval(() => this.sessionTick.update((n) => n + 1), 30_000);

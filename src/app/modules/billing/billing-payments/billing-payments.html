@@ -2,7 +2,6 @@
   <header class="head">
     <div>
       <h1>{{ 'BILLING.TITLE' | translate }}</h1>
-      <p class="sub">{{ 'BILLING.SUBTITLE' | translate }}</p>
     </div>
     <button type="button" class="btn btn-primary" (click)="openCreate()">{{ 'BILLING.NEW_CHARGE' | translate }}</button>
   </header>
@@ -82,6 +81,9 @@
               </button>
               <button type="button" class="btn btn-danger" (click)="openAnnul(row)" [disabled]="row.status === 'anulado'">
                 {{ 'BILLING.BTN_ANNUL' | translate }}
+              </button>
+              <button type="button" class="btn btn-delete" (click)="deleteRecord(row)">
+                {{ 'BILLING.BTN_DELETE' | translate }}
               </button>
             </td>
           </tr>

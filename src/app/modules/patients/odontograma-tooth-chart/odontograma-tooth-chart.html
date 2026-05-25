@@ -11,42 +11,56 @@
     <polygon
       class="tooth-face"
       [class.tooth-face--active]="isFaceSelected('V')"
+      [class.tooth-face--active-has-fill]="isFaceSelected('V') && hasFaceColor('V')"
       points="10,10 90,10 65,35 35,35"
-      [attr.fill]="colorFor('V')"
+      [attr.fill]="faceFill('V')"
       (click)="onFaceClick('V', $event)"
     />
     <!-- M — mesial (izquierda) -->
     <polygon
       class="tooth-face"
       [class.tooth-face--active]="isFaceSelected('M')"
+      [class.tooth-face--active-has-fill]="isFaceSelected('M') && hasFaceColor('M')"
       points="10,10 35,35 35,65 10,90"
-      [attr.fill]="colorFor('M')"
+      [attr.fill]="faceFill('M')"
       (click)="onFaceClick('M', $event)"
     />
     <!-- O — oclusal/incisal (centro) -->
     <polygon
       class="tooth-face"
       [class.tooth-face--active]="isFaceSelected('O')"
+      [class.tooth-face--active-has-fill]="isFaceSelected('O') && hasFaceColor('O')"
       points="35,35 65,35 65,65 35,65"
-      [attr.fill]="colorFor('O')"
+      [attr.fill]="faceFill('O')"
       (click)="onFaceClick('O', $event)"
     />
     <!-- D — distal (derecha) -->
     <polygon
       class="tooth-face"
       [class.tooth-face--active]="isFaceSelected('D')"
+      [class.tooth-face--active-has-fill]="isFaceSelected('D') && hasFaceColor('D')"
       points="90,10 65,35 65,65 90,90"
-      [attr.fill]="colorFor('D')"
+      [attr.fill]="faceFill('D')"
       (click)="onFaceClick('D', $event)"
     />
     <!-- L — lingual/palatina (abajo) -->
     <polygon
       class="tooth-face"
       [class.tooth-face--active]="isFaceSelected('L')"
+      [class.tooth-face--active-has-fill]="isFaceSelected('L') && hasFaceColor('L')"
       points="10,90 35,65 65,65 90,90"
-      [attr.fill]="colorFor('L')"
+      [attr.fill]="faceFill('L')"
       (click)="onFaceClick('L', $event)"
     />
+    @for (face of faces; track face) {
+      @if (isFaceSelected(face)) {
+        <polygon
+          class="tooth-face-pulse"
+          [attr.points]="facePoints[face]"
+          pointer-events="none"
+        />
+      }
+    }
     <!-- Contorno exterior e interior -->
     <rect x="10" y="10" width="80" height="80" fill="none" stroke="currentColor" stroke-width="2" pointer-events="none" />
     <rect x="35" y="35" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" pointer-events="none" />
