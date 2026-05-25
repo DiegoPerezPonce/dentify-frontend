@@ -22,6 +22,7 @@ import { TreatmentCategoryService } from '../treatment-category.service';
 import { TreatmentService } from '../treatment.service';
 import { TreatmentCatalogPickerComponent } from '../treatment-catalog-picker/treatment-catalog-picker';
 import { AppIconComponent } from '../../../shared/app-icon/app-icon.component';
+import { DatetimeInputComponent } from '../../../shared/time-input/datetime-input.component';
 import {
   Appointment,
   AppointmentCreateDTO,
@@ -68,7 +69,13 @@ export type AppointmentModalViewMode = 'create' | 'detail' | 'edit';
 @Component({
   selector: 'app-appointment-form-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TreatmentCatalogPickerComponent, AppIconComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    TreatmentCatalogPickerComponent,
+    AppIconComponent,
+    DatetimeInputComponent
+  ],
   templateUrl: './appointment-form-modal.html',
   styleUrl: './appointment-form-modal.scss'
 })

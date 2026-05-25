@@ -87,6 +87,7 @@ export class OdontogramaInteractiveComponent implements OnInit, AfterViewInit, O
   readonly selectedBridgeState = signal<string>('PUENTE_FUTURO');
   readonly upperBridgeLines = signal<BridgeLineCoords[]>([]);
   readonly lowerBridgeLines = signal<BridgeLineCoords[]>([]);
+  readonly controlPanelOpen = signal(false);
 
   @ViewChild('upperRow') upperRowRef?: ElementRef<HTMLElement>;
   @ViewChild('lowerRow') lowerRowRef?: ElementRef<HTMLElement>;
@@ -685,7 +686,10 @@ export class OdontogramaInteractiveComponent implements OnInit, AfterViewInit, O
     const id = String(toothId);
     const result: Record<string, string> = {};
     for (const face of this.faces) {
-      result[face] = this.getFaceColor(id, face);
+      const status = this.getToothStatus(id, face);
+      if (status) {
+        result[face] = status.color;
+      }
     }
     return result;
   }
@@ -849,6 +853,10 @@ export class OdontogramaInteractiveComponent implements OnInit, AfterViewInit, O
 
   clearSelection(): void {
     this.selectedTooth.set(null);
+  }
+
+  toggleControlPanel(): void {
+    this.controlPanelOpen.update((open) => !open);
   }
 
   goBack(): void {

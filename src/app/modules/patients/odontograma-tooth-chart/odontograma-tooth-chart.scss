@@ -1,3 +1,11 @@
+:host {
+  display: block;
+  flex-shrink: 0;
+  --face-pulse-empty-min: color-mix(in srgb, var(--theme-primary, #0ea5e9) 18%, #ffffff);
+  --face-pulse-empty-max: color-mix(in srgb, var(--theme-primary, #0ea5e9) 58%, #ffffff);
+  --face-pulse-overlay: var(--theme-primary, #0ea5e9);
+}
+
 .tooth-chart {
   display: flex;
   flex-direction: column;
@@ -8,20 +16,21 @@
   background: transparent;
   cursor: pointer;
   border-radius: 6px;
-  color: #0e7490;
+  color: var(--theme-primary-hover, #0e7490);
+  flex-shrink: 0;
 
   &:hover {
-    background: #f0fdfa;
+    background: color-mix(in srgb, var(--theme-primary, #0ea5e9) 10%, transparent);
   }
 
   &--selected {
-    outline: 2px solid #0ea5e9;
+    outline: 2px solid var(--theme-primary, #0ea5e9);
     outline-offset: 2px;
-    background: #ecfeff;
+    background: color-mix(in srgb, var(--theme-primary, #0ea5e9) 16%, transparent);
   }
 
   &--corona .tooth-face {
-    stroke: rgba(15, 23, 42, 0.55);
+    stroke: color-mix(in srgb, var(--text-main, #0f172a) 55%, transparent);
   }
 }
 
@@ -32,19 +41,87 @@
 }
 
 .tooth-face {
-  stroke: #0e7490;
+  stroke: var(--theme-primary-hover, #0e7490);
   stroke-width: 0.5;
   cursor: pointer;
-  transition: filter 0.12s ease;
+  transition: filter 0.12s ease, stroke 0.12s ease;
 
   &:hover {
     filter: brightness(0.92);
   }
 
-  &--active {
-    stroke: #0284c7;
-    stroke-width: 1.5;
-    filter: brightness(0.88);
+  &--active:not(.tooth-face--active-has-fill) {
+    animation: tooth-face-empty-pulse 1s ease-in-out infinite;
+    stroke-width: 2;
+  }
+
+  &--active-has-fill {
+    animation: tooth-face-filled-pulse 1s ease-in-out infinite;
+    stroke-width: 2;
+  }
+}
+
+.tooth-face-pulse {
+  fill: var(--face-pulse-overlay);
+  stroke: var(--face-pulse-overlay);
+  stroke-width: 2;
+  animation: tooth-face-overlay-pulse 0.85s ease-in-out infinite;
+}
+
+@keyframes tooth-face-overlay-pulse {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 0.92;
+  }
+}
+
+@keyframes tooth-face-empty-pulse {
+  0%,
+  100% {
+    fill: var(--face-pulse-empty-min);
+    stroke: var(--theme-primary, #0ea5e9);
+    filter: drop-shadow(0 0 0 transparent);
+  }
+
+  50% {
+    fill: var(--face-pulse-empty-max);
+    stroke: var(--theme-primary-hover, #0284c7);
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--theme-primary, #0ea5e9) 65%, transparent));
+  }
+}
+
+@keyframes tooth-face-filled-pulse {
+  0%,
+  100% {
+    stroke: var(--theme-primary, #0ea5e9);
+    filter: brightness(1);
+  }
+
+  50% {
+    stroke: var(--theme-primary-hover, #0284c7);
+    filter: brightness(1.18) drop-shadow(0 0 2px color-mix(in srgb, var(--theme-primary, #0ea5e9) 55%, transparent));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tooth-face--active:not(.tooth-face--active-has-fill),
+  .tooth-face--active-has-fill,
+  .tooth-face-pulse {
+    animation: none;
+  }
+
+  .tooth-face-pulse {
+    opacity: 0.65;
+  }
+
+  .tooth-face--active:not(.tooth-face--active-has-fill) {
+    fill: var(--face-pulse-empty-min);
+    stroke: var(--theme-primary, #0ea5e9);
+    stroke-width: 2;
   }
 }
 
@@ -66,6 +143,40 @@
 .tooth-chart__number {
   font-size: 0.62rem;
   font-weight: 700;
-  color: #334155;
+  color: var(--text-main, #334155);
   line-height: 1;
+}
+
+:host-context(html[data-theme='dark']) {
+  --face-pulse-empty-min: color-mix(in srgb, var(--theme-primary, #22d3ee) 24%, #1e293b);
+  --face-pulse-empty-max: color-mix(in srgb, var(--theme-primary, #22d3ee) 62%, #1e293b);
+  --face-pulse-overlay: var(--theme-primary, #22d3ee);
+
+  .tooth-chart {
+    color: var(--theme-primary, #67e8f9);
+
+    &:hover {
+      background: color-mix(in srgb, var(--theme-primary, #22d3ee) 18%, transparent);
+    }
+
+    &--selected {
+      background: color-mix(in srgb, var(--theme-primary, #22d3ee) 24%, transparent);
+    }
+
+    &--corona .tooth-face {
+      stroke: color-mix(in srgb, var(--text-main, #f8fafc) 65%, transparent);
+    }
+  }
+
+  .tooth-face {
+    stroke: var(--theme-primary, #67e8f9);
+
+    &:hover {
+      filter: brightness(1.08);
+    }
+  }
+
+  .tooth-chart__number {
+    color: var(--text-main, #f1f5f9);
+  }
 }

@@ -1,0 +1,65 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.app-datetime-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr);
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.app-datetime-field--date {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.app-datetime-field__icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-top: 0.1rem;
+  border-radius: var(--radius-ui-sm, 8px);
+  background: color-mix(in srgb, var(--theme-primary, #06b6d4) 16%, var(--surface-card, #fff));
+  color: var(--theme-primary, #06b6d4);
+  border: 1px solid color-mix(in srgb, var(--theme-primary, #06b6d4) 28%, var(--border-color, #e2e8f0));
+}
+
+.app-datetime-field__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.app-datetime-field__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #64748b);
+}
+
+.app-datetime-split__date {
+  width: 100%;
+}
+
+html[data-theme='dark'] .app-datetime-field__icon-badge {
+  background: color-mix(in srgb, var(--theme-primary, #22d3ee) 18%, var(--surface-card, #0f172a));
+  border-color: color-mix(in srgb, var(--theme-primary, #22d3ee) 35%, var(--border-color, #334155));
+  color: var(--theme-primary, #22d3ee);
+}
+
+@media (max-width: 480px) {
+  .app-datetime-split {
+    grid-template-columns: 1fr;
+  }
+}

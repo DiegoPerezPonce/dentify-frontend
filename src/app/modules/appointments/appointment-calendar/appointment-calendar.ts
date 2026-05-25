@@ -212,13 +212,17 @@ export class AppointmentCalendarComponent implements OnInit {
   setAgendaView(view: AgendaLayoutView): void {
     this.agendaView.set(view);
     if (view === 'week') {
-      queueMicrotask(() => {
-        const api = this.fullCalendar?.getApi();
-        if (api) {
-          api.gotoDate(this.parseLocalYmd(this.selectedDate()));
-        }
-      });
+      this.syncFullCalendarToSelectedDate();
     }
+  }
+
+  /** Alinea la fecha visible del FullCalendar con el día elegido en el mini calendario. */
+  private syncFullCalendarToSelectedDate(): void {
+    queueMicrotask(() => {
+      const api = this.fullCalendar?.getApi();
+      if (!api) return;
+      api.gotoDate(this.parseLocalYmd(this.selectedDate()));
+    });
   }
 
   prevMiniMonth(): void {
@@ -248,6 +252,7 @@ export class AppointmentCalendarComponent implements OnInit {
       this.loadAppointments();
     }
     this.selectedDate.set(ymd);
+    this.syncFullCalendarToSelectedDate();
   }
 
   goToToday(): void {
@@ -255,6 +260,7 @@ export class AppointmentCalendarComponent implements OnInit {
     this.displayMonthStart.set(this.startOfMonth(t));
     this.selectedDate.set(this.toYmd(t));
     this.loadAppointments();
+    this.syncFullCalendarToSelectedDate();
   }
 
   formatSelectedDayHeading(): string {

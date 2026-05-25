@@ -27,6 +27,11 @@
   gap: 1rem;
 }
 
+.page-head .btn-primary {
+  flex-shrink: 0;
+  margin-right: calc(1rem + 1.25rem + 1rem);
+}
+
 .page-head h1 {
   margin: 0 0 0.35rem;
   font-size: 1.5rem;
@@ -339,10 +344,7 @@ html[data-theme='dark'] .alert.error {
 }
 
 .cell-patient-name {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
+  vertical-align: middle;
 }
 
 .cell-patient-name__line {
@@ -385,7 +387,10 @@ html[data-theme='dark'] .alert.error {
 }
 
 .terms-pending-badge {
-  display: inline-block;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 0.5rem;
   padding: 0.28rem 0.55rem;
   border-radius: var(--radius-ui-sm, 6px);
   font-size: 0.68rem;
@@ -396,7 +401,6 @@ html[data-theme='dark'] .alert.error {
   background: #fef3c7;
   color: #92400e;
   border: 1px solid #fcd34d;
-  max-width: 100%;
 }
 
 html[data-theme='dark'] .terms-pending-badge {
@@ -410,6 +414,10 @@ html[data-theme='dark'] .terms-pending-badge {
   .pager {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .page-head .btn-primary {
+    margin-right: 0;
   }
 
   .data-table th,

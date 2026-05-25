@@ -133,7 +133,6 @@
     "GREET_EVENING": "Good evening, {{name}}!",
     "SUBTITLE": "Here is your clinic overview for today.",
     "CURRENT_TIME": "Current time",
-    "SEARCH_PH": "Search patients, doctors…",
     "NOTIF_ARIA": "Notifications",
     "NEW_APPT": "+ New appointment",
     "PANEL_TITLE": "Dashboard",
@@ -203,7 +202,6 @@
   },
   "BILLING": {
     "TITLE": "Payments & billing",
-    "SUBTITLE": "Available to ROLE_USER and ROLE_ADMIN. Fine-grained permission rules will be enforced by the backend.",
     "NEW_CHARGE": "+ New charge",
     "ADMIN_NOTE": "Admin view: extended summary for operations.",
     "SUMMARY_TOTAL": "Total",
@@ -226,6 +224,8 @@
     "BTN_EDIT": "Edit",
     "BTN_MARK_PAID": "Mark paid",
     "BTN_ANNUL": "Cancel",
+    "BTN_DELETE": "Delete",
+    "CONFIRM_DELETE": "Delete the charge for {{patient}} ({{concept}})? This cannot be undone.",
     "EMPTY_ROWS": "No records match the current filters.",
     "MODAL_NEW": "New charge",
     "MODAL_EDIT": "Edit charge",
@@ -248,6 +248,7 @@
     "STATUS_ANNULLED": "Cancelled",
     "ERR_SAVE": "Could not save the record. It may no longer be outstanding.",
     "ERR_PAY": "Could not register the payment. The status may have changed.",
-    "ERR_ANNUL": "Could not cancel the record."
+    "ERR_ANNUL": "Could not cancel the record.",
+    "ERR_DELETE": "Could not delete the record."
   }
 }

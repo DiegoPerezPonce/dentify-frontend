@@ -190,6 +190,23 @@ export class BillingPaymentsComponent {
     this.reload();
   }
 
+  deleteRecord(record: BillingRecord): void {
+    const msg = this.translate.instant('BILLING.CONFIRM_DELETE', {
+      patient: record.patient_name,
+      concept: record.concept
+    });
+    if (!confirm(msg)) {
+      return;
+    }
+    this.error.set(null);
+    const ok = this.billingService.delete(record.id);
+    if (!ok) {
+      this.error.set(this.translate.instant('BILLING.ERR_DELETE'));
+      return;
+    }
+    this.reload();
+  }
+
   closeAllModals(): void {
     this.showEditModal.set(false);
     this.showPayModal.set(false);

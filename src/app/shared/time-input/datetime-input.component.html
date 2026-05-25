@@ -1,0 +1,28 @@
+<div class="app-datetime-split">
+  <div class="app-datetime-field app-datetime-field--date">
+    <span class="app-datetime-field__icon-badge" aria-hidden="true">
+      <app-icon name="calendar_today" size="sm" />
+    </span>
+    <div class="app-datetime-field__body">
+      <label class="app-datetime-field__label" [attr.for]="inputId()">Fecha</label>
+      <input
+        [id]="inputId()"
+        type="date"
+        class="form-control app-datetime-split__date"
+        [class.form-control--invalid-hours]="invalid()"
+        [value]="datePart()"
+        [disabled]="isDisabled()"
+        (change)="onDateChange($any($event.target).value)"
+        (blur)="onBlur()"
+      />
+    </div>
+  </div>
+  <app-time-input
+    class="app-datetime-split__time"
+    leadingIcon="schedule"
+    [value]="timePart() || '08:00'"
+    [disabled]="isDisabled()"
+    [ariaLabel]="'Hora'"
+    (valueChange)="onTimeChange($event)"
+  />
+</div>

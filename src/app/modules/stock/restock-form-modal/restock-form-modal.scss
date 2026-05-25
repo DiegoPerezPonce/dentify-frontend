@@ -1,10 +1,13 @@
 .modal-overlay {
+  --rfm-text: var(--text-main, #1f2937);
+  --rfm-muted: var(--text-muted, #6b7280);
+  --rfm-surface: var(--surface-card, #fff);
+  --rfm-surface-muted: var(--surface-elevated, #f8fafc);
+  --rfm-border: var(--border-color, #e5e7eb);
+
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,13 +16,17 @@
 }
 
 .modal-content {
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  background: var(--rfm-surface);
+  border: 1px solid var(--rfm-border);
+  border-radius: var(--radius-ui-lg, 0.75rem);
+  box-shadow: var(--shadow-ui-elevated, 0 10px 25px rgba(15, 23, 42, 0.2));
   max-width: 500px;
   width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-height: min(90vh, 640px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--rfm-text);
   animation: slideIn 0.3s ease-out;
 }
 
@@ -38,32 +45,34 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rfm-border);
+  flex-shrink: 0;
 
   h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1f2937;
+    font-size: 1.35rem;
+    font-weight: 700;
+    font-family: var(--font-titles, Exo, system-ui, sans-serif);
+    color: var(--rfm-text);
     margin: 0;
   }
 
   .close-button {
-    background: none;
-    border: none;
+    border: 1px solid var(--rfm-border);
+    background: var(--rfm-surface-muted);
     width: 2rem;
     height: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0.375rem;
+    border-radius: var(--radius-ui-sm, 0.375rem);
     cursor: pointer;
-    color: #6b7280;
+    color: var(--rfm-muted);
     transition: all 0.2s;
 
     &:hover:not(:disabled) {
-      background-color: #f3f4f6;
-      color: #1f2937;
+      border-color: var(--theme-primary, #06b6d4);
+      color: var(--rfm-text);
     }
 
     &:disabled {
@@ -79,33 +88,40 @@
 }
 
 .material-info {
-  background-color: #f3f4f6;
+  background: var(--rfm-surface-muted);
   padding: 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #374151;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  color: var(--rfm-muted);
   font-size: 0.875rem;
+  border-bottom: 1px solid var(--rfm-border);
+  flex-shrink: 0;
 
   strong {
-    color: #1f2937;
+    color: var(--rfm-text);
   }
 
   .current-stock {
-    background-color: #e5e7eb;
+    background: color-mix(in srgb, var(--theme-primary, #06b6d4) 16%, var(--rfm-surface));
+    border: 1px solid color-mix(in srgb, var(--theme-primary, #06b6d4) 32%, var(--rfm-border));
+    color: var(--rfm-text);
     padding: 0.25rem 0.75rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
+    border-radius: var(--radius-ui-sm, 0.375rem);
+    font-weight: 600;
   }
 }
 
 .alert {
-  margin: 1.5rem;
+  margin: 1rem 1.5rem 0;
   padding: 1rem 1.25rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-ui-sm, 0.5rem);
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-shrink: 0;
 
   .icon {
     width: 1.5rem;
@@ -114,14 +130,21 @@
   }
 
   &.alert-error {
-    background-color: #fee;
-    color: #c00;
-    border: 1px solid #fcc;
+    background: color-mix(in srgb, #ef4444 12%, var(--rfm-surface));
+    color: #b91c1c;
+    border: 1px solid color-mix(in srgb, #ef4444 35%, var(--rfm-border));
   }
 }
 
+html[data-theme='dark'] .alert.alert-error {
+  color: #fecaca;
+}
+
 form {
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .form-group {
@@ -130,28 +153,30 @@ form {
   label {
     display: block;
     font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
+    font-weight: 600;
+    color: var(--rfm-text);
     margin-bottom: 0.5rem;
   }
 
   .form-control {
     width: 100%;
+    box-sizing: border-box;
     padding: 0.625rem 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
+    border: 1px solid var(--input-border, var(--rfm-border));
+    border-radius: var(--radius-ui-sm, 0.375rem);
     font-size: 0.875rem;
-    color: #1f2937;
+    color: var(--input-text, var(--rfm-text));
+    background: var(--input-bg, var(--rfm-surface));
     transition: all 0.2s;
 
     &:focus {
       outline: none;
-      border-color: #3788d8;
-      box-shadow: 0 0 0 3px rgba(55, 136, 216, 0.1);
+      border-color: var(--theme-primary, #06b6d4);
+      box-shadow: 0 0 0 3px var(--theme-primary-soft, rgba(6, 182, 212, 0.2));
     }
 
     &.ng-invalid.ng-touched {
-      border-color: #dc2626;
+      border-color: #ef4444;
     }
   }
 
@@ -159,7 +184,7 @@ form {
     display: block;
     margin-top: 0.5rem;
     font-size: 0.75rem;
-    color: #dc2626;
+    color: #f87171;
   }
 }
 
@@ -167,16 +192,16 @@ form {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rfm-border);
+  margin-top: 1.25rem;
 }
 
 .btn {
   padding: 0.625rem 1.25rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-ui-sm, 0.375rem);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   border: none;
@@ -190,20 +215,23 @@ form {
   }
 
   &.btn-primary {
-    background-color: #3788d8;
-    color: white;
+    background: var(--theme-primary, #06b6d4);
+    border: 1px solid var(--theme-primary, #06b6d4);
+    color: #fff;
 
     &:hover:not(:disabled) {
-      background-color: #2c6eb8;
+      background: var(--theme-primary-hover, #0891b2);
+      border-color: var(--theme-primary-hover, #0891b2);
     }
   }
 
   &.btn-secondary {
-    background-color: #e5e7eb;
-    color: #374151;
+    background: var(--rfm-surface-muted);
+    color: var(--rfm-text);
+    border: 1px solid var(--rfm-border);
 
     &:hover:not(:disabled) {
-      background-color: #d1d5db;
+      border-color: var(--theme-primary, #06b6d4);
     }
   }
 }
@@ -212,7 +240,7 @@ form {
   width: 1rem;
   height: 1rem;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
@@ -226,7 +254,6 @@ form {
 @media (max-width: 768px) {
   .modal-content {
     max-width: 100%;
-    max-height: 100vh;
-    border-radius: 0;
+    max-height: 95vh;
   }
 }

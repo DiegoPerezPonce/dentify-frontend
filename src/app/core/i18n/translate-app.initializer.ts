@@ -1,6 +1,13 @@
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
+/** Persiste y activa un idioma de la app (shell, login, selector custom). */
+export function applyAppLang(translate: TranslateService, code: AppLang): void {
+  localStorage.setItem(LANG_STORAGE_KEY, code);
+  document.documentElement.lang = documentLangHtml(code);
+  void translate.use(code);
+}
+
 export const LANG_STORAGE_KEY = 'dentify_lang';
 
 /** Idiomas soportados (issue #20). */

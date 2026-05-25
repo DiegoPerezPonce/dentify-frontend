@@ -44,7 +44,10 @@
       
       <!-- Motivo de consulta -->
       <div class="form-section">
-        <h3 class="section-title">💬 Motivo de la consulta</h3>
+        <h3 class="section-title">
+          <app-icon name="forum" size="sm" />
+          Motivo de la consulta
+        </h3>
         
         <div class="form-group">
           <label for="motivo_consulta" class="required">
@@ -65,7 +68,10 @@
 
       <!-- Nivel de dolor -->
       <div class="form-section">
-        <h3 class="section-title">😣 Nivel de dolor</h3>
+        <h3 class="section-title">
+          <app-icon name="healing" size="sm" />
+          Nivel de dolor
+        </h3>
         <p class="section-description">Selecciona el nivel de dolor del paciente (0 = sin dolor, 10 = insoportable)</p>
         
         <div class="pain-scale">
@@ -78,7 +84,9 @@
               (click)="selectPainLevel(level.value)"
               [attr.aria-label]="'Nivel ' + level.value + ': ' + level.label"
             >
-              <span class="pain-icon">{{ level.icon }}</span>
+              <span class="pain-icon">
+                <app-icon [name]="level.icon" size="md" />
+              </span>
               <span class="pain-value">{{ level.value }}</span>
               <span class="pain-label">{{ level.label }}</span>
             </button>
@@ -87,7 +95,9 @@
 
         <div class="pain-summary">
           <div class="pain-summary-card" [style.background-color]="getPainLevelData(selectedPainLevel()).color">
-            <span class="pain-summary-icon">{{ getPainLevelData(selectedPainLevel()).icon }}</span>
+            <span class="pain-summary-icon">
+              <app-icon [name]="getPainLevelData(selectedPainLevel()).icon" size="lg" iconClass="pain-summary-icon__glyph" />
+            </span>
             <div class="pain-summary-text">
               <strong>Nivel {{ selectedPainLevel() }}</strong>
               <span>{{ getPainLevelData(selectedPainLevel()).label }}</span>
@@ -98,7 +108,10 @@
 
       <!-- Observaciones -->
       <div class="form-section">
-        <h3 class="section-title">📝 Observaciones adicionales</h3>
+        <h3 class="section-title">
+          <app-icon name="edit_note" size="sm" />
+          Observaciones adicionales
+        </h3>
         
         <div class="form-group">
           <label for="observaciones">Notas y comentarios (opcional)</label>

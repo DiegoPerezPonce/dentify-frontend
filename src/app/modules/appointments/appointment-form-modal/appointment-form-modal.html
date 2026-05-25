@@ -227,13 +227,10 @@
 
           <div class="form-group">
             <label for="startDateTime">Fecha y hora de inicio *</label>
-            <input
-              type="datetime-local"
-              id="startDateTime"
+            <app-datetime-input
+              inputId="startDateTime"
               formControlName="startDateTime"
-              class="form-control"
-              [class.form-control--invalid-hours]="clinicHoursAlert()"
-              (change)="onScheduleFieldsChange()"
+              [invalid]="!!clinicHoursAlert()"
             />
             @if (clinicHoursHint(); as hours) {
               <p class="field-hint">Horario de la clínica: {{ hours }}. La cita debe terminar antes del cierre.</p>

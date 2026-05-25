@@ -3,6 +3,14 @@ import { FACE_LABELS } from '../models/odontograma.models';
 
 const FACES = ['V', 'M', 'O', 'D', 'L'] as const;
 
+const FACE_POINTS: Record<(typeof FACES)[number], string> = {
+  V: '10,10 90,10 65,35 35,35',
+  M: '10,10 35,35 35,65 10,90',
+  O: '35,35 65,35 65,65 35,65',
+  D: '90,10 65,35 65,65 90,90',
+  L: '10,90 35,65 65,65 90,90'
+};
+
 @Component({
   selector: 'app-odontograma-tooth-chart',
   standalone: true,
@@ -28,6 +36,7 @@ export class OdontogramaToothChartComponent {
   @Output() faceSelect = new EventEmitter<string>();
 
   readonly faces = FACES;
+  readonly facePoints = FACE_POINTS;
   readonly faceLabels = FACE_LABELS;
 
   colorFor(face: string): string {
@@ -35,6 +44,25 @@ export class OdontogramaToothChartComponent {
       return this.coronaFillColor;
     }
     return this.faceColors[face] ?? '#ffffff';
+  }
+
+  /** Sin atributo fill cuando la cara está seleccionada y vacía: el CSS anima el parpadeo. */
+  faceFill(face: string): string | undefined {
+    if (this.coronaFillColor) {
+      return this.coronaFillColor;
+    }
+    const color = this.faceColors[face];
+    if (color) {
+      return color;
+    }
+    if (this.isFaceSelected(face)) {
+      return undefined;
+    }
+    return '#ffffff';
+  }
+
+  hasFaceColor(face: string): boolean {
+    return !this.coronaFillColor && !!this.faceColors[face];
   }
 
   isFaceSelected(face: string): boolean {
