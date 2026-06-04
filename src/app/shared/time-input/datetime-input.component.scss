@@ -48,8 +48,50 @@
   color: var(--text-muted, #64748b);
 }
 
+.app-datetime-date-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
 .app-datetime-split__date {
   width: 100%;
+  padding-right: 2.5rem;
+}
+
+.app-datetime-split__date-native {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-datetime-date-picker-btn {
+  position: absolute;
+  right: 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-ui-sm, 6px);
+  background: transparent;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: var(--theme-primary, #06b6d4);
+    background: color-mix(in srgb, var(--theme-primary, #06b6d4) 12%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
 }
 
 html[data-theme='dark'] .app-datetime-field__icon-badge {

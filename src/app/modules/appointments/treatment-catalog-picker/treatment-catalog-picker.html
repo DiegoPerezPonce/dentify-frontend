@@ -3,6 +3,7 @@
     <div class="tcp__selected" aria-live="polite">
       <span class="tcp__selected-cat">{{ sel.categoryName }}</span>
       <span class="tcp__selected-name">{{ sel.name }}</span>
+      <span class="tcp__selected-spec">{{ sel.dentistSpecialtyName }}</span>
       <button
         type="button"
         class="tcp__clear"
@@ -51,30 +52,47 @@
         <p class="tcp__muted">No hay tratamientos que coincidan con la búsqueda.</p>
       } @else {
         @for (group of filteredGroups(); track group.id) {
-          <section class="tcp__group">
-            <header class="tcp__group-head">
-              <span class="tcp__group-title">{{ group.name }}</span>
-            </header>
-            <ul class="tcp__opts">
-              @for (t of group.treatments; track t.id) {
-                <li>
-                  <button
-                    type="button"
-                    class="tcp__opt"
-                    [class.tcp__opt--on]="isSelected(t)"
-                    role="option"
-                    [attr.aria-selected]="isSelected(t)"
-                    (click)="selectTreatment(t)"
-                  >
-                    <span class="tcp__opt-label">{{ t.name }}</span>
-                    <span class="tcp__opt-meta">{{ t.defaultDurationMinutes }} min</span>
-                    @if (isSelected(t)) {
-                      <app-icon name="check" size="sm" class="tcp__check" />
-                    }
-                  </button>
-                </li>
-              }
-            </ul>
+          <section class="tcp__group" [class.tcp__group--open]="isGroupExpanded(group.id)">
+            <button
+              type="button"
+              class="tcp__group-head"
+              (click)="toggleGroup(group.id, $event)"
+              [attr.aria-expanded]="isGroupExpanded(group.id)"
+              [attr.aria-controls]="'tcp-group-' + group.id"
+            >
+              <span class="tcp__group-chevron" aria-hidden="true">
+                {{ isGroupExpanded(group.id) ? '▼' : '▶' }}
+              </span>
+              <span class="tcp__group-head-text">
+                <span class="tcp__group-title">{{ group.name }}</span>
+                <span class="tcp__group-sub">{{ treatmentCountLabel(group.treatments.length) }}</span>
+              </span>
+            </button>
+            @if (isGroupExpanded(group.id)) {
+              <ul class="tcp__opts" [id]="'tcp-group-' + group.id">
+                @for (t of group.treatments; track t.id) {
+                  <li>
+                    <button
+                      type="button"
+                      class="tcp__opt"
+                      [class.tcp__opt--on]="isSelected(t)"
+                      role="option"
+                      [attr.aria-selected]="isSelected(t)"
+                      (click)="selectTreatment(t)"
+                    >
+                      <span class="tcp__opt-body">
+                        <span class="tcp__opt-label">{{ t.name }}</span>
+                        <span class="tcp__opt-spec">Odontólogo: {{ t.dentistSpecialtyName }}</span>
+                      </span>
+                      <span class="tcp__opt-meta">{{ t.defaultDurationMinutes }} min</span>
+                      @if (isSelected(t)) {
+                        <app-icon name="check" size="sm" class="tcp__check" />
+                      }
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
           </section>
         }
       }

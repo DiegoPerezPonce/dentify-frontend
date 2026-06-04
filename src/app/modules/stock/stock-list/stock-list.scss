@@ -373,6 +373,13 @@ html[data-theme='light'] .stock-container .btn-danger,
   flex: 1;
   min-height: 0;
 
+  .field-hint {
+    margin-top: 0.2rem;
+    font-size: 0.72rem;
+    color: var(--stk-modal-muted);
+    font-weight: 400;
+  }
+
   label {
     display: flex;
     flex-direction: column;

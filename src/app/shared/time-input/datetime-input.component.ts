@@ -11,8 +11,11 @@ import {
   NG_VALUE_ACCESSOR
 } from '@angular/forms';
 import {
+  formatDateDisplayTyping,
+  formatDateToDisplay,
   mergeDatetimeLocal,
   normalizeTimeHHmm,
+  parseDisplayDateToIso,
   splitDatetimeLocalValue
 } from './time-slot.util';
 import { AppIconComponent } from '../app-icon/app-icon.component';
@@ -38,6 +41,8 @@ export class DatetimeInputComponent implements ControlValueAccessor {
   readonly invalid = input(false);
 
   readonly value = signal('');
+  /** Texto visible en formato DD/MM/YYYY. */
+  readonly dateInput = signal('');
 
   readonly datePart = computed(() => splitDatetimeLocalValue(this.value()).date);
   readonly timePart = computed(() => {
@@ -50,7 +55,9 @@ export class DatetimeInputComponent implements ControlValueAccessor {
   private formDisabled = signal(false);
 
   writeValue(value: string | null): void {
-    this.value.set(value ?? '');
+    const next = value ?? '';
+    this.value.set(next);
+    this.syncDateInputFromValue(next);
   }
 
   registerOnChange(fn: (value: string) => void): void {
@@ -69,9 +76,35 @@ export class DatetimeInputComponent implements ControlValueAccessor {
     return this.disabled() || this.formDisabled();
   }
 
-  onDateChange(raw: string): void {
-    const merged = mergeDatetimeLocal(raw, this.timePart() || '08:00');
+  onDateInput(raw: string): void {
+    this.dateInput.set(formatDateDisplayTyping(raw));
+  }
+
+  onDateBlur(): void {
+    const iso = parseDisplayDateToIso(this.dateInput());
+    if (!iso) {
+      this.syncDateInputFromValue(this.value());
+      this.onTouched();
+      return;
+    }
+    const merged = mergeDatetimeLocal(iso, this.timePart() || '08:00');
     this.emit(merged);
+  }
+
+  onDateChange(isoDate: string): void {
+    const merged = mergeDatetimeLocal(isoDate, this.timePart() || '08:00');
+    this.emit(merged);
+  }
+
+  openNativeDatePicker(input: HTMLInputElement): void {
+    if (this.isDisabled()) return;
+    input.showPicker?.();
+  }
+
+  onNativeDatePicked(raw: string): void {
+    if (!raw) return;
+    this.dateInput.set(formatDateToDisplay(raw));
+    this.onDateChange(raw);
   }
 
   onTimeChange(time: string): void {
@@ -93,7 +126,13 @@ export class DatetimeInputComponent implements ControlValueAccessor {
 
   private emit(next: string): void {
     this.value.set(next);
+    this.syncDateInputFromValue(next);
     this.onChange(next);
     this.onTouched();
+  }
+
+  private syncDateInputFromValue(datetimeLocal: string): void {
+    const { date } = splitDatetimeLocalValue(datetimeLocal);
+    this.dateInput.set(formatDateToDisplay(date));
   }
 }

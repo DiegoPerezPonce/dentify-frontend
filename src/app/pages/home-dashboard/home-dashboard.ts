@@ -168,17 +168,17 @@ export class HomeDashboardComponent implements OnInit {
     return ids.size;
   });
 
-  readonly boxesOccupiedCount = computed(() => {
+  readonly boxesAvailableCount = computed(() => {
     this.dashNow();
-    return this.boxCards().filter((b) => b.state === 'busy').length;
+    return this.boxCards().filter((b) => b.state === 'free').length;
   });
 
   readonly boxesTotal = computed(() => this.boxes().length);
 
-  readonly boxesOccupiedPct = computed(() => {
+  readonly boxesAvailablePct = computed(() => {
     const t = this.boxesTotal();
     if (!t) return 0;
-    return Math.min(100, Math.round((this.boxesOccupiedCount() / t) * 100));
+    return Math.min(100, Math.round((this.boxesAvailableCount() / t) * 100));
   });
 
   readonly nextApptHint = computed(() => {
@@ -418,8 +418,14 @@ function appointmentMatchesBox(a: Appointment, box: Box): boolean {
 function buildBoxDashboardCard(box: Box, appointments: Appointment[], nowMs: number): DashboardBox {
   const label = box.nombre?.trim() || `Box ${box.id}`;
   const est = (box.estado || '').toLowerCase();
+  const isMaintenance =
+    est === 'mantenimiento' || est.includes('manten') || est.includes('fuera');
 
-  if (est === 'mantenimiento' || est.includes('manten') || est.includes('fuera')) {
+  const boxAppts = appointments
+    .filter((a) => appointmentMatchesBox(a, box) && appointmentBlocksBox(a))
+    .sort((a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime());
+
+  if (isMaintenance && boxAppts.length === 0) {
     return {
       id: box.id,
       label,
@@ -427,10 +433,6 @@ function buildBoxDashboardCard(box: Box, appointments: Appointment[], nowMs: num
       statusLine: 'En mantenimiento'
     };
   }
-
-  const boxAppts = appointments
-    .filter((a) => appointmentMatchesBox(a, box) && appointmentBlocksBox(a))
-    .sort((a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime());
 
   const slotLines = boxAppts.map((a) =>
     formatOccupancySlot(a.startDateTime, a.endDateTime)
@@ -442,12 +444,14 @@ function buildBoxDashboardCard(box: Box, appointments: Appointment[], nowMs: num
     return nowMs >= start && nowMs < end;
   });
 
+  const maintenanceNote = isMaintenance ? ' · Box en mantenimiento' : '';
+
   if (current) {
     return {
       id: box.id,
       label,
       state: 'busy',
-      statusLine: 'Ocupado ahora',
+      statusLine: `Ocupado ahora${maintenanceNote}`,
       schedule: {
         heading: 'Cita en curso:',
         slots: [formatOccupancySlot(current.startDateTime, current.endDateTime)]
@@ -460,8 +464,8 @@ function buildBoxDashboardCard(box: Box, appointments: Appointment[], nowMs: num
     return {
       id: box.id,
       label,
-      state: 'free',
-      statusLine: 'Disponible',
+      state: isMaintenance ? 'busy' : 'free',
+      statusLine: isMaintenance ? `Cita programada${maintenanceNote}` : 'Disponible',
       schedule: {
         heading: 'Próxima cita:',
         slots: [formatOccupancySlot(next.startDateTime, next.endDateTime)]
@@ -473,8 +477,8 @@ function buildBoxDashboardCard(box: Box, appointments: Appointment[], nowMs: num
     return {
       id: box.id,
       label,
-      state: 'free',
-      statusLine: 'Disponible',
+      state: isMaintenance ? 'busy' : 'free',
+      statusLine: isMaintenance ? `Citas hoy${maintenanceNote}` : 'Disponible',
       schedule: {
         heading: 'Citas hoy:',
         slots: slotLines
@@ -482,12 +486,12 @@ function buildBoxDashboardCard(box: Box, appointments: Appointment[], nowMs: num
     };
   }
 
-  if (est === 'ocupado') {
+  if (isMaintenance) {
     return {
       id: box.id,
       label,
-      state: 'busy',
-      statusLine: 'Ocupado'
+      state: 'maint',
+      statusLine: 'En mantenimiento'
     };
   }
 

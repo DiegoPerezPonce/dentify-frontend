@@ -54,7 +54,7 @@ export class StockMaterialService {
   }
 
   update(id: number, dto: StockMaterialUpdateDTO): Observable<StockMaterial> {
-    return this.http.patch<StockMaterial>(`${this.base}/${id}`, dto);
+    return this.http.put<StockMaterial>(`${this.base}/${id}`, dto);
   }
 
   delete(id: number): Observable<void> {
@@ -73,12 +73,33 @@ export class StockMaterialService {
 function normalizeListResponse(res: unknown): StockMaterialListResult {
   if (res == null) return { items: [], total: 0 };
   if (Array.isArray(res)) {
-    return { items: res as StockMaterial[], total: res.length };
+    return { items: res.map((row) => normalizeMaterial(row)), total: res.length };
   }
   const r = res as Record<string, unknown>;
   if (Array.isArray(r['items'])) {
-    const total = Number(r['total'] ?? (r['items'] as StockMaterial[]).length);
-    return { items: r['items'] as StockMaterial[], total: Number.isFinite(total) ? total : 0 };
+    const items = (r['items'] as unknown[]).map((row) => normalizeMaterial(row));
+    const total = Number(r['total'] ?? items.length);
+    return { items, total: Number.isFinite(total) ? total : 0 };
   }
   return { items: [], total: 0 };
+}
+
+function normalizeMaterial(raw: unknown): StockMaterial {
+  const o = raw as Record<string, unknown>;
+  const cantidad = Number(o['cantidad_actual'] ?? 0);
+  const umbral = Number(o['umbral_minimo'] ?? 10);
+  const umbralRounded = Number.isFinite(umbral) ? umbral : 10;
+  const isLow =
+    o['is_low_stock'] != null
+      ? Boolean(o['is_low_stock'])
+      : cantidad <= umbralRounded;
+  return {
+    id: Number(o['id']),
+    nombre: String(o['nombre'] ?? ''),
+    cantidad_actual: Number.isFinite(cantidad) ? cantidad : 0,
+    umbral_minimo: umbralRounded,
+    is_low_stock: isLow,
+    unidad: String(o['unidad'] ?? ''),
+    fecha_ultima_reposicion: (o['fecha_ultima_reposicion'] as string | undefined) ?? undefined
+  };
 }

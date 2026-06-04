@@ -116,6 +116,15 @@ export const routes: Routes = [
           )
       },
       {
+        path: 'citas/:appointmentId/sesion',
+        canActivate: [roleGuard],
+        data: { ...clinicalOrAdmin, pageTitle: 'Sesión clínica' },
+        loadComponent: () =>
+          import('./modules/appointments/appointment-session/appointment-session').then(
+            (m) => m.AppointmentSessionComponent
+          )
+      },
+      {
         path: 'radiografias',
         canActivate: [roleGuard],
         data: {

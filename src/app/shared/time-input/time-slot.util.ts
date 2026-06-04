@@ -80,3 +80,43 @@ export function mergeDatetimeLocal(date: string, time: string): string {
   if (!d || !t) return '';
   return `${d}T${t}`;
 }
+
+/** ISO `YYYY-MM-DD` → visualización `DD/MM/YYYY`. */
+export function formatDateToDisplay(isoDate: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(isoDate ?? '').trim());
+  if (!match) return '';
+  return `${match[3]}/${match[2]}/${match[1]}`;
+}
+
+/** Parsea `DD/MM/YYYY` o `DD-MM-YYYY` a ISO `YYYY-MM-DD`. */
+export function parseDisplayDateToIso(display: string): string | null {
+  const raw = String(display ?? '').trim();
+  const match = /^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/.exec(raw);
+  if (!match) return null;
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+  if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1900 || year > 2100) {
+    return null;
+  }
+
+  const probe = new Date(year, month - 1, day);
+  if (
+    probe.getFullYear() !== year ||
+    probe.getMonth() !== month - 1 ||
+    probe.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+/** Máscara de escritura progresiva `DD/MM/YYYY` (solo dígitos). */
+export function formatDateDisplayTyping(raw: string): string {
+  const digits = String(raw ?? '').replace(/\D/g, '').slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}

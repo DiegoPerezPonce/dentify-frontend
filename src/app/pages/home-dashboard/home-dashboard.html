@@ -56,21 +56,21 @@
         <div class="dash-stat__ico"><app-icon name="chair_alt" size="lg" /></div>
         <div>
           <p class="dash-stat__label">{{ 'HOME_DASH.STAT_BOXES' | translate }}</p>
-          <p class="dash-stat__value">{{ boxesOccupiedCount() }}/{{ boxesTotal() || '—' }}</p>
+          <p class="dash-stat__value">{{ boxesAvailableCount() }}/{{ boxesTotal() || '—' }}</p>
           @if (boxesTotal()) {
             <div class="dash-stat__bar">
-              <span class="dash-stat__fill" [style.width.%]="boxesOccupiedPct()"></span>
+              <span class="dash-stat__fill" [style.width.%]="boxesAvailablePct()"></span>
             </div>
           }
         </div>
       </article>
-      <article class="dash-stat" [class.dash-stat--alert]="stockAlertTotal() > 0">
+      <article class="dash-stat">
         <div class="dash-stat__ico"><app-icon name="inventory_2" size="lg" /></div>
         <div>
           <p class="dash-stat__label">{{ 'HOME_DASH.STAT_STOCK' | translate }}</p>
           <p class="dash-stat__value">{{ stockAlertTotal() }}</p>
           @if (stockAlertTotal() > 0) {
-            <p class="dash-stat__hint">{{ 'HOME_DASH.STAT_STOCK_HINT' | translate }}</p>
+            <p class="dash-stat__hint dash-stat__hint--danger">{{ 'HOME_DASH.STAT_STOCK_HINT' | translate }}</p>
           } @else {
             <p class="dash-stat__hint dash-stat__hint--ok">{{ 'HOME_DASH.STAT_STOCK_OK' | translate }}</p>
           }
@@ -146,9 +146,15 @@
                     </p>
                   }
                   <div class="dash-appt__btns">
-                    <a routerLink="/app/agenda" class="dash-appt__btn dash-appt__btn--pri">{{
-                      'HOME_DASH.BTN_START' | translate
-                    }}</a>
+                    <a
+                      [routerLink]="['/app/citas', a.id, 'sesion']"
+                      class="dash-appt__btn dash-appt__btn--pri"
+                      [class.dash-appt__btn--disabled]="a.status === 'locked'"
+                      [attr.aria-disabled]="a.status === 'locked' ? true : null"
+                      (click)="a.status === 'locked' ? $event.preventDefault() : null"
+                    >
+                      {{ 'HOME_DASH.BTN_START' | translate }}
+                    </a>
                     <a [routerLink]="['/app/pacientes', a.patientId, 'historial']" class="dash-appt__btn dash-appt__btn--sec">{{
                       'HOME_DASH.BTN_HISTORY' | translate
                     }}</a>
@@ -174,14 +180,16 @@
               <article class="dash-box" [class]="'dash-box--' + b.state">
                 <span class="dash-box__tag">{{ b.label }}</span>
                 <p class="dash-box__status">{{ b.statusLine }}</p>
-                @if (b.schedule) {
-                  <p class="dash-box__schedule-title">{{ b.schedule.heading }}</p>
-                  <ul class="dash-box__slots">
-                    @for (slot of b.schedule.slots; track slot) {
-                      <li>{{ slot }}</li>
-                    }
-                  </ul>
-                }
+                <div class="dash-box__schedule-area" [class.dash-box__schedule-area--empty]="!b.schedule">
+                  @if (b.schedule) {
+                    <p class="dash-box__schedule-title">{{ b.schedule.heading }}</p>
+                    <ul class="dash-box__slots">
+                      @for (slot of b.schedule.slots; track slot) {
+                        <li>{{ slot }}</li>
+                      }
+                    </ul>
+                  }
+                </div>
               </article>
             }
           </div>

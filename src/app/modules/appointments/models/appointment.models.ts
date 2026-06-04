@@ -18,6 +18,8 @@ export interface Appointment {
   treatmentDurationMinutes?: number;
   appointmentKind?: AppointmentKind | string;
   catalogTreatmentId?: number;
+  catalogTreatmentName?: string;
+  treatmentCategoryName?: string;
   specialtyName?: string;
   treatment?: string;
   notes?: string;

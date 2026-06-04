@@ -36,10 +36,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   APPOINTMENT_KIND_OPTIONS,
   AppointmentKind,
+  CatalogTreatment,
   findCatalogTreatmentInGroups,
   filterDentistsBySpecialtyName,
   flattenCatalogTreatments,
   getAppointmentKindLabel,
+  getAppointmentProcedureLabel,
   getAppointmentKindTreatmentHint,
   TreatmentCategoryGroup
 } from '../models/clinical-catalog.models';
@@ -172,7 +174,7 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   readonly filteredDentists = computed(() => {
     this.formTick();
     this.availableDentistIds();
-    const treatment = this.selectedCatalogTreatment();
+    const treatment = this.resolveSelectedCatalogTreatment();
     const specialtyName = treatment?.dentistSpecialtyName ?? null;
     const all = this.dentists();
     let list = filterDentistsBySpecialtyName(all, specialtyName);
@@ -192,10 +194,49 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     return list;
   });
 
-  readonly selectedCatalogTreatment = computed(() => {
+  /** Mensaje cuando no hay odontólogos en el desplegable (turno vs. especialidad). */
+  readonly dentistUnavailableHint = computed(() => {
     this.formTick();
-    const id = Number(this.form.get('catalogTreatmentId')?.value);
-    return findCatalogTreatmentInGroups(this.treatmentGroups(), id);
+    this.availableDentistIds();
+    if (!this.hasScheduleSlotSelected() || this.loadingAvailableDentists()) {
+      return null;
+    }
+    if (this.filteredDentists().length > 0) {
+      return null;
+    }
+
+    const treatment = this.resolveSelectedCatalogTreatment();
+    const specialtyName = treatment?.dentistSpecialtyName?.trim();
+    if (!specialtyName) {
+      return 'Elige un tratamiento del catálogo para ver qué especialidad requiere.';
+    }
+
+    const all = this.dentists();
+    const bySpecialty = filterDentistsBySpecialtyName(all, specialtyName);
+    if (bySpecialty.length === 0) {
+      return `No hay odontólogos con especialidad «${specialtyName}». Crea uno en Odontólogos o revisa el catálogo.`;
+    }
+
+    const allowed = new Set(this.availableDentistIds());
+    const withShift = all.filter((d) => allowed.has(d.id));
+    if (withShift.length > 0) {
+      const busyNames = withShift.map((d) => this.getDentistName(d)).join(', ');
+      const busySpecs = [...new Set(withShift.map((d) => d.especialidad))].join(', ');
+      return (
+        `A esa hora hay turno libre (${busyNames}), pero el tratamiento requiere «${specialtyName}» ` +
+        `(especialidad actual: ${busySpecs}). Prueba otra hora o asigna un odontólogo con la especialidad correcta.`
+      );
+    }
+
+    const names = bySpecialty.map((d) => this.getDentistName(d)).join(', ');
+    const clinic = this.clinicSettings();
+    if (clinic) {
+      return (
+        `«${specialtyName}» (${names}) no tiene turno a esa hora. ` +
+        `Prueba mañana (${clinic.openTime}–${clinic.morningEndTime}) o tarde (${clinic.afternoonStartTime}–${clinic.closeTime}).`
+      );
+    }
+    return `Ningún odontólogo con «${specialtyName}» tiene turno libre en ese horario.`;
   });
 
   readonly selectedPatient = computed(() => {
@@ -483,9 +524,15 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     this.formTick.update((n) => n + 1);
   }
 
+  /** Tratamiento del catálogo según el formulario (no usar computed cacheado por formTick). */
+  private resolveSelectedCatalogTreatment(): CatalogTreatment | null {
+    const id = Number(this.form.get('catalogTreatmentId')?.value) || null;
+    return id ? findCatalogTreatmentInGroups(this.treatmentGroups(), id) : null;
+  }
+
   private onCatalogTreatmentChange(): void {
-    const treatment = this.selectedCatalogTreatment();
-    if (treatment) {
+    const treatment = this.resolveSelectedCatalogTreatment();
+    if (treatment?.defaultDurationMinutes) {
       this.form.patchValue({ treatmentDuration: treatment.defaultDurationMinutes });
     }
     this.form.patchValue({ dentistId: null, boxId: null });
@@ -710,7 +757,7 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
     }
 
     const formValue = this.form.value;
-    const catalog = this.selectedCatalogTreatment();
+    const catalog = this.resolveSelectedCatalogTreatment();
     const payloadBase = {
       patientId: Number(formValue.patientId),
       dentistId: Number(formValue.dentistId),
@@ -773,6 +820,12 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
 
   getAppointmentKindLabel(kind: string | undefined): string {
     return getAppointmentKindLabel(kind);
+  }
+
+  detailProcedureLabel(): string {
+    if (!this.appointment) return '—';
+    const label = getAppointmentProcedureLabel(this.appointment);
+    return label === 'Sin procedimiento' ? '—' : label;
   }
 
   formatDateTimeDisplay(iso: string): string {
@@ -895,7 +948,7 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   }
 
   hasCatalogTreatmentSelected(): boolean {
-    return !!this.selectedCatalogTreatment();
+    return !!this.resolveSelectedCatalogTreatment();
   }
 
   getTotalDurationMinutes(): number {
@@ -929,11 +982,11 @@ export class AppointmentFormModalComponent implements OnInit, OnChanges, OnDestr
   }
 
   selectedTreatmentCategoryName(): string | null {
-    return this.selectedCatalogTreatment()?.categoryName ?? null;
+    return this.resolveSelectedCatalogTreatment()?.categoryName ?? null;
   }
 
   requiredDentistSpecialtyLabel(): string | null {
-    return this.selectedCatalogTreatment()?.dentistSpecialtyName ?? null;
+    return this.resolveSelectedCatalogTreatment()?.dentistSpecialtyName ?? null;
   }
 
   detailAppointmentRisk(): MedicalAlertSeverity | null {

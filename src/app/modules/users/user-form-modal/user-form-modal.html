@@ -124,17 +124,27 @@
               </div>
 
               <div class="form-group">
-                <label for="dentistEspecialidad">Especialidad Odontólogo *</label>
+                <label for="dentistEspecialidad">Especialidad del odontólogo *</label>
                 <select
                   id="dentistEspecialidad"
                   formControlName="dentistEspecialidad"
+                  [disabled]="loadingSpecialties()"
                   [class.error]="form.get('dentistEspecialidad')?.touched && form.get('dentistEspecialidad')?.invalid"
                 >
-                  <option value="">Selecciona especialidad</option>
-                  @for (sp of specialties; track sp) {
+                  <option value="">
+                    @if (loadingSpecialties()) {
+                      Cargando especialidades…
+                    } @else {
+                      Selecciona especialidad
+                    }
+                  </option>
+                  @for (sp of specialtyOptions(); track sp) {
                     <option [value]="sp">{{ sp }}</option>
                   }
                 </select>
+                <p class="help-text">
+                  Debe coincidir con la especialidad que pide cada procedimiento al agendar citas.
+                </p>
                 @if (getFieldError('dentistEspecialidad'); as error) {
                   <span class="error-message">{{ error }}</span>
                 }

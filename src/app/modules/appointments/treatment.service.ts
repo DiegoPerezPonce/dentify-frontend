@@ -55,7 +55,8 @@ function normalizeTreatment(raw: unknown): CatalogTreatment {
     dentistSpecialtyName: String(o['dentistSpecialtyName'] ?? o['specialtyName'] ?? ''),
     specialtyId: Number(o['dentistSpecialtyId'] ?? o['specialtyId'] ?? 0),
     specialtyName: String(o['dentistSpecialtyName'] ?? o['specialtyName'] ?? ''),
-    defaultDurationMinutes: Number(o['defaultDurationMinutes'] ?? 30) || 30,
+    defaultDurationMinutes:
+      Number(o['defaultDurationMinutes'] ?? o['default_duration_minutes'] ?? 30) || 30,
     allowsUrgency: Boolean(o['allowsUrgency'] ?? true),
     forFirstVisit: Boolean(o['forFirstVisit'] ?? false),
     isCustom: Boolean(o['isCustom'] ?? false),

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BoxService } from '../box.service';
-import { Box } from '../models/box.models';
+import { Box, boxEstadoLabel, normalizeBoxEstado } from '../models/box.models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BoxFormModalComponent } from '../box-form-modal/box-form-modal';
 
@@ -82,10 +82,13 @@ export class BoxListComponent implements OnInit {
   }
 
   estadoClass(estado: string): string {
-    const e = (estado || '').toLowerCase();
-    if (e === 'disponible') return 'estado-disponible';
-    if (e === 'mantenimiento' || e === 'fuera de servicio') return 'estado-mantenimiento';
-    return 'estado-otro';
+    return normalizeBoxEstado(estado) === 'mantenimiento'
+      ? 'estado-mantenimiento'
+      : 'estado-disponible';
+  }
+
+  estadoLabel(estado: string): string {
+    return boxEstadoLabel(estado);
   }
 
   private getErrorMessage(err: unknown): string {

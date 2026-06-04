@@ -60,8 +60,8 @@
                 formControlName="estado"
                 [class.error]="form.get('estado')?.touched && form.get('estado')?.invalid"
               >
-                @for (e of estados; track e) {
-                  <option [value]="e">{{ e | titlecase }}</option>
+                @for (opt of estadoOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
                 }
               </select>
               @if (getFieldError('estado'); as err) {

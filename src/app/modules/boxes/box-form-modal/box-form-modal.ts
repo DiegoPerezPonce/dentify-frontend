@@ -11,10 +11,14 @@ import {
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BoxService } from '../box.service';
-import { Box, BoxCreatePayload, BoxUpdatePayload } from '../models/box.models';
+import {
+  Box,
+  BoxCreatePayload,
+  BOX_ESTADO_OPTIONS,
+  normalizeBoxEstado,
+  BoxUpdatePayload
+} from '../models/box.models';
 import { HttpErrorResponse } from '@angular/common/http';
-
-export const BOX_ESTADOS = ['disponible', 'ocupado', 'mantenimiento'] as const;
 
 @Component({
   selector: 'app-box-form-modal',
@@ -37,7 +41,7 @@ export class BoxFormModalComponent implements OnChanges {
   readonly form: FormGroup;
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
-  readonly estados = BOX_ESTADOS;
+  readonly estadoOptions = BOX_ESTADO_OPTIONS;
 
   constructor() {
     this.form = this.fb.group({
@@ -61,7 +65,7 @@ export class BoxFormModalComponent implements OnChanges {
       this.form.patchValue({
         nombre: this.box.nombre,
         descripcion: this.box.descripcion ?? '',
-        estado: this.box.estado || 'disponible'
+        estado: normalizeBoxEstado(this.box.estado)
       });
     } else {
       this.form.reset({

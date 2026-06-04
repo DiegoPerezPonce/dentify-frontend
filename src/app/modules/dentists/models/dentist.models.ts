@@ -25,7 +25,9 @@ export interface DentistListResult {
   total: number;
 }
 
-// Common specialties for dentists
+/**
+ * @deprecated Usar `SpecialtyService.list()` — misma lista que el catálogo de tratamientos.
+ */
 export const DENTIST_SPECIALTIES = [
   'Limpieza dental',
   'Odontología General',
