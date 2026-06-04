@@ -5,6 +5,8 @@ import { API_BASE_URL } from '../../core/config/api-base';
 import { PatientListQuery, PatientListResult, PatientRow } from './models/patient-list.models';
 import { Patient, PatientCreateDTO, PatientUpdateDTO } from './models/patient.models';
 import { ClinicalHistory } from './models/clinical-history.models';
+import { Appointment } from '../appointments/models/appointment.models';
+import { normalizeAppointmentFromApi } from '../appointments/appointment.service';
 
 @Injectable({
   providedIn: 'root'
@@ -74,6 +76,16 @@ export class PatientService {
    */
   getHistory(patientId: number): Observable<ClinicalHistory[]> {
     return this.http.get<ClinicalHistory[]>(`${this.base}/${patientId}/history`);
+  }
+
+  /** GET citas del paciente (historial de citas). */
+  getAppointments(patientId: number): Observable<Appointment[]> {
+    return this.http.get<unknown>(`${this.base}/${patientId}/appointments`).pipe(
+      map((raw) => {
+        const list = Array.isArray(raw) ? raw : [];
+        return list.map((item) => normalizeAppointmentFromApi(item));
+      })
+    );
   }
 }
 

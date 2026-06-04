@@ -1,10 +1,10 @@
-import { Component, EventEmitter, inject, Input, OnChanges, Output, signal, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../user.service';
 import { User, UserCreateDTO, UserUpdateDTO, AVAILABLE_ROLES } from '../models/user.models';
 import { HttpErrorResponse } from '@angular/common/http';
-import { DENTIST_SPECIALTIES } from '../../dentists/models/dentist.models';
+import { SpecialtyService } from '../../../core/catalog/specialty.service';
 
 @Component({
   selector: 'app-user-form-modal',
@@ -13,9 +13,10 @@ import { DENTIST_SPECIALTIES } from '../../dentists/models/dentist.models';
   templateUrl: './user-form-modal.html',
   styleUrl: './user-form-modal.scss'
 })
-export class UserFormModalComponent implements OnChanges {
+export class UserFormModalComponent implements OnInit, OnChanges {
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
+  private specialtyService = inject(SpecialtyService);
 
   @Input() isOpen = false;
   @Input() user: User | null = null;
@@ -26,7 +27,8 @@ export class UserFormModalComponent implements OnChanges {
   readonly form: FormGroup;
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
-  readonly specialties = DENTIST_SPECIALTIES;
+  readonly specialtyOptions = signal<string[]>([]);
+  readonly loadingSpecialties = signal(false);
   readonly availableRoles = AVAILABLE_ROLES;
 
   constructor() {
@@ -41,12 +43,32 @@ export class UserFormModalComponent implements OnChanges {
     });
   }
 
+  ngOnInit(): void {
+    this.loadSpecialtyOptions();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['user'] || changes['isOpen']) {
       if (this.isOpen) {
         this.resetForm();
+        if (this.specialtyOptions().length === 0) {
+          this.loadSpecialtyOptions();
+        }
       }
     }
+  }
+
+  private loadSpecialtyOptions(): void {
+    this.loadingSpecialties.set(true);
+    this.specialtyService.list().subscribe({
+      next: (items) => {
+        this.specialtyOptions.set(items.map((s) => s.name).sort((a, b) => a.localeCompare(b, 'es')));
+        this.loadingSpecialties.set(false);
+      },
+      error: () => {
+        this.loadingSpecialties.set(false);
+      }
+    });
   }
 
   resetForm(): void {

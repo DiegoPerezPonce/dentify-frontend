@@ -1,10 +1,22 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StockMaterialService } from '../stock-material.service';
-import { StockMaterial, LOW_STOCK_THRESHOLD } from '../models/stock-material.models';
+import { StockMaterial, isMaterialLowStock } from '../models/stock-material.models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RestockFormModalComponent } from '../restock-form-modal/restock-form-modal';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+
+function wholeNumberValidator(control: AbstractControl): ValidationErrors | null {
+  const raw = control.value;
+  if (raw === null || raw === '' || raw === undefined) {
+    return null;
+  }
+  const n = Number(raw);
+  if (!Number.isFinite(n) || !Number.isInteger(n) || n < 0) {
+    return { wholeNumber: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-stock-list',
@@ -29,9 +41,9 @@ export class StockListComponent implements OnInit {
 
   readonly catalogForm = this.fb.group({
     nombre: ['', [Validators.required, Validators.maxLength(255)]],
-    cantidad_actual: [0, [Validators.required, Validators.min(0)]],
+    cantidad_actual: [0, [Validators.required, wholeNumberValidator]],
     unidad: ['', [Validators.required, Validators.maxLength(50)]],
-    umbral_minimo: [10, [Validators.required, Validators.min(0)]]
+    umbral_minimo: [10, [Validators.required, wholeNumberValidator]]
   });
 
   ngOnInit(): void {
@@ -56,7 +68,7 @@ export class StockListComponent implements OnInit {
   }
 
   isLowStock(material: StockMaterial): boolean {
-    return material.cantidad_actual <= LOW_STOCK_THRESHOLD;
+    return isMaterialLowStock(material);
   }
 
   getLowStockCount(): number {
@@ -95,9 +107,9 @@ export class StockListComponent implements OnInit {
     this.catalogError.set(null);
     this.catalogForm.reset({
       nombre: material.nombre,
-      cantidad_actual: material.cantidad_actual,
+      cantidad_actual: Math.round(material.cantidad_actual),
       unidad: material.unidad,
-      umbral_minimo: material.umbral_minimo ?? 10
+      umbral_minimo: Math.round(material.umbral_minimo ?? 10)
     });
     this.showCatalogModal.set(true);
   }
@@ -120,9 +132,9 @@ export class StockListComponent implements OnInit {
 
     const payload = {
       nombre: String(formValue.nombre).trim(),
-      cantidad_actual: Number(formValue.cantidad_actual),
+      cantidad_actual: Math.round(Number(formValue.cantidad_actual)),
       unidad: String(formValue.unidad).trim(),
-      umbral_minimo: Number(formValue.umbral_minimo)
+      umbral_minimo: Math.round(Number(formValue.umbral_minimo))
     };
 
     const editing = this.editingMaterial();

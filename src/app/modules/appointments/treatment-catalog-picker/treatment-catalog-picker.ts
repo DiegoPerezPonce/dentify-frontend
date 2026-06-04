@@ -47,6 +47,8 @@ export class TreatmentCatalogPickerComponent implements ControlValueAccessor, On
   readonly disabled = signal(false);
   readonly panelOpen = signal(false);
   readonly filterText = signal('');
+  /** Categorías expandidas manualmente (por defecto todas cerradas). */
+  private readonly expandedGroupIds = signal<Set<number>>(new Set());
 
   private onChange: (v: number | null) => void = () => {};
   private onTouched: () => void = () => {};
@@ -60,6 +62,8 @@ export class TreatmentCatalogPickerComponent implements ControlValueAccessor, On
     if (!t) return '';
     return `${t.categoryName}: ${t.name}`;
   });
+
+  readonly hasActiveFilter = computed(() => normalizeSearch(this.filterText()).length > 0);
 
   readonly filteredGroups = computed(() => {
     const groups = this.groupsSignal();
@@ -82,6 +86,7 @@ export class TreatmentCatalogPickerComponent implements ControlValueAccessor, On
     if (changes['groups']) {
       this.groupsSignal.set(this.groups ?? []);
       this.syncValueWithGroups();
+      this.expandedGroupIds.set(new Set());
     }
   }
 
@@ -115,18 +120,64 @@ export class TreatmentCatalogPickerComponent implements ControlValueAccessor, On
 
   togglePanel(): void {
     if (this.disabled() || this.loading) return;
-    this.panelOpen.update((o) => !o);
-    if (this.panelOpen()) this.filterText.set('');
+    const willOpen = !this.panelOpen();
+    this.panelOpen.set(willOpen);
+    if (willOpen) {
+      this.filterText.set('');
+      this.expandGroupForSelectedTreatment();
+    } else {
+      this.filterText.set('');
+    }
   }
 
   openPanel(): void {
     if (this.disabled() || this.loading) return;
     this.panelOpen.set(true);
+    this.expandGroupForSelectedTreatment();
   }
 
   closePanel(): void {
     this.panelOpen.set(false);
     this.filterText.set('');
+  }
+
+  isGroupExpanded(groupId: number): boolean {
+    if (this.hasActiveFilter()) {
+      return true;
+    }
+    return this.expandedGroupIds().has(groupId);
+  }
+
+  toggleGroup(groupId: number, ev: Event): void {
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (this.hasActiveFilter()) {
+      return;
+    }
+    this.expandedGroupIds.update((prev) => {
+      const next = new Set(prev);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+  }
+
+  treatmentCountLabel(count: number): string {
+    if (count === 1) return '1 procedimiento';
+    return `${count} procedimientos`;
+  }
+
+  private expandGroupForSelectedTreatment(): void {
+    const t = this.selectedTreatment();
+    if (!t?.categoryId) return;
+    this.expandedGroupIds.update((prev) => {
+      const next = new Set(prev);
+      next.add(t.categoryId);
+      return next;
+    });
   }
 
   onFilterInput(raw: string): void {

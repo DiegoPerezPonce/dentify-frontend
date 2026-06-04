@@ -1,8 +1,4 @@
-export interface Specialty {
-  id: number;
-  name: string;
-  active: boolean;
-}
+export type { Specialty } from '../../../core/catalog/specialty.models';
 
 export interface CatalogTreatment {
   id: number;
@@ -55,6 +51,15 @@ export const APPOINTMENT_KIND_OPTIONS: readonly { value: AppointmentKind; label:
 export function getAppointmentKindLabel(kind: AppointmentKind | string | null | undefined): string {
   const found = APPOINTMENT_KIND_OPTIONS.find((o) => o.value === kind);
   return found?.label ?? String(kind ?? '—');
+}
+
+/** Nombre del procedimiento del catálogo (texto libre legacy o `catalogTreatmentName`). */
+export function getAppointmentProcedureLabel(apt: {
+  treatment?: string | null;
+  catalogTreatmentName?: string | null;
+}): string {
+  const name = (apt.treatment ?? apt.catalogTreatmentName ?? '').trim();
+  return name || 'Sin procedimiento';
 }
 
 /** Texto de ayuda bajo el selector de tratamiento según tipo de cita. */

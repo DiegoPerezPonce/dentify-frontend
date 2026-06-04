@@ -21,8 +21,8 @@
     }
 
     <div class="section-header">
-      <h2><app-icon name="history_edu" size="md" /> Historial Clínico</h2>
-      <p class="subtitle">Registro cronológico de consultas, tratamientos y observaciones médicas</p>
+      <h2><app-icon name="history_edu" size="md" /> Historial del paciente</h2>
+      <p class="subtitle">Citas realizadas y registro cronológico clínico</p>
     </div>
   </div>
 
@@ -41,8 +41,118 @@
     </div>
   }
 
-  <!-- Timeline del historial -->
   @if (!loading() && !error()) {
+    <section class="mh-section mh-section--appointments">
+      <div class="mh-section__head">
+        <h3><app-icon name="calendar_month" size="sm" /> Citas</h3>
+        @if (!appointmentsLoading() && appointments().length > 0) {
+          <span class="mh-section__count">{{ appointments().length }} {{ appointments().length === 1 ? 'cita' : 'citas' }}</span>
+        }
+      </div>
+
+      @if (appointmentsLoading()) {
+        <div class="loading-state loading-state--inline">
+          <div class="spinner"></div>
+          <p>Cargando citas...</p>
+        </div>
+      } @else if (appointments().length === 0) {
+        <div class="empty-state empty-state--compact">
+          <app-icon name="event_busy" size="lg" class="empty-icon" />
+          <h3>Sin citas registradas</h3>
+          <p>Este paciente aún no tiene citas en el sistema.</p>
+        </div>
+      } @else {
+        <div class="appointments-list">
+          @for (appt of appointments(); track appt.id) {
+            <article class="appt-card" [class.appt-card--expanded]="isAppointmentExpanded(appt.id)">
+              <button
+                type="button"
+                class="appt-card__head"
+                (click)="toggleAppointment(appt.id)"
+                [attr.aria-expanded]="isAppointmentExpanded(appt.id)"
+              >
+                <div class="appt-card__summary">
+                  <strong>{{ appointmentProcedureLabel(appt) }}</strong>
+                  <span class="appt-card__meta">
+                    {{ formatDateTime(appt.startDateTime) }}
+                    · {{ appt.dentistName || 'Sin odontólogo' }}
+                    · {{ appointmentKindLabel(appt) }}
+                  </span>
+                </div>
+                <div class="appt-card__actions">
+                  <span class="appt-status" [class]="appointmentStatusClass(appt.status)">
+                    {{ appointmentStatusLabel(appt.status) }}
+                  </span>
+                  <app-icon
+                    [name]="isAppointmentExpanded(appt.id) ? 'expand_less' : 'expand_more'"
+                    size="sm"
+                    iconClass="appt-card__chevron"
+                  />
+                </div>
+              </button>
+
+              @if (isAppointmentExpanded(appt.id)) {
+                <div class="appt-card__detail">
+                  <h4>Detalles de la cita</h4>
+                  <dl class="appt-detail-grid">
+                    <dt>Tipo de cita</dt>
+                    <dd>{{ appointmentKindLabel(appt) }}</dd>
+
+                    <dt>Tratamiento</dt>
+                    <dd>{{ appointmentProcedureLabel(appt) }}</dd>
+
+                    @if (appt.treatmentCategoryName?.trim()) {
+                      <dt>Área clínica</dt>
+                      <dd>{{ appt.treatmentCategoryName }}</dd>
+                    }
+
+                    <dt>Odontólogo</dt>
+                    <dd>{{ appt.dentistName || '—' }}</dd>
+
+                    <dt>Box</dt>
+                    <dd>{{ appt.boxName || '—' }}</dd>
+
+                    <dt>Inicio</dt>
+                    <dd>{{ formatDateTime(appt.startDateTime) }}</dd>
+
+                    <dt>Fin</dt>
+                    <dd>{{ formatDateTime(appt.endDateTime) }}</dd>
+
+                    <dt>Duración total</dt>
+                    <dd>{{ appt.duration }} minutos</dd>
+
+                    <dt>Duración del tratamiento</dt>
+                    <dd>{{ treatmentDurationMinutes(appt) }} min</dd>
+
+                    <dt>Limpieza del box</dt>
+                    <dd>{{ cleaningTimeMinutes(appt) }} min (final de la cita)</dd>
+
+                    <dt>Estado</dt>
+                    <dd>{{ appointmentStatusLabel(appt.status) }}</dd>
+
+                    <dt>Notas</dt>
+                    <dd class="multiline">{{ appt.notes?.trim() || '—' }}</dd>
+
+                    <dt>Paciente infeccioso</dt>
+                    <dd>{{ appt.isInfectiousPatient ? 'Sí' : 'No' }}</dd>
+                  </dl>
+                </div>
+              }
+            </article>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="mh-section mh-section--clinical">
+      <div class="mh-section__head">
+        <h3><app-icon name="history_edu" size="sm" /> Historial clínico</h3>
+        @if (history().length > 0) {
+          <span class="mh-section__count">
+            {{ history().length }} {{ history().length === 1 ? 'entrada' : 'entradas' }}
+          </span>
+        }
+      </div>
     @if (history().length === 0) {
       <div class="empty-state">
         <app-icon name="description" size="xl" class="empty-icon" />
@@ -87,13 +197,7 @@
         }
       </div>
 
-      <!-- Resumen al final -->
-      <div class="history-summary">
-        <p>
-          <strong>{{ history().length }}</strong> 
-          {{ history().length === 1 ? 'entrada' : 'entradas' }} en el historial
-        </p>
-      </div>
     }
+    </section>
   }
 </div>

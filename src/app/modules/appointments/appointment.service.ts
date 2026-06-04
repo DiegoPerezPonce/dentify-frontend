@@ -290,10 +290,10 @@ export function normalizeAppointmentFromApi(raw: unknown): Appointment {
   const cleaningRaw = o['cleaningTimeMinutes'] ?? o['tiempo_limpieza'];
   const cleaningTimeMinutes =
     cleaningRaw != null && cleaningRaw !== '' ? Number(cleaningRaw) : undefined;
-  const treatmentRaw = o['treatmentDurationMinutes'] ?? o['duracion_tratamiento'];
+  const treatmentDurationRaw = o['treatmentDurationMinutes'] ?? o['duracion_tratamiento'];
   const treatmentDurationMinutes =
-    treatmentRaw != null && treatmentRaw !== ''
-      ? Number(treatmentRaw)
+    treatmentDurationRaw != null && treatmentDurationRaw !== ''
+      ? Number(treatmentDurationRaw)
       : cleaningTimeMinutes != null
         ? Math.max(0, duration - cleaningTimeMinutes)
         : undefined;
@@ -334,7 +334,17 @@ export function normalizeAppointmentFromApi(raw: unknown): Appointment {
       ? Number(catalogTreatmentIdRaw)
       : undefined;
   const specialtyName = (o['specialtyName'] ?? o['specialty_name']) as string | undefined;
-  const treatment = (o['treatment'] as string | undefined) ?? undefined;
+  const catalogTreatmentName = (
+    o['catalogTreatmentName'] ?? o['catalog_treatment_name']
+  ) as string | undefined;
+  const treatmentCategoryName = (
+    o['treatmentCategoryName'] ?? o['treatment_category_name']
+  ) as string | undefined;
+  const treatmentNameRaw = o['treatment'];
+  const treatment =
+    (typeof treatmentNameRaw === 'string' ? treatmentNameRaw.trim() : '') ||
+    catalogTreatmentName?.trim() ||
+    undefined;
   const notes = (o['notes'] as string | undefined) ?? undefined;
   const isInfectiousPatient = Boolean(o['isInfectiousPatient'] ?? o['isInfectious'] ?? false);
   const patientMedicalFlagsRaw = o['patientMedicalFlags'] ?? o['patient_medical_flags'];
@@ -359,6 +369,8 @@ export function normalizeAppointmentFromApi(raw: unknown): Appointment {
       : undefined,
     appointmentKind: appointmentKind || undefined,
     catalogTreatmentId: Number.isFinite(catalogTreatmentId) ? catalogTreatmentId : undefined,
+    catalogTreatmentName: catalogTreatmentName?.trim() || undefined,
+    treatmentCategoryName: treatmentCategoryName?.trim() || undefined,
     specialtyName: specialtyName?.trim() || undefined,
     treatment,
     notes,

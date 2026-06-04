@@ -201,7 +201,8 @@
                             }
                             {{ apt.patientName || 'Paciente' }}
                           </span>
-                          <span class="day-row__treatment">{{ apt.treatment || 'Sin tratamiento indicado' }}</span>
+                          <span class="day-row__kind">{{ appointmentKindLabel(apt) }}</span>
+                          <span class="day-row__treatment">{{ appointmentProcedureLabel(apt) }}</span>
                         </div>
                         <div class="day-row__meta">
                           @if (apt.boxName || apt.boxId) {

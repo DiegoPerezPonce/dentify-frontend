@@ -60,7 +60,7 @@
             <div class="stat-row">
               <span class="stat-label">Cantidad:</span>
               <span class="stat-value" [class.low]="isLowStock(material)">
-                {{ material.cantidad_actual }} {{ material.unidad }}
+                {{ material.cantidad_actual | number:'1.0-0' }} {{ material.unidad }}
               </span>
             </div>
 
@@ -143,12 +143,20 @@
 
         <label>
           Cantidad inicial/actual *
-          <input type="number" min="0" step="0.01" formControlName="cantidad_actual" />
+          <input type="number" min="0" step="1" inputmode="numeric" formControlName="cantidad_actual" />
         </label>
 
         <label>
           Umbral mínimo (stock bajo) *
-          <input type="number" min="0" step="0.01" formControlName="umbral_minimo" />
+          <input
+            type="number"
+            min="0"
+            step="1"
+            inputmode="numeric"
+            formControlName="umbral_minimo"
+            placeholder="10"
+          />
+          <span class="field-hint">Por defecto: 10 unidades</span>
         </label>
 
         <div class="catalog-modal-actions">

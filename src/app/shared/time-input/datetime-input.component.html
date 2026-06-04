@@ -5,16 +5,41 @@
     </span>
     <div class="app-datetime-field__body">
       <label class="app-datetime-field__label" [attr.for]="inputId()">Fecha</label>
-      <input
-        [id]="inputId()"
-        type="date"
-        class="form-control app-datetime-split__date"
-        [class.form-control--invalid-hours]="invalid()"
-        [value]="datePart()"
-        [disabled]="isDisabled()"
-        (change)="onDateChange($any($event.target).value)"
-        (blur)="onBlur()"
-      />
+      <div class="app-datetime-date-wrap">
+        <input
+          [id]="inputId()"
+          type="text"
+          class="form-control app-datetime-split__date"
+          [class.form-control--invalid-hours]="invalid()"
+          [value]="dateInput()"
+          placeholder="dd/mm/aaaa"
+          inputmode="numeric"
+          autocomplete="off"
+          maxlength="10"
+          [disabled]="isDisabled()"
+          (input)="onDateInput($any($event.target).value)"
+          (blur)="onDateBlur()"
+        />
+        <input
+          #nativeDate
+          type="date"
+          class="app-datetime-split__date-native"
+          tabindex="-1"
+          aria-hidden="true"
+          [value]="datePart()"
+          [disabled]="isDisabled()"
+          (change)="onNativeDatePicked($any($event.target).value)"
+        />
+        <button
+          type="button"
+          class="app-datetime-date-picker-btn"
+          [disabled]="isDisabled()"
+          aria-label="Abrir calendario"
+          (click)="openNativeDatePicker(nativeDate)"
+        >
+          <app-icon name="calendar_today" size="sm" />
+        </button>
+      </div>
     </div>
   </div>
   <app-time-input

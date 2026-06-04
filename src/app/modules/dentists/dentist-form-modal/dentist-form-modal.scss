@@ -202,6 +202,13 @@ html[data-theme='dark'] .alert-error {
     color: #f87171;
     margin-top: -0.15rem;
   }
+
+  .field-hint {
+    margin: 0.25rem 0 0;
+    font-size: 0.75rem;
+    color: var(--dfm-muted);
+    line-height: 1.4;
+  }
 }
 
 .modal-footer {

@@ -1,9 +1,10 @@
-import { Component, EventEmitter, inject, Input, OnChanges, Output, signal, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DentistService } from '../dentist.service';
-import { Dentist, DentistCreateDTO, DentistUpdateDTO, DENTIST_SPECIALTIES } from '../models/dentist.models';
+import { Dentist, DentistCreateDTO, DentistUpdateDTO } from '../models/dentist.models';
 import { HttpErrorResponse } from '@angular/common/http';
+import { SpecialtyService } from '../../../core/catalog/specialty.service';
 
 @Component({
   selector: 'app-dentist-form-modal',
@@ -12,9 +13,10 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './dentist-form-modal.html',
   styleUrl: './dentist-form-modal.scss'
 })
-export class DentistFormModalComponent implements OnChanges {
+export class DentistFormModalComponent implements OnInit, OnChanges {
   private fb = inject(FormBuilder);
   private dentistService = inject(DentistService);
+  private specialtyService = inject(SpecialtyService);
 
   @Input() isOpen = false;
   @Input() dentist: Dentist | null = null;
@@ -25,7 +27,8 @@ export class DentistFormModalComponent implements OnChanges {
   readonly form: FormGroup;
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
-  readonly specialties = DENTIST_SPECIALTIES;
+  readonly specialtyOptions = signal<string[]>([]);
+  readonly loadingSpecialties = signal(false);
 
   constructor() {
     this.form = this.fb.group({
@@ -36,12 +39,32 @@ export class DentistFormModalComponent implements OnChanges {
     });
   }
 
+  ngOnInit(): void {
+    this.loadSpecialtyOptions();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['dentist'] || changes['isOpen']) {
       if (this.isOpen) {
         this.resetForm();
+        if (this.specialtyOptions().length === 0) {
+          this.loadSpecialtyOptions();
+        }
       }
     }
+  }
+
+  private loadSpecialtyOptions(): void {
+    this.loadingSpecialties.set(true);
+    this.specialtyService.list().subscribe({
+      next: (items) => {
+        this.specialtyOptions.set(items.map((s) => s.name).sort((a, b) => a.localeCompare(b, 'es')));
+        this.loadingSpecialties.set(false);
+      },
+      error: () => {
+        this.loadingSpecialties.set(false);
+      }
+    });
   }
 
   resetForm(): void {

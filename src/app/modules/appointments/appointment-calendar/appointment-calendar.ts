@@ -46,6 +46,10 @@ import {
   medicalRiskIconName
 } from '../appointment-patient-risk.utils';
 import type { MedicalAlertSeverity } from '../../patients/medical-flags.constants';
+import {
+  getAppointmentKindLabel,
+  getAppointmentProcedureLabel
+} from '../models/clinical-catalog.models';
 
 export type AgendaLayoutView = 'day' | 'week';
 
@@ -279,6 +283,14 @@ export class AppointmentCalendarComponent implements OnInit {
     return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   }
 
+  appointmentKindLabel(apt: Appointment): string {
+    return getAppointmentKindLabel(apt.appointmentKind);
+  }
+
+  appointmentProcedureLabel(apt: Appointment): string {
+    return getAppointmentProcedureLabel(apt);
+  }
+
   statusLabel(status: AppointmentStatus): string {
     switch (status) {
       case AppointmentStatus.SCHEDULED:
@@ -429,7 +441,14 @@ export class AppointmentCalendarComponent implements OnInit {
   private getEventTooltip(apt: Appointment): string {
     const lines: string[] = [];
     if (apt.patientName?.trim()) lines.push(apt.patientName.trim());
-    if (apt.treatment?.trim()) lines.push(apt.treatment.trim());
+    lines.push(`Tipo de cita: ${getAppointmentKindLabel(apt.appointmentKind)}`);
+    const procedure = getAppointmentProcedureLabel(apt);
+    if (procedure !== 'Sin procedimiento') {
+      lines.push(`Tratamiento: ${procedure}`);
+    }
+    if (apt.treatmentCategoryName?.trim()) {
+      lines.push(`Área: ${apt.treatmentCategoryName.trim()}`);
+    }
     if (apt.dentistName?.trim()) lines.push(`Odontólogo: ${apt.dentistName.trim()}`);
     if (apt.boxName?.trim()) lines.push(`Box: ${apt.boxName.trim()}`);
     const start = new Date(apt.startDateTime);

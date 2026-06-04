@@ -1,0 +1,167 @@
+<div class="appt-session">
+  <header class="appt-session__header">
+    <button type="button" class="btn-back" (click)="goBack()">
+      <app-icon name="arrow_back" size="sm" />
+      Volver al inicio
+    </button>
+
+    @if (appointment(); as appt) {
+      <div class="appt-session__hero">
+        <div>
+          <p class="appt-session__eyebrow">Sesión clínica en curso</p>
+          <h1>{{ appt.patientName ?? 'Paciente' }}</h1>
+          <p class="appt-session__meta">
+            {{ formatDateTime(appt.startDateTime) }}
+            · {{ session()?.treatment_name || appt.treatment || 'Tratamiento' }}
+          </p>
+        </div>
+        @if (session(); as s) {
+          <span class="appt-session__status" [class.appt-session__status--done]="s.status === 'completed'">
+            {{ s.status === 'completed' ? 'Completada' : 'En curso' }}
+          </span>
+        }
+      </div>
+    }
+  </header>
+
+  @if (error()) {
+    <div class="alert alert-error" role="alert">
+      <app-icon name="warning" size="md" />
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Preparando materiales de la sesión...</p>
+    </div>
+  } @else if (session(); as s) {
+    <div class="session-steps">
+      <div class="session-step session-step--active">
+        <span class="session-step__num">1</span>
+        <span>Materiales de la sesión</span>
+      </div>
+      <div class="session-step" [class.session-step--active]="isCompleted()">
+        <span class="session-step__num">2</span>
+        <span>Completar cita</span>
+      </div>
+    </div>
+
+  <section class="panel panel--cart">
+      <div class="panel__head">
+        <div>
+          <h2>
+            <app-icon name="shopping_cart" size="sm" />
+            Carrito precargado
+          </h2>
+          <p class="panel__sub">
+            Materiales del protocolo del tratamiento. Ajusta cantidades o añade lo que vayas a usar en el box.
+          </p>
+        </div>
+        @if (materialCount() > 0) {
+          <span class="panel__badge">
+            {{ materialCount() }} {{ materialCount() === 1 ? 'material' : 'materiales' }}
+          </span>
+        }
+      </div>
+
+      @if (!materialLines().length) {
+        <p class="panel__empty">
+          No hay materiales en el protocolo para este tratamiento. Añade los que vayas a consumir.
+        </p>
+      } @else {
+        <div
+          #cartScroll
+          class="panel__cart-scroll"
+          [class.panel__cart-scroll--active]="cartNeedsScroll()"
+        >
+          <ul class="material-list">
+          @for (line of materialLines(); track line.id ?? line.stock_material_id) {
+            <li class="material-row" [class.material-row--protocol]="line.from_protocol">
+              <div class="material-row__info">
+                <strong>{{ line.material_nombre }}</strong>
+                <span class="material-row__meta">
+                  Stock: {{ line.stock_disponible }} {{ line.unidad }}
+                  @if (line.from_protocol) {
+                    · <app-icon name="menu_book" size="xs" /> Protocolo
+                  }
+                </span>
+                @if (line.protocol_notes) {
+                  <p class="material-row__note">{{ line.protocol_notes }}</p>
+                }
+              </div>
+              <label class="material-row__qty">
+                <span>Cantidad</span>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  inputmode="numeric"
+                  [ngModel]="line.cantidad_usada"
+                  [ngModelOptions]="{ standalone: true }"
+                  [disabled]="isCompleted() || saving()"
+                  (ngModelChange)="setLineQty(line, $event)"
+                />
+              </label>
+              @if (!isCompleted()) {
+                <button
+                  type="button"
+                  class="btn-icon"
+                  (click)="removeLine(line)"
+                  [disabled]="saving()"
+                  aria-label="Quitar material"
+                >
+                  <app-icon name="delete" size="sm" />
+                </button>
+              }
+            </li>
+          }
+          </ul>
+        </div>
+      }
+
+      @if (!isCompleted()) {
+        <div class="add-material">
+          <h3>Añadir material extra</h3>
+          <p class="add-material__hint">Por ejemplo, un bote entero de composite si la reconstrucción lo requiere.</p>
+          <div class="add-material__row">
+            <select [(ngModel)]="addMaterialId" [ngModelOptions]="{ standalone: true }" class="add-material__select">
+              <option [ngValue]="null">Seleccionar material...</option>
+              @for (m of stockCatalog(); track m.id) {
+                <option [ngValue]="m.id">{{ m.nombre }} ({{ m.cantidad_actual }} {{ m.unidad }})</option>
+              }
+            </select>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              inputmode="numeric"
+              class="add-material__qty"
+              [ngModel]="addQty"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="onAddQtyChange($event)"
+            />
+            <button type="button" class="btn btn-secondary" (click)="addMaterial()" [disabled]="saving() || addMaterialId == null">
+              Añadir
+            </button>
+          </div>
+        </div>
+
+        <div class="panel__actions">
+          <button type="button" class="btn btn-secondary" (click)="saveMaterials()" [disabled]="saving()">
+            Guardar lista
+          </button>
+          <button type="button" class="btn btn-primary" (click)="completeSession()" [disabled]="saving() || !materialLines().length">
+            {{ saving() ? 'Procesando...' : 'Completar cita y descontar stock' }}
+          </button>
+        </div>
+      } @else {
+        <p class="panel__done-msg">
+          <app-icon name="check_circle" size="sm" />
+          Cita completada. El stock ya fue descontado.
+        </p>
+      }
+    </section>
+  }
+</div>
