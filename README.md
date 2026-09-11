@@ -1,59 +1,157 @@
-# DentifyFrontend
+# Dentify - Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.9.
+[![Angular Version](https://img.shields.io/badge/Angular-v20.3.9-DD0031?style=for-the-badge\&logo=angular\&logoColor=white)](https://angular.io/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=for-the-badge\&logo=typescript\&logoColor=white)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![Backend Repo](https://img.shields.io/badge/Backend-Dentify--Backend-blue?style=for-the-badge\&logo=github)](https://github.com/DiegoPerezPonce/dentify-backend)
 
-## Development server
+**Dentify** is a modern web application designed for comprehensive dental clinic management. It empowers dental health professionals to manage patient records, clinical histories, and treatments, featuring an intuitive and interactive odontogram.
 
-To start a local development server, run:
+---
+
+## 🌟 Key Features
+
+* 🦷 **Interactive Odontogram:** Dynamic visualization and condition/procedure recording per tooth.
+* 📋 **Treatment Management:** Catalog and treatment selection tailored to individual patient records.
+* 👤 **Patient File System:** Comprehensive registration, medical history, and continuous tracking.
+* 🎨 **Modern & Responsive UI:** Designed with a seamless user experience (UX) and styled with SCSS.
+* 🔒 **Secure Backend Integration:** Connected via REST API to the backend services layer.
+
+---
+
+## 📸 Screenshots
+
+> *Add actual screenshots of your application here to improve visual impact.*
+
+|                   Odontogram                   |              Treatment Management              |
+| :--------------------------------------------: | :--------------------------------------------: |
+| ![Odontogram](docs/screenshots/odontogram.png) | ![Treatments](docs/screenshots/treatments.png) |
+
+---
+
+## 🛠️ Tech Stack
+
+* **Framework:** [Angular v20](https://angular.io/)
+* **Languages:** TypeScript, HTML5, SCSS
+* **Architecture:** Modular Components, Reactive Services (RxJS / Signals)
+* **Build Tool:** Angular CLI
+
+---
+
+## 🚀 Getting Started
+
+Follow these steps to run the project locally.
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+* [Node.js](https://nodejs.org/) — LTS version recommended
+* [npm](https://www.npmjs.com/) or `pnpm`
+* [Angular CLI](https://angular.io/cli) v20+
+
+Install Angular CLI globally if necessary:
+
+```bash
+npm install -g @angular/cli
+```
+
+### Local Setup
+
+#### 1. Clone the repository
+
+```bash
+git clone https://github.com/DiegoPerezPonce/dentify-frontend.git
+cd dentify-frontend
+```
+
+#### 2. Install dependencies
+
+Using npm:
+
+```bash
+npm install
+```
+
+Or using pnpm:
+
+```bash
+pnpm install
+```
+
+#### 3. Configure environment variables
+
+Verify or update:
+
+```text
+src/environments/environment.ts
+```
+
+to point to your backend API URL:
+
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8080/api'
+};
+```
+
+> Adjust the `apiUrl` according to your local `dentify-backend` configuration.
+
+#### 4. Start the development server
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Navigate to:
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```text
+http://localhost:4200/
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The application will automatically reload when source files are modified.
 
-```bash
-ng generate --help
-```
+---
 
-## Building
+## 🧪 Testing & Build
 
-To build the project run:
+### Unit Tests
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Run the unit tests with:
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
+### Production Build
 
-For end-to-end (e2e) testing, run:
+Build the application for production:
 
 ```bash
-ng e2e
+ng build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Build artifacts will be stored in the:
 
-## Additional Resources
+```text
+dist/
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+directory.
+
+---
+
+## 🔗 Related Repository
+
+This frontend connects to the **Dentify Backend** service.
+
+👉 [**Dentify Backend Repository**](https://github.com/DiegoPerezPonce/dentify-backend)
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
+
+See the [`LICENSE`](LICENSE) file for details.
